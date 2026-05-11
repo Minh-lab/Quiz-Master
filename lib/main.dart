@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_theme.dart';
+import 'package:quiz_mater_apllication/src/core/widgets/intro.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/splash.dart';
 
 class Exam {
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: AppTheme.lightTheme,
-      home: const Splash(),
+      home: const Intro(),
     );
   }
 }

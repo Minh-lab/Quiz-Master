@@ -33,6 +33,7 @@ dependencies:
   fl_chart: ^0.70.2
   shimmer: ^3.0.0
   cached_network_image: ^3.4.1
+  flutter_native_splash: ^2.4.7
 
   # Tiện ích
   flutter_dotenv: ^5.2.1
@@ -46,11 +47,16 @@ dev_dependencies:
   bloc_test: 
   mocktail: ^1.0.4
 
+flutter_native_splash:
+  color: "#0088FF"
+  image: assets/logo.png
+  # android_12:
+  #   image: assets/splash_android_12.png
+  #   icon_background_color: "#ffffff"
+
 flutter:
   uses-material-design: true
 
   assets:
     - assets/images/
     # - .env
-
-  
