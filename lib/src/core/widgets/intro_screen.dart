@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
+import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_theme.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_button.dart';
+import 'package:quiz_mater_apllication/src/core/widgets/app_container.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/pages/exem_subject_screen.dart';
 
-class Intro extends StatelessWidget {
-  const Intro({super.key});
+class IntroScreen extends StatelessWidget {
+  const IntroScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBarIntro(
-        Image.asset(AppAsset.topSplash2Image, fit: BoxFit.cover),
+        Image.asset(AppAssetImage.topSplash2Image, fit: BoxFit.cover),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -25,7 +29,12 @@ class Intro extends StatelessWidget {
               "Edu Hub là ứng dụng luyện đề thi miễn phí dành cho các bạn học sinh THPT Sự hài lòng của bạn là niềm vui của tôi, Xin cảm ơn!",
             ),
             Expanded(child: SizedBox()),
-            AppButton(title: 'Tiếp tục', onPressed: () {}),
+            AppButton(
+              title: 'Tiếp tục',
+              onPressed: () {
+               context.push(AppRouter.homeRoute);
+              },
+            ),
           ],
         ),
       ),
