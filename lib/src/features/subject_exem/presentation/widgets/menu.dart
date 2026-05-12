@@ -9,7 +9,7 @@ class MenuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppContainer(
-      padding: 10,
+      // padding: const EdgeInsets.all(2),
       width: double.infinity,
       height: 100,
       child: Row(
@@ -18,11 +18,11 @@ class MenuCard extends StatelessWidget {
         children: [
           _itemMenu(
             icon: SvgPicture.asset(
-              AppAssetIcon.examIcon,
+              AppAssetIcon.favourite,
               width: 40,
               height: 40,
             ),
-            title: 'Luyện đề',
+            title: 'Yêu thích',
             onTap: () {},
           ),
           _itemMenu(
@@ -56,6 +56,9 @@ class MenuCard extends StatelessWidget {
   }) {
     return Material(
       color: Colors.transparent,
+        // borderRadius: BorderRadius.circular(16),
+
+      // elevation: 1,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),

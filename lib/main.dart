@@ -13,13 +13,7 @@ void main() {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  final router = GoRouter(
-    initialLocation: AppRouter.intro,
-    routes: [
-      GoRoute(path: AppRouter.homeRoute , builder: (context, state) =>  ExemSubjectScreen()),
-      GoRoute(path: AppRouter.intro, builder: (context, state) => const IntroScreen()),
-    ],
-  );
+ 
 
   // This widget is the root of your application.
   @override
@@ -28,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: AppTheme.lightTheme,
       // darkTheme: AppTheme.darkTheme,
-      routerConfig: router,
+      routerConfig: AppRouter.router,
     );
   }
 }

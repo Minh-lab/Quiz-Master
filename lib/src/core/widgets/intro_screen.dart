@@ -17,13 +17,13 @@ class IntroScreen extends StatelessWidget {
         Image.asset(AppAssetImage.topSplash2Image, fit: BoxFit.cover),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(AppTheme.spacingMD),
 
         child: Column(
           children: [
-            SizedBox(height: 50),
+            SizedBox(height: AppTheme.spacing3XL),
             _titleIntro('Edu Hub'),
-            SizedBox(height: 30),
+            SizedBox(height: AppTheme.spacing3XL),
 
             _contentIntro(
               "Edu Hub là ứng dụng luyện đề thi miễn phí dành cho các bạn học sinh THPT Sự hài lòng của bạn là niềm vui của tôi, Xin cảm ơn!",
@@ -32,7 +32,7 @@ class IntroScreen extends StatelessWidget {
             AppButton(
               title: 'Tiếp tục',
               onPressed: () {
-               context.push(AppRouter.homeRoute);
+                context.push(AppRouter.exam);
               },
             ),
           ],

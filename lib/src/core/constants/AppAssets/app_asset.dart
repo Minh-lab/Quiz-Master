@@ -24,4 +24,8 @@ class AppAssetIcon {
   static const String statisticsIcon = 'assets/icons/statistics.svg';
   static const String winningIcon = 'assets/icons/winning.svg';
   static const String writingIcon = 'assets/icons/writing.svg';
+  static const String mathIcon = 'assets/icons/mathIcon.svg';
+  static const String chemistryIcon = 'assets/icons/chemistryIcon.svg';
+  static const String line = 'assets/icons/line.svg';
+  static const String favourite= 'assets/icons/favourite.svg';
 }
