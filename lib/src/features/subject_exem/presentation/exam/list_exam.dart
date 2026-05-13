@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_appbar.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/exam_card.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/subject_card.dart';
@@ -14,10 +16,10 @@ class ListExam extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(8),
         child: ExamCard(
-          title:
-              'ĐỀ THI THPT QUỐC GIA MÔN TIẾNG ANH 2025',
+          title: 'ĐỀ THI THPT QUỐC GIA MÔN TIẾNG ANH 2025',
           numberQuestion: '10',
-          time: '10',
+          time: '45',
+          onTap: () => context.push(AppRouter.exambyIdDetail(subjectId, '1')),
         ),
       ),
     );
