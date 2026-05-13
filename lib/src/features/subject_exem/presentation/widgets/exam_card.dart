@@ -1,69 +1,104 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_container.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ExamCard extends StatelessWidget {
   final String title;
-  final int numberExam;
-  final Color? color;
-  final Widget image;
-  final VoidCallback? onTap;
-
+  final String numberQuestion;
+  final String time;
   const ExamCard({
     super.key,
     required this.title,
-    required this.numberExam,
-    required this.image,
-    this.color,
-    this.onTap
-    
+    required this.numberQuestion,
+    required this.time,
   });
 
   @override
   Widget build(BuildContext context) {
+    // TODO: implement build
+
     return AppContainer(
-      padding: EdgeInsets.zero, // Padding is handled by inner widget for InkWell effect
-      child: Material(
-        elevation: 0.0,
-        // color: Colors.transparent, // Allow AppContainer background to show
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: color ?? AppColors.success.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: image,
-                ),
-                const Spacer(),
-                Text(
-                  title,
-                  style: AppTypography.headlineSmall(color: AppColors.textPrimary),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '$numberExam+ đề thi',
-                  style: AppTypography.labelMedium(color: AppColors.textSecondary).copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+      color: AppColors.background,
+      width: double.infinity,
+      // height: 200,
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      // height: 200,
+      child: Row(
+        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            // width: 50,
+            // height: 100,
+            child: SvgPicture.asset(
+              AppAssetIcon.engIcon,
+              width: 60,
+              height: 60,
+              colorFilter: ColorFilter.mode(AppColors.borderSelected.withValues(alpha: 0.7), BlendMode.srcIn),
             ),
           ),
-        ),
+          SizedBox(width: 16),
+          Expanded(child: _detailExam()),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Độ Khó'),
+              Text('Khó'),
+              SizedBox(height: 40),
+              AppContainer(
+                color: AppColors.borderSelected.withValues(alpha: 0.7),
+                width: 100,
+                height: 36,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 5,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [Icon(Icons.edit_outlined, color: Colors.white.withValues(alpha: 0.8)), Text('Thi thử', style: AppTypography.bodyMedium().copyWith(color: Colors.white, fontWeight: FontWeight.w600  ),)],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailExam() {
+    return Container(
+      // width: 100,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
+        children: [
+          Text(title, style: AppTypography.headlineSmall(), softWrap: true),
+
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.question_answer_outlined),
+                  Text('$numberQuestion câu'),
+                ],
+              ),
+              SizedBox(width: 10),
+
+              Row(
+                children: [
+                  Icon(Icons.timer_outlined),
+                  Text('$numberQuestion phút'),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

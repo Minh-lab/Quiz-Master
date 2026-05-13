@@ -5,7 +5,7 @@ import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_container.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/exam_card.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/subject_card.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/menu.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -33,7 +33,7 @@ class ExemSubjectScreen extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                ExamCard(
+                SubjectCard(
                   title: 'Tiếng Anh',
                   numberExam: 10,
                   color: AppColors.primaryLight.withValues(alpha: 0.15),
@@ -44,7 +44,7 @@ class ExemSubjectScreen extends StatelessWidget {
                   ),
                   onTap: () => context.push(AppRouter.subjectDetail('1')),
                 ),
-                ExamCard(
+                SubjectCard(
                   title: 'Vật Lý',
                   numberExam: 10,
                   color: AppColors.success.withValues(alpha: 0.15),
@@ -54,7 +54,7 @@ class ExemSubjectScreen extends StatelessWidget {
                     height: 40,
                   ),
                 ),
-                ExamCard(
+                SubjectCard(
                   title: 'Toán Học',
                   numberExam: 10,
                   color: AppColors.warning.withValues(alpha: 0.15),
@@ -64,7 +64,7 @@ class ExemSubjectScreen extends StatelessWidget {
                     height: 40,
                   ),
                 ),
-                ExamCard(
+                SubjectCard(
                   title: 'Hóa Học',
                   numberExam: 10,
                   color: AppColors.error.withValues(alpha: 0.15),

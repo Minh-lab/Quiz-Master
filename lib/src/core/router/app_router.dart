@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
-import 'package:quiz_mater_apllication/src/features/exam/list_exam.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/list_exam.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/home/home_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/pages/exem_subject_screen.dart';
 
