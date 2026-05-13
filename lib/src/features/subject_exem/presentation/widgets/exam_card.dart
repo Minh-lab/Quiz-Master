@@ -8,13 +8,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class ExamCard extends StatelessWidget {
   final String title;
+  final VoidCallback? onTap;
   final String numberQuestion;
+
   final String time;
   const ExamCard({
     super.key,
     required this.title,
     required this.numberQuestion,
     required this.time,
+    this.onTap,
   });
 
   @override
@@ -31,16 +34,19 @@ class ExamCard extends StatelessWidget {
         // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            // width: 50,
-            // height: 100,
-            child: SvgPicture.asset(
-              AppAssetIcon.engIcon,
-              width: 60,
-              height: 60,
-              colorFilter: ColorFilter.mode(AppColors.borderSelected.withValues(alpha: 0.7), BlendMode.srcIn),
-            ),
-          ),
+          // Container(
+          //   // width: 50,
+          //   // height: 100,
+          //   child: SvgPicture.asset(
+          //     AppAssetIcon.engIcon,
+          //     width: 60,
+          //     height: 60,
+          //     colorFilter: ColorFilter.mode(
+          //       AppColors.borderSelected.withValues(alpha: 0.7),
+          //       BlendMode.srcIn,
+          //     ),
+          //   ),
+          // ),
           SizedBox(width: 16),
           Expanded(child: _detailExam()),
           Column(
@@ -49,16 +55,32 @@ class ExamCard extends StatelessWidget {
             children: [
               Text('Độ Khó'),
               Text('Khó'),
-              SizedBox(height: 40),
+              SizedBox(height: 30),
               AppContainer(
                 color: AppColors.borderSelected.withValues(alpha: 0.7),
                 width: 100,
                 height: 36,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 5,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [Icon(Icons.edit_outlined, color: Colors.white.withValues(alpha: 0.8)), Text('Thi thử', style: AppTypography.bodyMedium().copyWith(color: Colors.white, fontWeight: FontWeight.w600  ),)],
+                child: ElevatedButton(
+                  onPressed: onTap,
+                  child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                    // spacing: 5,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Icon(
+                      //   Icons.edit_outlined,
+                      //   color: Colors.white.withValues(alpha: 0.8),
+                        
+                      // ),
+                      Text(
+                        'Thi thử',
+                        style: AppTypography.bodyMedium().copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
