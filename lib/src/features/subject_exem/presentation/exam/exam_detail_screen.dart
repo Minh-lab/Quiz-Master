@@ -19,16 +19,17 @@ class ExamDetailScreen extends StatefulWidget {
 }
 
 class _ExamDetailScreenState extends State<ExamDetailScreen> {
-  PageController pageController = PageController(
-    initialPage: 0,
-    viewportFraction: 0.85,
-  );
+  int _currentIndex = 0;
+  Map<int, String> _selectedAnswers = {};
+  // String? _currentAnswer;
+  final PageController _pageController = PageController(initialPage: 0);
+  final ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       appBar: _buildAppBar(),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         child: Column(
           children: [
@@ -36,7 +37,14 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
             SizedBox(height: 20),
             _buildQuestionNavigator(),
             SizedBox(height: 20),
-            _buildQuestionCard(1),
+
+            Expanded(
+              child: _buildQuestionContent(
+                context,
+                _pageController,
+                'Đạo hàm của hàm số x là:',
+              ),
+            ),
           ],
         ),
       ),
@@ -69,12 +77,15 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     return Container(
       child: Row(
         children: [
-          Text('Câu 1/50', style: AppTypography.headlineSmall()),
+          Text(
+            'Câu ${_currentIndex + 1}/50',
+            style: AppTypography.headlineSmall(),
+          ),
           SizedBox(width: 20),
           Expanded(
             child: LinearProgressIndicator(
               minHeight: 10,
-              value: 40 / 50,
+              value: (_currentIndex + 1) / 50,
               borderRadius: BorderRadius.circular(30),
               color: AppColors.primary,
               backgroundColor: AppColors.surfaceVariant,
@@ -91,27 +102,31 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
       height: 40,
       // padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.separated(
+        controller: _scrollController,
         itemCount: 50,
         scrollDirection: Axis.horizontal,
-        // controller: pageController,
+        // controller: _pageController,
         itemBuilder: (context, index) {
-          return Container(
-            width: 30,
+          return InkWell(
+            onTap: () => _pageController.jumpToPage(index),
+            child: Container(
+              width: 30,
 
-            // height: 40,
-            // padding: const EdgeInsets.all(8),
-            child: Center(
-              child: Text(
-                index.toString(),
-                style: AppTypography.headlineSmall(color: Colors.white),
+              // height: 40,
+              // padding: const EdgeInsets.all(8),
+              child: Center(
+                child: Text(
+                  (index + 1).toString(),
+                  style: AppTypography.headlineSmall(color: Colors.white),
+                ),
               ),
-            ),
-            decoration: BoxDecoration(
-              // color: AppColors.primary,
-              color: index == 0 || index != 0
-                  ? AppColors.primary
-                  : AppColors.surface,
-              borderRadius: BorderRadius.circular(8),
+              decoration: BoxDecoration(
+                // color: AppColors.primary,
+                color: index == 0 || index != 0
+                    ? AppColors.primary
+                    : AppColors.surface,
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           );
         },
@@ -122,123 +137,202 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  Widget _buildQuestionCard(int index) {
-    return Container(
-      width: double.infinity,
-      // height: 200,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(16),
-        border: BoxBorder.all(color: AppColors.border, width: 3),
-      ),
-      child: Column(
-        spacing: 20,
-        // mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Câu $index',
-                  style: AppTypography.headlineSmall().copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Center(
+  Widget _buildQuestionCard(int index, String nameQuestion) {
+    return SingleChildScrollView(
+      child: Container(
+        width: double.infinity,
+        // height: 200,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(16),
+          border: BoxBorder.all(color: AppColors.border, width: 3),
+        ),
+        child: Column(
+          spacing: 20,
+          // mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
                   child: Text(
-                    '0.25 điểm',
-                    style: AppTypography.labelSmall(
-                      color: AppColors.textPrimary,
+                    'Câu $index',
+                    style: AppTypography.headlineSmall().copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Text(
-            'Đạo hàm của hàm số x là?',
-            style: AppTypography.headlineMedium(),
-          ),
-          _buildAnswerSelect('A'),
-          _buildAnswerSelect('B'),
-          _buildAnswerSelect('C'),
-          _buildAnswerSelect('D'),
-        ],
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '0.25 điểm',
+                      style: AppTypography.labelSmall(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Text(nameQuestion, style: AppTypography.headlineMedium()),
+            _buildAnswerSelect('A'),
+            _buildAnswerSelect('B'),
+            _buildAnswerSelect('C'),
+            _buildAnswerSelect('D'),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildAnswerSelect(String answer) {
-    return Container(
-      width: double.infinity,
-      height: 60,
-      decoration: BoxDecoration(
-        color: AppColors.background,
+    return Material(
+      borderRadius: BorderRadius.circular(16),
+   
+      child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        border: BoxBorder.all(color: AppColors.border, width: 3),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            margin: const EdgeInsets.only(left: 10),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.darkTextSecondary.withValues(alpha: 0.2),
-              border: BoxBorder.all(color: AppColors.border, width: 3),
-            ),
-            child: Center(
-              child: Text(answer, style: AppTypography.headlineSmall()),
-            ),
+        onTap: () {
+          setState(() {
+            _selectedAnswers[_currentIndex] = answer;
+          });
+        },
+        child: Container(
+          width: double.infinity,
+          height: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: BoxBorder.all(color: AppColors.border, width: 1),
           ),
-          SizedBox(width: 10),
-          Text('0', style: AppTypography.headlineSmall()),
-        ],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 10),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color:  _selectedAnswers[_currentIndex] == answer ? AppColors.primary : AppColors.darkTextSecondary.withValues(alpha: 0.2),
+                  border: BoxBorder.all(color: AppColors.border, width: 3),
+                ),
+                child: Center(
+                  child: Text(answer, style: AppTypography.headlineSmall().copyWith(color:  _selectedAnswers[_currentIndex] == answer ? Colors.white : AppColors.textPrimary )),
+                ),
+              ),
+              SizedBox(width: 10),
+              Text('0', style: AppTypography.headlineSmall()),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildBottomNav() {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.12,
-      padding: const EdgeInsets.all(16),
+      height: MediaQuery.sizeOf(context).height * 0.07,
+      padding: EdgeInsets.symmetric(horizontal: 26),
+      margin: EdgeInsets.only(bottom: MediaQuery.sizeOf(context).height * 0.01),
       child: Row(
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildButtonAction('TRƯỚC'),
+          _buildButtonAction(
+            label: 'TRƯỚC',
+            onTap: () => _pageController.previousPage(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            ),
+          ),
           Spacer(),
-          _buildButtonAction('NỘP BÀI'),
+          _buildButtonAction(label: 'NỘP BÀI', onTap: () {}),
           Spacer(),
-          _buildButtonAction('SAU'),
+          _buildButtonAction(
+            label: 'SAU',
+            onTap: () => _pageController.nextPage(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildButtonAction(String label) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.background,
+  Widget _buildButtonAction({
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      // elevation: 1,
+      color: AppColors.background,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        border: BoxBorder.all(color: AppColors.border, width: 3),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: BoxBorder.all(color: AppColors.border, width: 1.5),
+          ),
+          child: Center(
+            child: Text(
+              label.toUpperCase(),
+              style: AppTypography.labelMedium(),
+            ),
+          ),
+        ),
       ),
-      child: Center(
-        child: Text(label.toUpperCase(), style: AppTypography.headlineSmall()),
+    );
+  }
+
+  Widget _buildQuestionContent(
+    BuildContext context,
+    PageController _pageController,
+    String nameQuestion,
+  ) {
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.sizeOf(context).height * nameQuestion.length * 0.00333,
+      child: PageView.builder(
+        controller: _pageController,
+        onPageChanged: (value) {
+          setState(() {
+            _currentIndex = value;
+          });
+          _scrollToCurrentQuestion(value);
+        },
+        itemCount: 50,
+        itemBuilder: (context, index) {
+          return _buildQuestionCard(index + 1, nameQuestion);
+        },
       ),
+    );
+  }
+
+  void _scrollToCurrentQuestion(int index) {
+    const itemWidth = 40.0;
+    const spacing = 8.0;
+
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final offset = (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
+    offset.clamp(0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      offset,
+
+      duration: const Duration(milliseconds: 300),
+
+      curve: Curves.easeInOut,
     );
   }
 }
