@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_appbar.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/submit_exam_dialog.dart';
 
 class ExamDetailScreen extends StatefulWidget {
   final String subjectId;
@@ -25,28 +26,39 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
   final PageController _pageController = PageController(initialPage: 0);
   final ScrollController _scrollController = ScrollController();
   @override
+  void dispose() {
+    _scrollController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-        child: Column(
-          children: [
-            _buildProgressBar(),
-            SizedBox(height: 20),
-            _buildQuestionNavigator(),
-            SizedBox(height: 20),
+      body: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            child: Column(
+              children: [
+                _buildProgressBar(),
+                SizedBox(height: 20),
+                _buildQuestionNavigator(),
+                SizedBox(height: 20),
 
-            Expanded(
-              child: _buildQuestionContent(
-                context,
-                _pageController,
-                'Đạo hàm của hàm số x là:',
-              ),
+                Expanded(
+                  child: _buildQuestionContent(
+                    context,
+                    _pageController,
+                    'Đạo hàm của hàm số x là:',
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: _buildBottomNav(),
     );
@@ -85,7 +97,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
           Expanded(
             child: LinearProgressIndicator(
               minHeight: 10,
-              value: (_currentIndex + 1) / 50,
+              value: (_selectedAnswers.length) / 50,
               borderRadius: BorderRadius.circular(30),
               color: AppColors.primary,
               backgroundColor: AppColors.surfaceVariant,
@@ -105,7 +117,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
         controller: _scrollController,
         itemCount: 50,
         scrollDirection: Axis.horizontal,
-        // controller: _pageController,
+
         itemBuilder: (context, index) {
           return InkWell(
             onTap: () => _pageController.jumpToPage(index),
@@ -198,7 +210,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
   Widget _buildAnswerSelect(String answer) {
     return Material(
       borderRadius: BorderRadius.circular(16),
-   
+
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
@@ -221,11 +233,20 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color:  _selectedAnswers[_currentIndex] == answer ? AppColors.primary : AppColors.darkTextSecondary.withValues(alpha: 0.2),
+                  color: _selectedAnswers[_currentIndex] == answer
+                      ? AppColors.primary
+                      : AppColors.darkTextSecondary.withValues(alpha: 0.2),
                   border: BoxBorder.all(color: AppColors.border, width: 3),
                 ),
                 child: Center(
-                  child: Text(answer, style: AppTypography.headlineSmall().copyWith(color:  _selectedAnswers[_currentIndex] == answer ? Colors.white : AppColors.textPrimary )),
+                  child: Text(
+                    answer,
+                    style: AppTypography.headlineSmall().copyWith(
+                      color: _selectedAnswers[_currentIndex] == answer
+                          ? Colors.white
+                          : AppColors.textPrimary,
+                    ),
+                  ),
                 ),
               ),
               SizedBox(width: 10),
@@ -253,7 +274,17 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
             ),
           ),
           Spacer(),
-          _buildButtonAction(label: 'NỘP BÀI', onTap: () {}),
+          _buildButtonAction(
+            label: 'NỘP BÀI',
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return SubmitExamDialog();
+                },
+              );
+            },
+          ),
           Spacer(),
           _buildButtonAction(
             label: 'SAU',
@@ -305,11 +336,11 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
       height: MediaQuery.sizeOf(context).height * nameQuestion.length * 0.00333,
       child: PageView.builder(
         controller: _pageController,
-        onPageChanged: (value) {
+        onPageChanged: (index) {
           setState(() {
-            _currentIndex = value;
+            _currentIndex = index;
           });
-          _scrollToCurrentQuestion(value);
+          _scrollToCurrentQuestion(index);
         },
         itemCount: 50,
         itemBuilder: (context, index) {
