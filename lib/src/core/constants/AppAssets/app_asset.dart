@@ -2,6 +2,7 @@ class AppAssetImage {
   static const String splashImage = 'assets/images/logo.png';
   static const String topSplash2Image = 'assets/images/topsplash2.png';
   static const String calculatingImage = 'assets/images/calculating.png';
+  static const String imageQuestion = 'assets/images/question.png';
 }
 
 class AppAssetIcon {
@@ -27,5 +28,5 @@ class AppAssetIcon {
   static const String mathIcon = 'assets/icons/mathIcon.svg';
   static const String chemistryIcon = 'assets/icons/chemistryIcon.svg';
   static const String line = 'assets/icons/line.svg';
-  static const String favourite= 'assets/icons/favourite.svg';
+  static const String favourite = 'assets/icons/favourite.svg';
 }

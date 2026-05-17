@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "795544707095",
+    "project_id": "book-shop-791d3",
+    "storage_bucket": "book-shop-791d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795544707095:android:1358659432eb837565fc52",
+        "android_client_info": {
+          "package_name": "com.example.quiz_mater_apllication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALZFdpm7z5yR1g7dHtvR5vOCludeKJVhM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

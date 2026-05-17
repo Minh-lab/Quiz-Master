@@ -63,14 +63,14 @@ class ExamCard extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onTap,
                   child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     // spacing: 5,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Icon(
                       //   Icons.edit_outlined,
                       //   color: Colors.white.withValues(alpha: 0.8),
-                        
+
                       // ),
                       Text(
                         'Thi thử',
