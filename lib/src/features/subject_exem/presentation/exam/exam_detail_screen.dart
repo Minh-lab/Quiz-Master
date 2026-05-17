@@ -21,7 +21,7 @@ class ExamDetailScreen extends StatefulWidget {
 
 class _ExamDetailScreenState extends State<ExamDetailScreen> {
   int _currentIndex = 0;
-  Map<int, String> _selectedAnswers = {};
+  Map<int, int?> _selectedAnswers = {};
   // String? _currentAnswer;
   final PageController _pageController = PageController(initialPage: 0);
   final ScrollController _scrollController = ScrollController();
@@ -208,6 +208,21 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
   }
 
   Widget _buildAnswerSelect(String answer) {
+    int? selectedAnswer;
+    switch (answer) {
+      case 'A':
+        selectedAnswer = 0;
+        break;
+      case 'B':
+        selectedAnswer = 1;
+        break;
+      case 'C':
+        selectedAnswer = 2;
+        break;
+      case 'D':
+        selectedAnswer = 3;
+        break;
+    }
     return Material(
       borderRadius: BorderRadius.circular(16),
 
@@ -215,7 +230,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         onTap: () {
           setState(() {
-            _selectedAnswers[_currentIndex] = answer;
+            _selectedAnswers[_currentIndex] = selectedAnswer;
           });
         },
         child: Container(
@@ -233,8 +248,8 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _selectedAnswers[_currentIndex] == answer
-                      ? AppColors.primary
+                  color: _selectedAnswers[_currentIndex] == selectedAnswer
+                      ? AppColors.primary.withValues(alpha: 0.8)
                       : AppColors.darkTextSecondary.withValues(alpha: 0.2),
                   border: BoxBorder.all(color: AppColors.border, width: 3),
                 ),
