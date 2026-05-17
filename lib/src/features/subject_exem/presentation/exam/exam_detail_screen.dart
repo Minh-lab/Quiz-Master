@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_appbar.dart';
@@ -197,6 +198,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
               ],
             ),
             Text(nameQuestion, style: AppTypography.headlineMedium()),
+            Image.asset(AppAssetImage.imageQuestion, fit: BoxFit.cover),
             _buildAnswerSelect('A'),
             _buildAnswerSelect('B'),
             _buildAnswerSelect('C'),

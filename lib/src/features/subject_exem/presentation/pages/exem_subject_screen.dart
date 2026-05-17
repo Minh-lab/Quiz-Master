@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
 import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_container.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_event.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/subject_card.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/menu.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -42,7 +46,9 @@ class ExemSubjectScreen extends StatelessWidget {
                     width: 40,
                     height: 40,
                   ),
-                  onTap: () => context.push(AppRouter.subjectDetail('1')),
+                  onTap: () {
+                    context.push(AppRouter.subjectDetail('english'));
+                  },
                 ),
                 SubjectCard(
                   title: 'Vật Lý',
@@ -53,6 +59,9 @@ class ExemSubjectScreen extends StatelessWidget {
                     width: 40,
                     height: 40,
                   ),
+                  onTap: () {
+                    context.push(AppRouter.subjectDetail('physics'));
+                  }
                 ),
                 SubjectCard(
                   title: 'Toán Học',
@@ -63,6 +72,9 @@ class ExemSubjectScreen extends StatelessWidget {
                     width: 40,
                     height: 40,
                   ),
+                  onTap: () {
+                    context.push(AppRouter.subjectDetail('math'));
+                  },
                 ),
                 SubjectCard(
                   title: 'Hóa Học',
@@ -73,6 +85,9 @@ class ExemSubjectScreen extends StatelessWidget {
                     width: 40,
                     height: 40,
                   ),
+                  onTap: () {
+                    context.push(AppRouter.subjectDetail('chemistry'));
+                  }
                 ),
               ],
             ),

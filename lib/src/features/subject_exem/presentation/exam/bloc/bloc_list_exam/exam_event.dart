@@ -1,8 +1,13 @@
 abstract class ExamEvent {}
 
-class LoadExamEvent extends ExamEvent {
+class FetchExamPreviewEvent extends ExamEvent {
+  final String subjectId;
+  FetchExamPreviewEvent({required this.subjectId});
+}
+
+class FetchExamDetailEvent extends ExamEvent {
   final String examId;
-  LoadExamEvent({required this.examId});
+  FetchExamDetailEvent({required this.examId});
 }
 
 class SelectAnswerEvent extends ExamEvent {

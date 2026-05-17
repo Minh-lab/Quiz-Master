@@ -1,17 +1,30 @@
+import 'package:dartz/dartz.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/firebase_options.dart';
 import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_theme.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/splash.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service_iml.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/domain/usecases/exams/get_exams_by_subject_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/pages/exem_subject_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await init();
+  testData();
   runApp(MyApp());
+}
+
+void testData() async {
+  Either data = await ExamServiceIml().getExamsBySubject('math');
+  data.fold((failure) => print(failure.message), (exams) => print(exams));
 }
 
 class MyApp extends StatelessWidget {
@@ -20,11 +33,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      theme: AppTheme.lightTheme,
-      // darkTheme: AppTheme.darkTheme,
-      routerConfig: AppRouter.router,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => sl<ExamBloc>(),
+        ),
+      ],
+      child: MaterialApp.router(
+        title: 'Flutter Demo',
+        theme: AppTheme.lightTheme,
+        // darkTheme: AppTheme.darkTheme,
+        routerConfig: AppRouter.router,
+      ),
     );
   }
 }
