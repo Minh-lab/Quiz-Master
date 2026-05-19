@@ -5,10 +5,10 @@ class FetchExamPreviewEvent extends ExamEvent {
   FetchExamPreviewEvent({required this.subjectId});
 }
 
-class FetchExamDetailEvent extends ExamEvent {
-  final String examId;
-  FetchExamDetailEvent({required this.examId});
-}
+// class FetchExamDetailEvent extends ExamEvent {
+//   final String examId;
+//   FetchExamDetailEvent({required this.examId});
+// }
 
 class SelectAnswerEvent extends ExamEvent {
   final int questionIndex;

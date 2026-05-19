@@ -11,7 +11,7 @@ class ExamModel extends ExamEntity {
     required super.questions,
   });
 
-  factory ExamModel.fromJson(
+  factory ExamModel.fromFireStore(
     Map<String, dynamic> json,
     String documentId,
     List<QuestionModel> questionList,

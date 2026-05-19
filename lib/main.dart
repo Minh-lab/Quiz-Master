@@ -9,10 +9,11 @@ import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_theme.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/splash.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service_iml.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service/exam_service_iml.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/usecases/exams/get_exams_by_subject_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_bloc.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/pages/exem_subject_screen.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/pages/exem_subject_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,11 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => sl<ExamBloc>(),
-        ),
-      ],
+      providers: [BlocProvider(create: (context) => sl<ExamBloc>())],
       child: MaterialApp.router(
         title: 'Flutter Demo',
         theme: AppTheme.lightTheme,

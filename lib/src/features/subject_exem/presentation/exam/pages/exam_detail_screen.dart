@@ -6,6 +6,7 @@ import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.da
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_appbar.dart';
+import 'package:quiz_mater_apllication/src/core/widgets/math_text_builder.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/question.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_event.dart';
@@ -67,7 +68,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                   padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                   child: Column(
                     children: [
-                      _buildProgressBar(),
+                      _buildProgressBar(totalQuestion: questions.length),
                       SizedBox(height: 20),
                       _buildQuestionNavigator(
                         lengthNavigator: questions.length,
@@ -117,7 +118,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  Widget _buildProgressBar() {
+  Widget _buildProgressBar({required int totalQuestion}) {
     return BlocSelector<ExamDetailBloc, ExamDetailState, int>(
       selector: (state) {
         if (state is ExamDetailLoaded) {
@@ -130,7 +131,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
           child: Row(
             children: [
               Text(
-                'Câu ${totalQuestionAnswered}/50',
+                'Câu ${totalQuestionAnswered}/${totalQuestion}',
                 style: AppTypography.headlineSmall(),
               ),
               SizedBox(width: 20),
@@ -179,33 +180,56 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
 
             itemBuilder: (context, index) {
               bool isAnswered = selectedAnswers[index + 1] != null;
+              bool isCurrent = currentIndex == index;
+
+              Color bgColor = isCurrent
+                  ? AppColors
+                        .background //
+                  : (isAnswered ? AppColors.primary : AppColors.surfaceVariant);
+
+              Color textColor = isCurrent
+                  ? AppColors.primary
+                  : (isAnswered ? Colors.white : AppColors.textSecondary);
+
+              Color borderColor = isCurrent
+                  ? AppColors.primary
+                  : Colors.transparent;
+
               return InkWell(
                 onTap: () => _pageController.jumpToPage(index),
-                child: Container(
-                  width: 30,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 36,
                   decoration: BoxDecoration(
-                    border: BoxBorder.all(
-                      color: (currentIndex == index) ? AppColors.success : Colors.transparent,
-                      width: 2,
-                    ),
-                    // color: AppColors.primary,
-                    color: (isAnswered)
-                        ? AppColors.primary
-                        : AppColors.textSecondary,
+                    color: bgColor,
                     borderRadius: BorderRadius.circular(8),
-                  ),
+                    border: Border.all(color: borderColor, width: 2),
 
-                  // height: 40,
-                  // padding: const EdgeInsets.all(8),
+                    boxShadow: isCurrent
+                        ? [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : null,
+                  ),
                   child: Center(
                     child: Text(
                       (index + 1).toString(),
-                      style: AppTypography.headlineSmall(color: Colors.white),
+                      style: AppTypography.headlineSmall().copyWith(
+                        color: textColor,
+                        fontWeight: isCurrent
+                            ? FontWeight.w900
+                            : FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               );
             },
+
             separatorBuilder: (BuildContext context, int index) {
               return const SizedBox(width: 5);
             },
@@ -266,16 +290,17 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                 ),
               ],
             ),
-            Text(question.content, style: AppTypography.headlineMedium()),
+            MathTextBuilder(
+              text: question.content,
+              style: AppTypography.headlineMedium(),
+            ),
             (question.imageUrl != null && question.imageUrl!.isNotEmpty)
                 ? CachedNetworkImage(
                     imageUrl: question.imageUrl!,
                     placeholder: (context, url) =>
-                        const CircularProgressIndicator(), // Xoay xoay lúc chờ tải
-                    errorWidget: (context, url, error) => const Icon(
-                      Icons.error,
-                      color: Colors.red,
-                    ), // Nếu link chết thì hiện icon lỗi
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error, color: Colors.red),
                   )
                 : SizedBox.shrink(),
 
@@ -288,33 +313,16 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
               },
               builder: (context, answerIndex) {
                 return Column(
-                  spacing: 10,
-                  children: [
-                    _buildAnswerSelect(
+                  spacing: 12,
+                  children: List.generate(question.options.length, (index) {
+                    return _buildAnswerSelect(
                       context: context,
-                      answer: 'A',
+                      optionIndex: index,
+                      optionText: question.options[index],
                       userAnswer: answerIndex,
                       questionOrder: question.order,
-                    ),
-                    _buildAnswerSelect(
-                      context: context,
-                      answer: 'B',
-                      userAnswer: answerIndex,
-                      questionOrder: question.order,
-                    ),
-                    _buildAnswerSelect(
-                      context: context,
-                      answer: 'C',
-                      userAnswer: answerIndex,
-                      questionOrder: question.order,
-                    ),
-                    _buildAnswerSelect(
-                      context: context,
-                      answer: 'D',
-                      userAnswer: answerIndex,
-                      questionOrder: question.order,
-                    ),
-                  ],
+                    );
+                  }),
                 );
               },
             ),
@@ -326,28 +334,21 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
 
   Widget _buildAnswerSelect({
     required BuildContext context,
-    required String answer,
+    required int optionIndex,
+    required String optionText,
     required int? userAnswer,
     required int questionOrder,
   }) {
-    int? optionIndex;
-    switch (answer) {
-      case 'A':
-        optionIndex = 0;
-        break;
-      case 'B':
-        optionIndex = 1;
-        break;
-      case 'C':
-        optionIndex = 2;
-        break;
-      case 'D':
-        optionIndex = 3;
-        break;
-    }
-    return Material(
-      borderRadius: BorderRadius.circular(16),
+    final String letter = String.fromCharCode(65 + optionIndex);
+    final String cleanedText = optionText.replaceFirst(
+      RegExp(r'^[A-Z]\.\s*'),
+      '',
+    );
+    bool isSelected = optionIndex == userAnswer;
 
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
@@ -361,36 +362,59 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
         child: Container(
           width: double.infinity,
           height: 60,
+          padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.primary.withValues(alpha: 0.1)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
-            border: BoxBorder.all(color: AppColors.border, width: 1),
+            border: BoxBorder.all(
+              color: isSelected ? AppColors.primary : AppColors.border,
+              width: isSelected ? 2 : 1, // Viền đậm hơn khi chọn
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
                 margin: const EdgeInsets.only(left: 10),
-                padding: const EdgeInsets.all(8),
+                width: 40,
+                height: 40, // Cố định kích thước hình tròn chữ cái
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: optionIndex == userAnswer
-                      ? AppColors.primary.withValues(alpha: 0.8)
+                  color: isSelected
+                      ? AppColors.primary
                       : AppColors.darkTextSecondary.withValues(alpha: 0.2),
-                  border: BoxBorder.all(color: AppColors.border, width: 3),
+                  border: BoxBorder.all(
+                    color: isSelected ? AppColors.primary : AppColors.border,
+                    width: 2,
+                  ),
                 ),
                 child: Center(
                   child: Text(
-                    answer,
+                    letter,
                     style: AppTypography.headlineSmall().copyWith(
-                      color: optionIndex == userAnswer
-                          ? Colors.white
-                          : AppColors.textPrimary,
+                      color: isSelected ? Colors.white : AppColors.textPrimary,
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 10),
-              Text('0', style: AppTypography.headlineSmall()),
+              const SizedBox(width: 15),
+
+              Expanded(
+                child: MathTextBuilder(
+                  text: cleanedText,
+                  style: AppTypography.headlineSmall().copyWith(
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.textPrimary,
+                    fontWeight: isSelected
+                        ? FontWeight.w900
+                        : FontWeight.normal,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
             ],
           ),
         ),

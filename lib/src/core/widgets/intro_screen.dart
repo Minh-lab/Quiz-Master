@@ -6,7 +6,7 @@ import 'package:quiz_mater_apllication/src/core/theme/app_theme.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_button.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_container.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/pages/exem_subject_screen.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/pages/exem_subject_screen.dart';
 
 class IntroScreen extends StatelessWidget {
   const IntroScreen({super.key});
