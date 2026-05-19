@@ -37,7 +37,7 @@ class ExamServiceIml extends ExamService {
       final List<ExamModel> examList = examDoc.docs.map((doc) {
         return ExamModel.fromJson(doc.data(), doc.id, []);
       }).toList();
-      print(examList);
+      // print(examList);
       return Right(examList);
     } catch (e) {
       return Left(e);
@@ -60,12 +60,10 @@ class ExamServiceIml extends ExamService {
       final questionsList = listExamDetail.docs
           .map((doc) => QuestionModel.fromJson(doc.data(), doc.id))
           .toList();
-      final examModel = ExamModel.fromJson(
-        examDoc.data()!,
-        examDoc.id,
-        questionsList,
-      );
-      return Right(examModel);
+      questionsList.forEach((element) {
+        print(element.content);
+      });
+      return Right(questionsList);
     } catch (e) {
       return Left(e);
     }

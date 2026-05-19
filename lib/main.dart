@@ -11,6 +11,7 @@ import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/splash.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service_iml.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/usecases/exams/get_exams_by_subject_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/pages/exem_subject_screen.dart';
 
@@ -35,9 +36,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => sl<ExamBloc>(),
-        ),
+        BlocProvider(create: (context) => sl<ExamBloc>()),
       ],
       child: MaterialApp.router(
         title: 'Flutter Demo',

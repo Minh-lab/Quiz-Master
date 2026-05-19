@@ -1,9 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_appbar.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/question.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_event.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_state.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_event.dart'
+    hide SelectAnswerEvent;
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/submit_exam_dialog.dart';
 
 class ExamDetailScreen extends StatefulWidget {
@@ -21,8 +29,6 @@ class ExamDetailScreen extends StatefulWidget {
 }
 
 class _ExamDetailScreenState extends State<ExamDetailScreen> {
-  int _currentIndex = 0;
-  Map<int, int?> _selectedAnswers = {};
   // String? _currentAnswer;
   final PageController _pageController = PageController(initialPage: 0);
   final ScrollController _scrollController = ScrollController();
@@ -33,33 +39,59 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     super.dispose();
   }
 
+  void initState() {
+    super.initState();
+    context.read<ExamDetailBloc>().add(
+      FetchExamDetailEvent(examId: widget.examId, subjectId: widget.subjectId),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Stack(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            child: Column(
+      body: BlocBuilder<ExamDetailBloc, ExamDetailState>(
+        builder: (BuildContext context, state) {
+          if (state is ExamDetailLoading)
+            Center(child: Center(child: CircularProgressIndicator()));
+          else if (state is ExamDetailLoaded) {
+            List<QuestionEntity> questions = state.questions;
+            print(state.selectedAnswers![state.currentIndex + 1]);
+            print(state.selectedAnswers![state.currentIndex + 1] != null);
+            return Stack(
               children: [
-                _buildProgressBar(),
-                SizedBox(height: 20),
-                _buildQuestionNavigator(),
-                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  child: Column(
+                    children: [
+                      _buildProgressBar(state.selectedAnswers!.length),
+                      SizedBox(height: 20),
+                      _buildQuestionNavigator(
+                        currentIndex: state.currentIndex,
+                        lengthNavigator: questions.length,
+                        isAnswered:
+                            state.selectedAnswers![state.currentIndex + 1] !=
+                            null,
+                      ),
 
-                Expanded(
-                  child: _buildQuestionContent(
-                    context,
-                    _pageController,
-                    'Đạo hàm của hàm số x là:',
+                      SizedBox(height: 20),
+
+                      Expanded(
+                        child: _buildQuestionContent(
+                          context: context,
+                          pageController: _pageController,
+                          listQuestion: questions,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
+            );
+          }
+          return Container();
+        },
       ),
       bottomNavigationBar: _buildBottomNav(),
     );
@@ -67,7 +99,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return PreferredSize(
-      preferredSize: const Size.fromHeight(100),
+      preferredSize: const Size.fromHeight(70),
       child: AppAppbar(
         title: 'Đề thi ${widget.examId} - Môn ${widget.subjectId}',
         actions: _timeCountdown(),
@@ -86,21 +118,23 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  Widget _buildProgressBar() {
+  Widget _buildProgressBar(int totalQuestionAnswered) {
     return Container(
       child: Row(
         children: [
           Text(
-            'Câu ${_currentIndex + 1}/50',
+            'Câu ${totalQuestionAnswered}/50',
             style: AppTypography.headlineSmall(),
           ),
           SizedBox(width: 20),
           Expanded(
             child: LinearProgressIndicator(
               minHeight: 10,
-              value: (_selectedAnswers.length) / 50,
+              value: (totalQuestionAnswered) / 50,
               borderRadius: BorderRadius.circular(30),
-              color: AppColors.primary,
+              color: (totalQuestionAnswered > 0)
+                  ? AppColors.primary
+                  : AppColors.surface,
               backgroundColor: AppColors.surfaceVariant,
             ),
           ),
@@ -109,14 +143,18 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  Widget _buildQuestionNavigator() {
+  Widget _buildQuestionNavigator({
+    required int currentIndex,
+    required int lengthNavigator,
+    required bool isAnswered,
+  }) {
     return Container(
       width: double.infinity,
       height: 40,
       // padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.separated(
         controller: _scrollController,
-        itemCount: 50,
+        itemCount: 2,
         scrollDirection: Axis.horizontal,
 
         itemBuilder: (context, index) {
@@ -124,6 +162,13 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
             onTap: () => _pageController.jumpToPage(index),
             child: Container(
               width: 30,
+              decoration: BoxDecoration(
+                // color: AppColors.primary,
+                color: (isAnswered && index == currentIndex)
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+                borderRadius: BorderRadius.circular(8),
+              ),
 
               // height: 40,
               // padding: const EdgeInsets.all(8),
@@ -132,13 +177,6 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                   (index + 1).toString(),
                   style: AppTypography.headlineSmall(color: Colors.white),
                 ),
-              ),
-              decoration: BoxDecoration(
-                // color: AppColors.primary,
-                color: index == 0 || index != 0
-                    ? AppColors.primary
-                    : AppColors.surface,
-                borderRadius: BorderRadius.circular(8),
               ),
             ),
           );
@@ -150,7 +188,11 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  Widget _buildQuestionCard(int index, String nameQuestion) {
+  Widget _buildQuestionCard(
+    BuildContext context,
+    int index,
+    QuestionEntity question,
+  ) {
     return SingleChildScrollView(
       child: Container(
         width: double.infinity,
@@ -188,7 +230,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      '0.25 điểm',
+                      question.score.toString(),
                       style: AppTypography.labelSmall(
                         color: AppColors.textPrimary,
                       ),
@@ -197,19 +239,49 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                 ),
               ],
             ),
-            Text(nameQuestion, style: AppTypography.headlineMedium()),
-            Image.asset(AppAssetImage.imageQuestion, fit: BoxFit.cover),
-            _buildAnswerSelect('A'),
-            _buildAnswerSelect('B'),
-            _buildAnswerSelect('C'),
-            _buildAnswerSelect('D'),
+            Text(question.content, style: AppTypography.headlineMedium()),
+            (question.imageUrl != null && question.imageUrl!.isNotEmpty)
+                ? CachedNetworkImage(
+                    imageUrl: question.imageUrl!,
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(), // Xoay xoay lúc chờ tải
+                    errorWidget: (context, url, error) => const Icon(
+                      Icons.error,
+                      color: Colors.red,
+                    ), // Nếu link chết thì hiện icon lỗi
+                  )
+                : SizedBox.shrink(),
+            _buildAnswerSelect(
+              context: context,
+              answer: 'A',
+              questionIndex: question.order,
+            ),
+            _buildAnswerSelect(
+              context: context,
+              answer: 'B',
+              questionIndex: question.order,
+            ),
+            _buildAnswerSelect(
+              context: context,
+              answer: 'C',
+              questionIndex: question.order,
+            ),
+            _buildAnswerSelect(
+              context: context,
+              answer: 'D',
+              questionIndex: question.order,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAnswerSelect(String answer) {
+  Widget _buildAnswerSelect({
+    required BuildContext context,
+    required String answer,
+    required int questionIndex,
+  }) {
     int? selectedAnswer;
     switch (answer) {
       case 'A':
@@ -231,9 +303,12 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
-          setState(() {
-            _selectedAnswers[_currentIndex] = selectedAnswer;
-          });
+          context.read<ExamDetailBloc>().add(
+            SelectAnswerEvent(
+              questionIndex: questionIndex,
+              answerIndex: selectedAnswer,
+            ),
+          );
         },
         child: Container(
           width: double.infinity,
@@ -250,7 +325,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _selectedAnswers[_currentIndex] == selectedAnswer
+                  color: questionIndex == selectedAnswer
                       ? AppColors.primary.withValues(alpha: 0.8)
                       : AppColors.darkTextSecondary.withValues(alpha: 0.2),
                   border: BoxBorder.all(color: AppColors.border, width: 3),
@@ -259,7 +334,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                   child: Text(
                     answer,
                     style: AppTypography.headlineSmall().copyWith(
-                      color: _selectedAnswers[_currentIndex] == answer
+                      color: questionIndex == selectedAnswer
                           ? Colors.white
                           : AppColors.textPrimary,
                     ),
@@ -343,25 +418,25 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  Widget _buildQuestionContent(
-    BuildContext context,
-    PageController _pageController,
-    String nameQuestion,
-  ) {
+  Widget _buildQuestionContent({
+    required BuildContext context,
+    required PageController pageController,
+    required List<QuestionEntity> listQuestion,
+  }) {
     return Container(
       width: double.infinity,
-      height: MediaQuery.sizeOf(context).height * nameQuestion.length * 0.00333,
+      // height: MediaQuery.sizeOf(context).height  * 0.00333,
       child: PageView.builder(
         controller: _pageController,
         onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          context.read<ExamDetailBloc>().add(
+            ChangeQuestionEvent(newIndex: index),
+          );
           _scrollToCurrentQuestion(index);
         },
-        itemCount: 50,
+        itemCount: listQuestion.length,
         itemBuilder: (context, index) {
-          return _buildQuestionCard(index + 1, nameQuestion);
+          return _buildQuestionCard(context, index + 1, listQuestion[index]);
         },
       ),
     );

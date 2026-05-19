@@ -19,7 +19,7 @@ class ExamBloc extends Bloc<ExamEvent, ExamState> {
     result.fold((failure) => emit(ExamError(messageError: failure.toString())), (
       exams,
     ) {
-      print('oke');
+      // print('oke');
       emit(ExamLoaded(exams: exams));
     });
   }
