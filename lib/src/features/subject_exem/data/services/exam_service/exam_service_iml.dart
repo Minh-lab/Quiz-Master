@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/models/exam.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/models/question.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service/exam_service.dart';
 
 class ExamServiceIml extends ExamService {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -18,7 +18,7 @@ class ExamServiceIml extends ExamService {
     final questionsList = questionsQuery.docs
         .map((doc) => QuestionModel.fromJson(doc.data(), doc.id))
         .toList();
-    final examModel = ExamModel.fromJson(
+    final examModel = ExamModel.fromFireStore(
       examDoc.data()!,
       examDoc.id,
       questionsList,
@@ -35,11 +35,12 @@ class ExamServiceIml extends ExamService {
           .where('subjectId', isEqualTo: subjectId)
           .get();
       final List<ExamModel> examList = examDoc.docs.map((doc) {
-        return ExamModel.fromJson(doc.data(), doc.id, []);
+        return ExamModel.fromFireStore(doc.data(), doc.id, []);
       }).toList();
       // print(examList);
       return Right(examList);
     } catch (e) {
+      print(e);
       return Left(e);
     }
   }
@@ -56,6 +57,7 @@ class ExamServiceIml extends ExamService {
           .collection('exams')
           .doc(examId)
           .collection('questions')
+          .orderBy('order', descending: false)
           .get();
       final questionsList = listExamDetail.docs
           .map((doc) => QuestionModel.fromJson(doc.data(), doc.id))

@@ -1,12 +1,19 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/exam_detail_screen.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/list_exam.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_event.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_state.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/exam_detail_screen.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/list_exam.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/home/home_screen.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/pages/exem_subject_screen.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_event.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/pages/exem_subject_screen.dart';
 
 class AppRouter {
-  static const String subject = '/subject/:subjectId';
+  static const String subjectById = '/subject/:subjectId';
   static const String home = '/home';
   static const String intro = '/intro';
   static const String exam = '/exam';
@@ -32,11 +39,15 @@ class AppRouter {
       GoRoute(
         path: AppRouter.examById,
         builder: (context, state) {
-          final subjectId = state.pathParameters['subjectId']!;
+          final String subjectId = state.pathParameters['subjectId']!;
 
-          final examId = state.pathParameters['examId']!;
+          final String examId = state.pathParameters['examId']!;
 
-          return ExamDetailScreen(subjectId: subjectId, examId: examId);
+          return BlocProvider(
+            create: (context) => sl<ExamDetailBloc>()
+              ..add(FetchExamDetailEvent(examId: examId, subjectId: subjectId)),
+            child: ExamDetailScreen(subjectId: subjectId, examId: examId),
+          );
         },
       ),
 
@@ -53,12 +64,15 @@ class AppRouter {
               /// EXAM
               GoRoute(
                 path: AppRouter.exam,
-                builder: (context, state) => const ExemSubjectScreen(),
+                builder: (context, state) => BlocProvider(
+                  create: (context) => sl<SubjectBloc>()..add(FetchSubjectEvent()),
+                  child: const ExemSubjectScreen(),
+                ),
               ),
 
               /// SUBJECT DETAIL
               GoRoute(
-                path: AppRouter.subject,
+                path: AppRouter.subjectById,
                 builder: (context, state) {
                   final subjectId = state.pathParameters['subjectId']!;
 

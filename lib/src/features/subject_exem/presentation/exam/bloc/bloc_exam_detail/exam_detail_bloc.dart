@@ -48,13 +48,13 @@ class ExamDetailBloc extends Bloc<ExamDetailEvent, ExamDetailState> {
     }
   }
 
-  void _onChangeQuestion(
-    ChangeQuestionEvent event,
-    Emitter<ExamDetailState> emit,
-  ) {
-    if (state is ExamDetailLoaded) {
-      final currentState = state as ExamDetailLoaded;
-      emit(currentState.copyWith(currentIndex: event.newIndex));
+    void _onChangeQuestion(
+      ChangeQuestionEvent event,
+      Emitter<ExamDetailState> emit,
+    ) {
+      if (state is ExamDetailLoaded) {
+        final currentState = state as ExamDetailLoaded;
+        emit(currentState.copyWith(currentIndex: event.newIndex));
+      }
     }
-  }
 }
