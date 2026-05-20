@@ -20,11 +20,15 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 class ExamDetailScreen extends StatefulWidget {
   final String subjectId;
   final String examId;
+  final String title;
+  final int duration;
 
   const ExamDetailScreen({
     Key? key,
     required this.subjectId,
+    required this.title,
     required this.examId,
+    required this.duration,
   }) : super(key: key);
 
   @override
@@ -56,7 +60,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: _buildAppBar(duration: 90),
+      appBar: _buildAppBar(),
       body: BlocBuilder<ExamDetailBloc, ExamDetailState>(
         buildWhen: (previous, current) =>
             previous.runtimeType != current.runtimeType,
@@ -100,17 +104,18 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar({required int duration}) {
+  PreferredSizeWidget _buildAppBar() {
+    int duration = widget.duration;
     return PreferredSize(
       preferredSize: const Size.fromHeight(70),
       child: AppAppbar(
-        title: 'Đề thi ${widget.examId} - Môn ${widget.subjectId}',
+        title: 'Đề thi ${widget.title} ',
         actions: _timeCountdown(duration: 90),
       ),
     );
   }
 
-  Widget _timeCountdown({required int duration  }) {
+  Widget _timeCountdown({required int duration}) {
     return Container(
       margin: EdgeInsets.only(right: 15),
       child: Row(

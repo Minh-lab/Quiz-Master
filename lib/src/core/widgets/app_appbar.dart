@@ -8,7 +8,14 @@ class AppAppbar extends StatelessWidget implements PreferredSizeWidget {
   const AppAppbar({super.key, required this.title, this.leading, this.actions});
   @override
   Widget build(BuildContext context) {
-    return AppBar(title: Text(title), leading: leading , actions: [actions?? Container()],);
+    return AppBar(
+      title: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Text(title),
+      ),
+      leading: leading,
+      actions: [actions ?? Container()],
+    );
   }
 
   @override

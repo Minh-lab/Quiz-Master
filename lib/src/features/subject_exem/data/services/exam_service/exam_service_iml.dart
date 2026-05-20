@@ -90,4 +90,16 @@ class ExamServiceIml extends ExamService {
       return Left(e);
     }
   }
+
+  @override
+  Future<Either<dynamic, dynamic>> GetExamDuration(String examId) async {
+    // TODO: implement GetExamDuration
+    try {
+      final examDoc = await firestore.collection('exams').doc(examId).get();
+      int duration = examDoc.data()!['duration'] as int;
+      return Right(duration);
+    } catch (e) {
+      return Left(e);
+    }
+  }
 }

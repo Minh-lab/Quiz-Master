@@ -8,6 +8,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_state.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_event.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/list_exam_dialog.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/exam_card.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/subject_card.dart';
 
@@ -37,10 +38,23 @@ class ListExam extends StatelessWidget {
                         title: exams[index].title,
                         numberQuestion: exams[index].totalQuestions.toString(),
                         time: exams[index].duration.toString(),
-                        onTap: () => context.push(
-                          AppRouter.exambyIdDetail(subjectId, exams[index].id),
-                          extra: exams[index],
-                        ),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return ListExamDialog(
+                                exam: exams[index],
+                                onConfirm: () => context.push(
+                                  AppRouter.exambyIdDetail(
+                                    subjectId,
+                                    exams[index].id,
+                                  ),
+                                  extra: exams[index],
+                                ),
+                              );
+                            },
+                          );
+                        },
                       );
                     },
                     separatorBuilder: (BuildContext context, int index) {
@@ -61,4 +75,6 @@ class ListExam extends StatelessWidget {
       ),
     );
   }
+
+  
 }

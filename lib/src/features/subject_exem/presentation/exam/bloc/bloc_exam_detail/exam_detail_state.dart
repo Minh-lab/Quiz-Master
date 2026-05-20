@@ -30,6 +30,11 @@ class ExamDetailLoaded extends ExamDetailState {
   }
 }
 
+class ExamDurationState extends ExamDetailState {
+  final int duration;
+  ExamDurationState({required this.duration});
+}
+
 class ExamDetailError extends ExamDetailState {
   final String messageError;
   ExamDetailError({required this.messageError});

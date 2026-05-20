@@ -19,6 +19,9 @@ class ChangeQuestionEvent extends ExamDetailEvent {
   ChangeQuestionEvent({required this.newIndex});
 }
 
-class TickTimerEvent extends ExamDetailEvent {}
+class GetExamDurationEvent extends ExamDetailEvent {
+  final String examId;
+  GetExamDurationEvent({required this.examId});
+}
 
 class SubmitEvent extends ExamDetailEvent {}
