@@ -5,11 +5,36 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 
 class ExamDetailBloc extends Bloc<ExamDetailEvent, ExamDetailState> {
   GetExamDetailUseCase getExamDetailUseCase;
+  
   ExamDetailBloc({required this.getExamDetailUseCase})
     : super(ExamDetailInitial()) {
     on<FetchExamDetailEvent>(_onFetchExamDetail);
     on<SelectAnswerEvent>(_onSelectAnswers); // TODO: implement event handler>
     on<ChangeQuestionEvent>(_onChangeQuestion);
+  }
+
+  Future<void> _getExamDuration(
+    GetExamDurationEvent event,
+    Emitter<ExamDetailState> emit,
+  ) async {
+    emit(ExamDetailLoading());
+    try {
+      final result = await getExamDetailUseCase.call(
+        examId: event.examId,
+        subjectId: event.examId,
+      );
+      result.fold(
+        (l) {
+          emit(ExamDetailError(messageError: l.toString()));
+        },
+        (r) {
+          emit(ExamDurationState(duration: r));
+        },
+      );
+    } catch (e) {
+      print('❌ LỖI TẠI EXAM_DETAIL_BLOC: $e');
+      emit(ExamDetailError(messageError: e.toString()));
+    }
   }
 
   Future<void> _onFetchExamDetail(
@@ -24,13 +49,20 @@ class ExamDetailBloc extends Bloc<ExamDetailEvent, ExamDetailState> {
       );
       result.fold(
         (l) {
-          emit(ExamDetailError(messageError: l.message));
+          // Tránh NoSuchMethodError nếu đối tượng lỗi không có trường 'message'
+          final errorMessage = l is Exception
+              ? l.toString()
+              : (l?.toString() ?? 'Lỗi không xác định khi tải đề thi');
+          emit(ExamDetailError(messageError: errorMessage));
         },
         (r) {
           emit(ExamDetailLoaded(questions: r));
         },
       );
-    } catch (e) {}
+    } catch (e) {
+      print('❌ LỖI TẠI EXAM_DETAIL_BLOC: $e');
+      emit(ExamDetailError(messageError: e.toString()));
+    }
   }
 
   void _onSelectAnswers(
@@ -39,7 +71,7 @@ class ExamDetailBloc extends Bloc<ExamDetailEvent, ExamDetailState> {
   ) {
     if (state is ExamDetailLoaded) {
       final currentState = state as ExamDetailLoaded;
-      final updateSelectedAnswers = Map<int, int?>.from(
+      final updateSelectedAnswers = Map<int, dynamic>.from(
         currentState.selectedAnswers!,
       );
       updateSelectedAnswers[event.questionIndex] = event.answerIndex;
@@ -48,13 +80,13 @@ class ExamDetailBloc extends Bloc<ExamDetailEvent, ExamDetailState> {
     }
   }
 
-    void _onChangeQuestion(
-      ChangeQuestionEvent event,
-      Emitter<ExamDetailState> emit,
-    ) {
-      if (state is ExamDetailLoaded) {
-        final currentState = state as ExamDetailLoaded;
-        emit(currentState.copyWith(currentIndex: event.newIndex));
-      }
+  void _onChangeQuestion(
+    ChangeQuestionEvent event,
+    Emitter<ExamDetailState> emit,
+  ) {
+    if (state is ExamDetailLoaded) {
+      final currentState = state as ExamDetailLoaded;
+      emit(currentState.copyWith(currentIndex: event.newIndex));
     }
+  }
 }

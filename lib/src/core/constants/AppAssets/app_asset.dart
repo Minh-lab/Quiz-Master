@@ -29,4 +29,6 @@ class AppAssetIcon {
   static const String chemistryIcon = 'assets/icons/chemistryIcon.svg';
   static const String line = 'assets/icons/line.svg';
   static const String favourite = 'assets/icons/favourite.svg';
+  static const String examDetailPopup = 'assets/icons/examDetailPopup.svg';
+  
 }

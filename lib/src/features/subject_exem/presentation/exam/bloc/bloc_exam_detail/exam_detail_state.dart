@@ -6,10 +6,10 @@ class ExamDetailInitial extends ExamDetailState {}
 
 class ExamDetailLoading extends ExamDetailState {}
 
-class ExamDetailLoaded extends ExamDetailState {  
+class ExamDetailLoaded extends ExamDetailState {
   final List<QuestionEntity> questions;
   final int currentIndex;
-  final Map<int, int?>? selectedAnswers;
+  final Map<int, dynamic>? selectedAnswers;
 
   ExamDetailLoaded({
     required this.questions,
@@ -20,7 +20,7 @@ class ExamDetailLoaded extends ExamDetailState {
   ExamDetailLoaded copyWith({
     List<QuestionEntity>? questions,
     int? currentIndex,
-    Map<int, int?>? selectedAnswers,
+    Map<int, dynamic>? selectedAnswers,
   }) {
     return ExamDetailLoaded(
       questions: questions ?? this.questions,
@@ -28,6 +28,11 @@ class ExamDetailLoaded extends ExamDetailState {
       selectedAnswers: selectedAnswers ?? this.selectedAnswers,
     );
   }
+}
+
+class ExamDurationState extends ExamDetailState {
+  final int duration;
+  ExamDurationState({required this.duration});
 }
 
 class ExamDetailError extends ExamDetailState {

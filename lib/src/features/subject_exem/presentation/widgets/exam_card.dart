@@ -53,9 +53,9 @@ class ExamCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Độ Khó'),
-              Text('Khó'),
-              SizedBox(height: 30),
+              // Text('Độ Khó'),
+              // Text('Khó'),
+              SizedBox(height: 50),
               AppContainer(
                 color: AppColors.borderSelected.withValues(alpha: 0.7),
                 width: 100,
@@ -115,7 +115,7 @@ class ExamCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(Icons.timer_outlined),
-                  Text('$numberQuestion phút'),
+                  Text('$time phút'),
                 ],
               ),
             ],

@@ -6,10 +6,19 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/menu.dart';
 
 class SubmitExamDialog extends StatelessWidget {
-  final int totalQuestions = 50;
-  final int answeredQuestions = 40;
-  final String timeLeft = '03:02';
-  VoidCallback? onSubmit;
+  final int totalQuestions;
+  final int answeredQuestions;
+  final String timeLeft;
+  final VoidCallback? onSubmit;
+
+  const SubmitExamDialog({
+    super.key,
+    required this.totalQuestions,
+    required this.answeredQuestions,
+    required this.timeLeft,
+    this.onSubmit,
+  });
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -157,7 +166,7 @@ class SubmitExamDialog extends StatelessWidget {
                                   color: AppColors.borderWrong,
                                 ),
                                 label: 'Chưa làm',
-                                numberAnswered: answeredQuestions,
+                                numberAnswered: totalQuestions - answeredQuestions,
                                 timeLeft: timeLeft,
                                 backgroundColor: AppColors.borderWrong
                                     .withValues(alpha: 0.4),
@@ -210,7 +219,12 @@ class SubmitExamDialog extends StatelessWidget {
                                     color: AppColors.borderWrong,
                                   ),
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pop(context); // Đóng dialog
+                                  if (onSubmit != null) {
+                                    onSubmit!(); // Kích hoạt callback nộp bài
+                                  }
+                                },
 
                                 child: Text(
                                   'NỘP BÀI',

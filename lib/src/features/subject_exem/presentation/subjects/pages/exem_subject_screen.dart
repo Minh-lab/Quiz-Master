@@ -32,8 +32,8 @@ class ExemSubjectScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const MenuCard(),
-            const SizedBox(height: 32),
+            // const MenuCard(),
+            // const SizedBox(height: 32),
             _headingExam(),
             const SizedBox(height: 16),
 

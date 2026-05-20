@@ -10,7 +10,7 @@ class FetchExamDetailEvent extends ExamDetailEvent {
 
 class SelectAnswerEvent extends ExamDetailEvent {
   final int questionIndex;
-  final int? answerIndex;
+  final dynamic answerIndex;
   SelectAnswerEvent({required this.questionIndex, required this.answerIndex});
 }
 
@@ -19,6 +19,9 @@ class ChangeQuestionEvent extends ExamDetailEvent {
   ChangeQuestionEvent({required this.newIndex});
 }
 
-class TickTimerEvent extends ExamDetailEvent {}
+class GetExamDurationEvent extends ExamDetailEvent {
+  final String examId;
+  GetExamDurationEvent({required this.examId});
+}
 
 class SubmitEvent extends ExamDetailEvent {}

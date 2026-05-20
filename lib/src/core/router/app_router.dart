@@ -2,11 +2,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/exam.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_event.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_state.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/exam_detail_screen.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/list_exam.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/list_exam_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/home/home_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_event.dart';
@@ -42,11 +43,16 @@ class AppRouter {
           final String subjectId = state.pathParameters['subjectId']!;
 
           final String examId = state.pathParameters['examId']!;
-
+          final exam = state.extra as ExamEntity;
           return BlocProvider(
             create: (context) => sl<ExamDetailBloc>()
               ..add(FetchExamDetailEvent(examId: examId, subjectId: subjectId)),
-            child: ExamDetailScreen(subjectId: subjectId, examId: examId),
+            child: ExamDetailScreen(
+              subjectId: subjectId,
+              examId: examId,
+              title: exam.title,
+              duration: exam.duration,
+            ),
           );
         },
       ),
@@ -65,7 +71,8 @@ class AppRouter {
               GoRoute(
                 path: AppRouter.exam,
                 builder: (context, state) => BlocProvider(
-                  create: (context) => sl<SubjectBloc>()..add(FetchSubjectEvent()),
+                  create: (context) =>
+                      sl<SubjectBloc>()..add(FetchSubjectEvent()),
                   child: const ExemSubjectScreen(),
                 ),
               ),
