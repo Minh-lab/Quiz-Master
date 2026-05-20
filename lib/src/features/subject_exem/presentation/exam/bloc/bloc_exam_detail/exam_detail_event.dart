@@ -10,7 +10,7 @@ class FetchExamDetailEvent extends ExamDetailEvent {
 
 class SelectAnswerEvent extends ExamDetailEvent {
   final int questionIndex;
-  final int? answerIndex;
+  final dynamic answerIndex;
   SelectAnswerEvent({required this.questionIndex, required this.answerIndex});
 }
 

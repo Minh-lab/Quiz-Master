@@ -46,25 +46,45 @@ class ExamServiceIml extends ExamService {
   }
 
   @override
+  @override
   Future<Either<dynamic, dynamic>> getExamsDetail({
     required String examId,
     required String subjectId,
   }) async {
-    // TODO: implement getExamsDetail
     try {
+      print('getExamsDetail');
       final examDoc = await firestore.collection('exams').doc(examId).get();
-      final listExamDetail = await firestore
-          .collection('exams')
-          .doc(examId)
-          .collection('questions')
-          .orderBy('order', descending: false)
-          .get();
-      final questionsList = listExamDetail.docs
-          .map((doc) => QuestionModel.fromJson(doc.data(), doc.id))
-          .toList();
-      questionsList.forEach((element) {
-        print(element.content);
-      });
+      if (!examDoc.exists) return Left(Exception('Exam not found'));
+
+      final examData = examDoc.data()!;
+      List<QuestionModel> questionsList = [];
+
+      if (examData.containsKey('questions') && examData['questions'] is List) {
+        final List<dynamic> rawQuestions = examData['questions'];
+        questionsList = rawQuestions
+            .map(
+              (q) => QuestionModel.fromJson(
+                Map<String, dynamic>.from(q),
+                q['id'] ?? '',
+              ),
+            )
+            .toList();
+      } else {
+        // Tương thích ngược: Đọc từ Subcollection cũ
+        final listExamDetail = await firestore
+            .collection('exams')
+            .doc(examId)
+            .collection('questions')
+            .orderBy('order', descending: false)
+            .get();
+        questionsList = listExamDetail.docs
+            .map((doc) => QuestionModel.fromJson(doc.data(), doc.id))
+            .toList();
+      }
+
+      // Sắp xếp lại tăng dần theo 'order'
+      questionsList.sort((a, b) => a.order.compareTo(b.order));
+
       return Right(questionsList);
     } catch (e) {
       return Left(e);

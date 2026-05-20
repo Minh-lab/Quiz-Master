@@ -24,13 +24,20 @@ class ExamDetailBloc extends Bloc<ExamDetailEvent, ExamDetailState> {
       );
       result.fold(
         (l) {
-          emit(ExamDetailError(messageError: l.message));
+          // Tránh NoSuchMethodError nếu đối tượng lỗi không có trường 'message'
+          final errorMessage = l is Exception 
+              ? l.toString() 
+              : (l?.toString() ?? 'Lỗi không xác định khi tải đề thi');
+          emit(ExamDetailError(messageError: errorMessage));
         },
         (r) {
           emit(ExamDetailLoaded(questions: r));
         },
       );
-    } catch (e) {}
+    } catch (e) {
+      print('❌ LỖI TẠI EXAM_DETAIL_BLOC: $e');
+      emit(ExamDetailError(messageError: e.toString()));
+    }
   }
 
   void _onSelectAnswers(
@@ -39,7 +46,7 @@ class ExamDetailBloc extends Bloc<ExamDetailEvent, ExamDetailState> {
   ) {
     if (state is ExamDetailLoaded) {
       final currentState = state as ExamDetailLoaded;
-      final updateSelectedAnswers = Map<int, int?>.from(
+      final updateSelectedAnswers = Map<int, dynamic>.from(
         currentState.selectedAnswers!,
       );
       updateSelectedAnswers[event.questionIndex] = event.answerIndex;

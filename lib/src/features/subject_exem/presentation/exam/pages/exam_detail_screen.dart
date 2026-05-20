@@ -13,6 +13,8 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_state.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_event.dart'
     hide SelectAnswerEvent;
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/firebase_image.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/short_answer_input_field.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/submit_exam_dialog.dart';
 
 class ExamDetailScreen extends StatefulWidget {
@@ -30,6 +32,9 @@ class ExamDetailScreen extends StatefulWidget {
 }
 
 class _ExamDetailScreenState extends State<ExamDetailScreen> {
+  List<String> indexToLetter = ['A', 'B', 'C', 'D'];
+  int? duration;
+
   // String? _currentAnswer;
   final PageController _pageController = PageController(initialPage: 0);
   final ScrollController _scrollController = ScrollController();
@@ -51,17 +56,15 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(duration: 90),
       body: BlocBuilder<ExamDetailBloc, ExamDetailState>(
         buildWhen: (previous, current) =>
             previous.runtimeType != current.runtimeType,
         builder: (BuildContext context, state) {
-          if (state is ExamDetailLoading)
+          if (state is ExamDetailLoading) {
             return Center(child: Center(child: CircularProgressIndicator()));
-          else if (state is ExamDetailLoaded) {
+          } else if (state is ExamDetailLoaded) {
             List<QuestionEntity> questions = state.questions;
-            print(state.selectedAnswers![state.currentIndex + 1]);
-            print(state.selectedAnswers![state.currentIndex + 1] != null);
             return Stack(
               children: [
                 Padding(
@@ -97,23 +100,23 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar({required int duration}) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(70),
       child: AppAppbar(
         title: 'Đề thi ${widget.examId} - Môn ${widget.subjectId}',
-        actions: _timeCountdown(),
+        actions: _timeCountdown(duration: 90),
       ),
     );
   }
 
-  Widget _timeCountdown() {
+  Widget _timeCountdown({required int duration  }) {
     return Container(
       margin: EdgeInsets.only(right: 15),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: 5,
-        children: [Icon(Icons.timer_outlined), Text('14:14')],
+        children: [Icon(Icons.timer_outlined), Text('$duration phút')],
       ),
     );
   }
@@ -122,7 +125,9 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     return BlocSelector<ExamDetailBloc, ExamDetailState, int>(
       selector: (state) {
         if (state is ExamDetailLoaded) {
-          return state.selectedAnswers?.length ?? 0;
+          // Chỉ đếm những câu đã trả lời thực sự (không phải giá trị null)
+          return state.selectedAnswers?.values.where((v) => v != null).length ??
+              0;
         }
         return 0;
       },
@@ -138,7 +143,9 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
               Expanded(
                 child: LinearProgressIndicator(
                   minHeight: 10,
-                  value: (totalQuestionAnswered) / 50,
+                  value: totalQuestion > 0
+                      ? (totalQuestionAnswered / totalQuestion)
+                      : 0.0,
                   borderRadius: BorderRadius.circular(30),
                   color: (totalQuestionAnswered > 0)
                       ? AppColors.primary
@@ -164,7 +171,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
       },
       builder: (context, state) {
         int currentIndex = 0;
-        Map<int, int?> selectedAnswers = {};
+        Map<int, dynamic> selectedAnswers = {};
         if (state is ExamDetailLoaded) {
           currentIndex = state.currentIndex;
           selectedAnswers = state.selectedAnswers ?? {};
@@ -252,7 +259,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.circular(16),
-          border: BoxBorder.all(color: AppColors.border, width: 3),
+          border: Border.all(color: AppColors.border, width: 3),
         ),
         child: Column(
           spacing: 20,
@@ -295,16 +302,10 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
               style: AppTypography.headlineMedium(),
             ),
             (question.imageUrl != null && question.imageUrl!.isNotEmpty)
-                ? CachedNetworkImage(
-                    imageUrl: question.imageUrl!,
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error, color: Colors.red),
-                  )
+                ? Center(child: FirebaseImage(imageUrl: question.imageUrl!))
                 : SizedBox.shrink(),
 
-            BlocSelector<ExamDetailBloc, ExamDetailState, int?>(
+            BlocSelector<ExamDetailBloc, ExamDetailState, dynamic>(
               selector: (state) {
                 if (state is ExamDetailLoaded) {
                   return state.selectedAnswers?[question.order];
@@ -312,111 +313,13 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
                 return null;
               },
               builder: (context, answerIndex) {
-                return Column(
-                  spacing: 12,
-                  children: List.generate(question.options.length, (index) {
-                    return _buildAnswerSelect(
-                      context: context,
-                      optionIndex: index,
-                      optionText: question.options[index],
-                      userAnswer: answerIndex,
-                      questionOrder: question.order,
-                    );
-                  }),
+                return Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: _buildAnswerSection(question, answerIndex),
                 );
               },
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAnswerSelect({
-    required BuildContext context,
-    required int optionIndex,
-    required String optionText,
-    required int? userAnswer,
-    required int questionOrder,
-  }) {
-    final String letter = String.fromCharCode(65 + optionIndex);
-    final String cleanedText = optionText.replaceFirst(
-      RegExp(r'^[A-Z]\.\s*'),
-      '',
-    );
-    bool isSelected = optionIndex == userAnswer;
-
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          context.read<ExamDetailBloc>().add(
-            SelectAnswerEvent(
-              questionIndex: questionOrder,
-              answerIndex: optionIndex,
-            ),
-          );
-        },
-        child: Container(
-          width: double.infinity,
-          height: 60,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? AppColors.primary.withValues(alpha: 0.1)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            border: BoxBorder.all(
-              color: isSelected ? AppColors.primary : AppColors.border,
-              width: isSelected ? 2 : 1, // Viền đậm hơn khi chọn
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(left: 10),
-                width: 40,
-                height: 40, // Cố định kích thước hình tròn chữ cái
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected
-                      ? AppColors.primary
-                      : AppColors.darkTextSecondary.withValues(alpha: 0.2),
-                  border: BoxBorder.all(
-                    color: isSelected ? AppColors.primary : AppColors.border,
-                    width: 2,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    letter,
-                    style: AppTypography.headlineSmall().copyWith(
-                      color: isSelected ? Colors.white : AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 15),
-
-              Expanded(
-                child: MathTextBuilder(
-                  text: cleanedText,
-                  style: AppTypography.headlineSmall().copyWith(
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.textPrimary,
-                    fontWeight: isSelected
-                        ? FontWeight.w900
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-            ],
-          ),
         ),
       ),
     );
@@ -441,12 +344,29 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
           _buildButtonAction(
             label: 'NỘP BÀI',
             onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return SubmitExamDialog();
-                },
-              );
+              final state = context.read<ExamDetailBloc>().state;
+              if (state is ExamDetailLoaded) {
+                final total = state.questions.length;
+                final answered = state.selectedAnswers!.values
+                    .where((v) => v != null)
+                    .length;
+
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return SubmitExamDialog(
+                      totalQuestions: total,
+                      answeredQuestions: answered,
+                      timeLeft:
+                          '14:14', // Đang để tạm thời, sau này lấy từ bộ đếm ngược
+                      onSubmit: () {
+                        // TODO: Gọi sự kiện nộp bài chính thức
+                        // context.read<ExamDetailBloc>().add(SubmitExamEvent());
+                      },
+                    );
+                  },
+                );
+              }
             },
           ),
           Spacer(),
@@ -477,7 +397,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: BoxBorder.all(color: AppColors.border, width: 1.5),
+            border: Border.all(color: AppColors.border, width: 1.5),
           ),
           child: Center(
             child: Text(
@@ -528,6 +448,208 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
       duration: const Duration(milliseconds: 300),
 
       curve: Curves.easeInOut,
+    );
+  }
+
+  Widget _buildAnswerSection(QuestionEntity question, dynamic userAnswer) {
+    switch (question.type) {
+      case 'multiple_choice':
+        return _buildMultipleChoiceAnswers(question, userAnswer);
+      case 'true_false':
+        return _buildTrueFalseAnswers(question, userAnswer);
+      case 'short_answer':
+        return _buildShortAnswerInput(question, userAnswer);
+      default:
+        return const SizedBox();
+    }
+  }
+
+  // 4.1. Giao diện PHẦN I: Trắc nghiệm lựa chọn (A, B, C, D)
+  Widget _buildMultipleChoiceAnswers(
+    QuestionEntity question,
+    dynamic userAnswer,
+  ) {
+    return Column(
+      children: List.generate(question.options.length, (index) {
+        final letter = indexToLetter[index];
+        final optionText = question.options[index];
+        final isSelected = userAnswer == letter;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          child: InkWell(
+            onTap: () {
+              context.read<ExamDetailBloc>().add(
+                SelectAnswerEvent(
+                  questionIndex: question.order,
+                  answerIndex: letter,
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : AppColors.surface,
+                border: Border.all(
+                  color: isSelected ? AppColors.primary : AppColors.border,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor: isSelected
+                        ? AppColors.primary
+                        : AppColors.surfaceVariant,
+                    child: Text(
+                      letter,
+                      style: TextStyle(
+                        color: isSelected
+                            ? Colors.white
+                            : AppColors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      optionText,
+                      style: AppTypography.bodyLarge().copyWith(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  // 4.2. Giao diện PHẦN II: Trắc nghiệm Đúng / Sai (Bảng lựa chọn cho 4 ý)
+  Widget _buildTrueFalseAnswers(QuestionEntity question, dynamic userAnswer) {
+    final Map<String, bool> answers = Map<String, bool>.from(
+      userAnswer as Map? ?? {},
+    );
+    final keys = ['a', 'b', 'c', 'd'];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            'Chọn Đúng hoặc Sai cho mỗi ý kiến dưới đây:',
+            style: AppTypography.headlineSmall().copyWith(
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+        ...List.generate(keys.length, (index) {
+          final key = keys[index];
+          final optionText = question.options[index];
+          final currentSelection = answers[key];
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(optionText, style: AppTypography.bodyLarge()),
+                ),
+                const SizedBox(width: 8),
+                // Nút Đúng
+                _buildTrueFalseOptionButton(
+                  label: 'Đúng',
+                  isSelected: currentSelection == true,
+                  selectedColor: Colors.green,
+                  onTap: () {
+                    answers[key] = true;
+                    context.read<ExamDetailBloc>().add(
+                      SelectAnswerEvent(
+                        questionIndex: question.order,
+                        answerIndex: answers,
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
+                // Nút Sai
+                _buildTrueFalseOptionButton(
+                  label: 'Sai',
+                  isSelected: currentSelection == false,
+                  selectedColor: Colors.red,
+                  onTap: () {
+                    answers[key] = false;
+                    context.read<ExamDetailBloc>().add(
+                      SelectAnswerEvent(
+                        questionIndex: question.order,
+                        answerIndex: answers,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildTrueFalseOptionButton({
+    required String label,
+    required bool isSelected,
+    required Color selectedColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? selectedColor : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? selectedColor : AppColors.border,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : AppColors.textSecondary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 4.3. Giao diện PHẦN III: Trắc nghiệm điền câu trả lời ngắn
+  Widget _buildShortAnswerInput(QuestionEntity question, dynamic userAnswer) {
+    return ShortAnswerInputField(
+      question: question,
+      initialValue: userAnswer as String? ?? '',
+      onChanged: (value) {
+        context.read<ExamDetailBloc>().add(
+          SelectAnswerEvent(
+            questionIndex: question.order,
+            answerIndex: value.trim(),
+          ),
+        );
+      },
     );
   }
 }

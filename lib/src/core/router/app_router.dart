@@ -6,7 +6,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_event.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_state.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/exam_detail_screen.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/list_exam.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/list_exam_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/home/home_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_event.dart';
