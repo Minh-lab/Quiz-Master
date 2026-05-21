@@ -30,5 +30,6 @@ class AppAssetIcon {
   static const String line = 'assets/icons/line.svg';
   static const String favourite = 'assets/icons/favourite.svg';
   static const String examDetailPopup = 'assets/icons/examDetailPopup.svg';
+  static const String prize = 'assets/icons/prize.svg';
   
 }

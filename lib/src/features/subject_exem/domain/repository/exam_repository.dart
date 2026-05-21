@@ -13,5 +13,5 @@ abstract class IExamRepository {
     ExamEntity exam,
     Map<int, int> answers,
   );
-  Future<Either> GetExamDuration(String examId);
+
 }
