@@ -7,5 +7,4 @@ abstract class ExamService {
     required String subjectId,
   });
   Future<Either> getExamsBySubject(String subjectId);
-  Future<Either> GetExamDuration(String examId);
 }

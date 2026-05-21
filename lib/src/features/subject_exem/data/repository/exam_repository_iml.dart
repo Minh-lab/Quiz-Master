@@ -41,9 +41,5 @@ class ExamRepositoryIml extends IExamRepository {
     return ExamServiceIml().getExamsBySubject(subjectId);
   }
 
-  @override
-  Future<Either<dynamic, dynamic>> GetExamDuration(String examId) {
-    // TODO: implement GetExamDuration
-    return ExamServiceIml().GetExamDuration(examId);
-  }
+
 }
