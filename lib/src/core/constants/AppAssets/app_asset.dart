@@ -3,6 +3,8 @@ class AppAssetImage {
   static const String topSplash2Image = 'assets/images/topsplash2.png';
   static const String calculatingImage = 'assets/images/calculating.png';
   static const String imageQuestion = 'assets/images/question.png';
+  static const String signinImage = 'assets/images/signin.png';
+  static const String signupImage = 'assets/images/signup.png';
 }
 
 class AppAssetIcon {
@@ -31,5 +33,6 @@ class AppAssetIcon {
   static const String favourite = 'assets/icons/favourite.svg';
   static const String examDetailPopup = 'assets/icons/examDetailPopup.svg';
   static const String prize = 'assets/icons/prize.svg';
-  
+  static const String gradurationCap = 'assets/icons/gradurationCap.svg';
+  static const String google = 'assets/icons/google.svg';
 }
