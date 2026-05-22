@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum AuthProvider { google, facebook, email, anonymous }
+enum AppAuthProvider { google, facebook, email, anonymous }
 
 class UserEntity extends Equatable {
   final String uid; // Firebase UID, là khóa định danh duy nhất
@@ -10,7 +10,7 @@ class UserEntity extends Equatable {
   final String? photoUrl; // Ảnh đại diện (lấy từ Google/Facebook)
   final bool isAnonymous; // true nếu đang ở chế độ khách
   final bool isEmailVerified; // true nếu đã xác minh email
-  final AuthProvider provider; // Phương thức đăng nhập hiện tại
+  final AppAuthProvider provider; // Phương thức đăng nhập hiện tại
   final DateTime? createdAt;
 
   const UserEntity({

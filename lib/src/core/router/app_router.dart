@@ -1,7 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/app/di/injection_container.dart';
+import 'package:quiz_mater_apllication/src/core/router/go_router_adapter.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_in/signin_screen.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_up.dart/sign_up_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/exam.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_event.dart';
@@ -18,6 +21,9 @@ class AppRouter {
   static const String home = '/home';
   static const String intro = '/intro';
   static const String exam = '/exam';
+  static const String signin = '/signin';
+  static const String signup = '/signup';
+  static const String forgotPassword = '/forgot_password';
 
   static const String examById = '/subject/:subjectId/exam/:examId';
 
@@ -27,13 +33,22 @@ class AppRouter {
       '/subject/$subjectId/exam/$examId';
 
   static final router = GoRouter(
-    initialLocation: AppRouter.intro,
+    initialLocation: AppRouter.signin,
 
+    // refreshListenable: GoRouterAdapter(),
     routes: [
       /// INTRO
       GoRoute(
         path: AppRouter.intro,
         builder: (context, state) => const IntroScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.signup,
+        builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.signin,
+        builder: (context, state) => const SignInScreen(),
       ),
 
       /// EXAM DETAIL
