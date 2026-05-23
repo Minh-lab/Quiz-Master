@@ -1,13 +1,20 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
 import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
+import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signin_request.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signup_request.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/widgets/social_login_button.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -18,6 +25,7 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  bool isHiddenPassword = true;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   @override
@@ -33,21 +41,45 @@ class _SignInScreenState extends State<SignInScreen> {
     // TODO: implement build
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            // crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 24),
-              _buildHeader(),
-              // Expanded(child: Image.asset(AppAssetImage.signinImage, fit: BoxFit.cover, )),
-              SizedBox(height: 24),
-              _buildSignInForm(),
-              // SizedBox(height: 14),
-              _buildFooter(onTap: () => context.push(AppRouter.signup)),
-              // SizedBox(height: 14),
-            ],
-          ),
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Đăng nhập thất bại: ${state.message}')),
+              );
+            }
+          },
+          builder: (BuildContext context, AuthState state) {
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 24),
+                      _buildHeader(),
+                      // Expanded(child: Image.asset(AppAssetImage.signinImage, fit: BoxFit.cover, )),
+                      SizedBox(height: 24),
+                      _buildSignInForm(context),
+                      // SizedBox(height: 14),
+                      _buildFooter(onTap: () => context.push(AppRouter.signup)),
+                      // SizedBox(height: 14),
+                    ],
+                  ),
+                ),
+                if (state is AuthLoading)
+                  Center(
+                    child: Positioned.fill(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -80,7 +112,7 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  Widget _buildSignInForm() {
+  Widget _buildSignInForm(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
       child: Column(
@@ -108,14 +140,21 @@ class _SignInScreenState extends State<SignInScreen> {
           SizedBox(height: 24),
           TextField(
             controller: passwordController,
-            obscureText: true,
+            obscureText: isHiddenPassword,
 
             // obscuringCharacter: '*',
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.lock_outlined, color: AppColors.textHint),
-              suffixIcon: Icon(
-                Icons.remove_red_eye_outlined,
-                color: AppColors.textHint,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  isHiddenPassword ? Icons.visibility_off : Icons.visibility,
+                  color: AppColors.textHint,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isHiddenPassword = !isHiddenPassword;
+                  });
+                },
               ),
 
               hintText: 'Mật khẩu',
@@ -129,24 +168,17 @@ class _SignInScreenState extends State<SignInScreen> {
           SizedBox(height: 20),
           _buildSignInHelper(),
           SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+          _buildSigninButton(
+            onTap: () async {
+              context.read<AuthBloc>().add(
+                SigninWithEmailRequested(
+                  signinRequest: SigninRequest(
+                    email: emailController.text,
+                    password: passwordController.text,
+                  ),
                 ),
-              ),
-              onPressed: () {},
-              child: Text(
-                'Đăng nhập',
-                style: AppTypography.bodyLarge().copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
+              );
+            },
           ),
           SizedBox(height: 32),
           _buildDivider(),
@@ -170,6 +202,28 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSigninButton({required VoidCallback onTap}) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        onPressed: onTap,
+        child: Text(
+          'Đăng nhập',
+          style: AppTypography.bodyLarge().copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
       ),
     );
   }

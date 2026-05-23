@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 
@@ -20,9 +21,11 @@ class UserModel extends UserEntity {
     'photoUrl': photoUrl,
     'isAnonymous': isAnonymous,
     'isEmailVerified': isEmailVerified,
-    'provider': provider.toString(),
+    'provider': provider.name,
     'createdAt': createdAt,
   };
+
+  UserEntity toEntity() => this;
 
   factory UserModel.fromFirebaseUser(User firebaseUser) {
     // Xác định phương thức đăng nhập từ danh sách providerData
@@ -47,6 +50,21 @@ class UserModel extends UserEntity {
       isEmailVerified: firebaseUser.emailVerified,
       provider: provider,
       createdAt: firebaseUser.metadata.creationTime,
+    );
+  }
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      uid: json['uid'],
+      email: json['email'],
+      displayName: json['displayName'],
+      photoUrl: json['photoUrl'],
+      isAnonymous: json['isAnonymous'],
+      isEmailVerified: json['isEmailVerified'],
+      provider: AppAuthProvider.values.firstWhere(
+        (e) => e.name == json['provider'] || e.toString() == json['provider'],
+        orElse: () => AppAuthProvider.email,
+      ),
+      createdAt: (json['createdAt'] as Timestamp?)?.toDate(),
     );
   }
 }

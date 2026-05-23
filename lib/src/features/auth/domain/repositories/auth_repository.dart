@@ -1,4 +1,6 @@
 import 'package:dartz/dartz.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signin_request.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signup_request.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 
 abstract class AuthRepository {
@@ -9,10 +11,8 @@ abstract class AuthRepository {
   Stream<UserEntity?> get authStateChanges;
 
   // Đăng nhập bằng Email & Password
-  Future<Either> signInWithEmail(
-    String email,
-    String password,
-  );
+  Future<Either> signInWithEmail(SigninRequest signinRequest);
+  Future<Either> signUpWithEmail(SignupRequest signupRequest);
 
   Future<Either> signInWithGoogle();
 

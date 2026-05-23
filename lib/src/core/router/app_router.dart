@@ -4,6 +4,7 @@ import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/router/go_router_adapter.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_in/signin_screen.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_up.dart/sign_up_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/exam.dart';
@@ -18,6 +19,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/su
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/pages/exem_subject_screen.dart';
 
 class AppRouter {
+  static final AuthBloc authBloc = sl<AuthBloc>();
   static const String subjectById = '/subject/:subjectId';
   static const String home = '/home';
   static const String intro = '/intro';
@@ -36,7 +38,31 @@ class AppRouter {
   static final router = GoRouter(
     initialLocation: AppRouter.signin,
 
-    // refreshListenable: GoRouterAdapter(),
+    refreshListenable: GoRouterAdapter(authBloc.stream),
+    redirect: (context, state) {
+      final authState = AppRouter.authBloc.state;
+      print(
+        'GoRouter Redirect Triggered! Current state: $authState, Location: ${state.matchedLocation}',
+      );
+
+      final isAuthenticated =
+          authState is AuthSuccess || authState is GuestModeActive;
+
+      final isAuthPage =
+          state.matchedLocation == AppRouter.signin ||
+          state.matchedLocation == AppRouter.signup ||
+          state.matchedLocation == AppRouter.intro;
+
+      if (!isAuthenticated && !isAuthPage) {
+        return AppRouter.signin;
+      }
+
+      if (isAuthenticated && isAuthPage) {
+        return AppRouter.home;
+      }
+
+      return null;
+    },
     routes: [
       /// INTRO
       GoRoute(
@@ -45,14 +71,13 @@ class AppRouter {
       ),
       GoRoute(
         path: AppRouter.signup,
-        builder: (context, state) => const SignUpScreen(),
+        builder: (context, state) =>
+            BlocProvider.value(value: authBloc, child: const SignUpScreen()),
       ),
       GoRoute(
         path: AppRouter.signin,
-        builder: (context, state) => BlocProvider(
-          create: (context) => sl<AuthBloc>(),
-          child: const SignInScreen(),
-        ),
+        builder: (context, state) =>
+            BlocProvider.value(value: authBloc, child: const SignInScreen()),
       ),
 
       /// EXAM DETAIL
@@ -88,7 +113,7 @@ class AppRouter {
             routes: [
               /// EXAM
               GoRoute(
-                path: AppRouter.exam,
+                path: AppRouter.home,
                 builder: (context, state) => BlocProvider(
                   create: (context) =>
                       sl<SubjectBloc>()..add(FetchSubjectEvent()),
@@ -109,19 +134,19 @@ class AppRouter {
           ),
 
           /// BRANCH 2
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRouter.home,
-                builder: (context, state) => BlocProvider(
-                  create: (context) {
-                    return sl<SubjectBloc>()..add(FetchSubjectEvent());
-                  },
-                  child: const ExemSubjectScreen(),
-                ),
-              ),
-            ],
-          ),
+          // StatefulShellBranch(
+          //   routes: [
+          //     GoRoute(
+          //       path: AppRouter.home,
+          //       builder: (context, state) => BlocProvider(
+          //         create: (context) {
+          //           return sl<SubjectBloc>()..add(FetchSubjectEvent());
+          //         },
+          //         child: const ExemSubjectScreen(),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     ],

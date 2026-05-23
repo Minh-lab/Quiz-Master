@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service.dart';
 import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service_imp.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signin_request.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signup_request.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/repositories/auth_repository.dart';
 
@@ -41,12 +43,17 @@ class AuthRepositoryIml extends AuthRepository {
   }
 
   @override
-  Future<Either<String, UserEntity>> signInWithEmail(
-    String email,
-    String password,
-  ) {
+  Future<Either> signInWithEmail(SigninRequest signinRequest) async {
     // TODO: implement signInWithEmail
-    throw UnimplementedError();
+    return await authService.signInWithEmail(signinRequest);
+  }
+
+  @override
+  Future<Either<dynamic, dynamic>> signUpWithEmail(
+    SignupRequest signupRequest,
+  ) {
+    // TODO: implement signUpWithEmail
+    return authService.signUpWithEmail(signupRequest);
   }
 
   @override
