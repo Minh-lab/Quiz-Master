@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
 import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
+import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signup_request.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/widgets/social_login_button.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -20,6 +23,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool isHiddenPassword = true;
+  bool isHiddenConfirmPassword = true;
   @override
   void dispose() {
     // TODO: implement dispose
@@ -44,7 +49,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(height: 16),
               _buildSignupForm(),
               SizedBox(height: 16),
-              _buildButtonSignup(),
+              _buildButtonSignup(() async {
+                if (_formKey.currentState!.validate()) {
+                  final result = await sl<AuthService>().signUpWithEmail(
+                    SignupRequest(
+                      email: emailController.text,
+                      userName: userNameController.text,
+                      password: passwordController.text,
+                    ),
+                  );
+                  result.fold(
+                    (error) => ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(error))),
+                    (r) => context.push(AppRouter.home),
+                  );
+                }
+              }),
               SizedBox(height: 16),
               _buildDivider(),
               SizedBox(height: 16),
@@ -143,16 +164,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             SizedBox(height: 16),
             TextField(
-              obscureText: true,
+              obscureText: isHiddenPassword,
               controller: passwordController,
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.lock_outlined,
                   color: AppColors.textHint,
                 ),
-                suffixIcon: Icon(
-                  Icons.remove_red_eye_outlined,
-                  color: AppColors.textHint,
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      isHiddenPassword = !isHiddenPassword;
+                    });
+                  },
+                  icon: isHiddenPassword
+                      ? Icon(
+                          Icons.visibility_off_outlined,
+                          color: AppColors.textHint,
+                        )
+                      : Icon(
+                          Icons.visibility_outlined,
+                          color: AppColors.textHint,
+                        ),
                 ),
                 hintText: 'Mật khẩu',
                 border: OutlineInputBorder(
@@ -163,14 +196,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SizedBox(height: 16),
             TextField(
               controller: confirmPasswordController,
+              obscureText: isHiddenConfirmPassword,
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.lock_outlined,
                   color: AppColors.textHint,
                 ),
-                suffixIcon: Icon(
-                  Icons.remove_red_eye_outlined,
-                  color: AppColors.textHint,
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      isHiddenConfirmPassword = !isHiddenConfirmPassword;
+                    });
+                  },
+                  icon: isHiddenConfirmPassword
+                      ? Icon(
+                          Icons.visibility_off_outlined,
+                          color: AppColors.textHint,
+                        )
+                      : Icon(
+                          Icons.visibility_outlined,
+                          color: AppColors.textHint,
+                        ),
                 ),
                 hintText: 'Xác nhận mật khẩu',
                 border: OutlineInputBorder(
@@ -185,7 +231,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildButtonSignup() {
+  Widget _buildButtonSignup(VoidCallback onTap) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -195,7 +241,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             borderRadius: BorderRadius.circular(14),
           ),
         ),
-        onPressed: () {},
+        onPressed: onTap,
         child: Text(
           'Tạo tài khoản',
           style: AppTypography.bodyLarge().copyWith(

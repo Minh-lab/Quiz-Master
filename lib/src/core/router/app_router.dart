@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/router/go_router_adapter.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_in/signin_screen.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_up.dart/sign_up_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/exam.dart';
@@ -48,7 +49,10 @@ class AppRouter {
       ),
       GoRoute(
         path: AppRouter.signin,
-        builder: (context, state) => const SignInScreen(),
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<AuthBloc>(),
+          child: const SignInScreen(),
+        ),
       ),
 
       /// EXAM DETAIL
@@ -109,7 +113,12 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRouter.home,
-                builder: (context, state) => const ExemSubjectScreen(),
+                builder: (context, state) => BlocProvider(
+                  create: (context) {
+                    return sl<SubjectBloc>()..add(FetchSubjectEvent());
+                  },
+                  child: const ExemSubjectScreen(),
+                ),
               ),
             ],
           ),

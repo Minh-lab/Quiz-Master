@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 
-
 class UserModel extends UserEntity {
   UserModel({
     required super.uid,
@@ -13,6 +12,18 @@ class UserModel extends UserEntity {
     required super.createdAt,
     required super.photoUrl,
   });
+
+  Map<String, dynamic> toJson() => {
+    'uid': uid,
+    'email': email,
+    'displayName': displayName,
+    'photoUrl': photoUrl,
+    'isAnonymous': isAnonymous,
+    'isEmailVerified': isEmailVerified,
+    'provider': provider.toString(),
+    'createdAt': createdAt,
+  };
+
   factory UserModel.fromFirebaseUser(User firebaseUser) {
     // Xác định phương thức đăng nhập từ danh sách providerData
     AppAuthProvider provider = AppAuthProvider.anonymous;
@@ -26,6 +37,7 @@ class UserModel extends UserEntity {
         provider = AppAuthProvider.email;
       }
     }
+
     return UserModel(
       uid: firebaseUser.uid,
       email: firebaseUser.email,
