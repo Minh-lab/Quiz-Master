@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quiz_mater_apllication/src/features/auth/data/models/user.dart';
 import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signin_request.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signup_request.dart';
 
 class AuthServiceImpl implements AuthService {
@@ -65,7 +66,31 @@ class AuthServiceImpl implements AuthService {
           .collection('users')
           .doc(user.uid)
           .set(userModel.toJson());
-      return Right(true);
+      return Right(userModel.toEntity());
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<dynamic, dynamic>> signInWithEmail(
+    SigninRequest signinRequest,
+  ) async {
+    try {
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: signinRequest.email,
+        password: signinRequest.password,
+      );
+      final userCredential = credential.user;
+      final userFirestore = await _firestore
+          .collection('users')
+          .doc(userCredential!.uid)
+          .get();
+      final userData = userFirestore.data();
+      UserModel user = UserModel.fromJson(userData!);
+      ();
+      print(user.toEntity);
+      return Right(user.toEntity());
     } catch (e) {
       return Left(e.toString());
     }
