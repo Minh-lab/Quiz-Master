@@ -1,4 +1,10 @@
 import 'package:get_it/get_it.dart';
+import 'package:quiz_mater_apllication/src/features/auth/data/repositories/auth_repository_iml.dart';
+import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service.dart';
+import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service_imp.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/repositories/auth_repository.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/AnonymousSignInUsecase.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/repository/exam_repository_iml.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/repository/subject_repository_iml.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service/exam_service.dart';
@@ -30,5 +36,13 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<ISubjectRepository>(
     () => SubjectRepositoryIml(subjectService: sl()),
+  );
+
+  
+  sl.registerFactory(() => AuthBloc(anonymoussigninUsecase: sl()));
+  sl.registerLazySingleton(() => AnonymoussigninUsecase(sl()));
+  sl.registerLazySingleton<AuthService>(() => AuthServiceImpl());
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryIml(authService: sl()),
   );
 }

@@ -1,11 +1,13 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
 import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/widgets/social_login_button.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -80,13 +82,15 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Widget _buildSignInForm() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: Center(child: Text('Đăng nhập', style: AppTypography.headlineSmall())),
+            child: Center(
+              child: Text('Đăng nhập', style: AppTypography.headlineSmall()),
+            ),
           ),
           SizedBox(height: 24),
           TextField(
@@ -152,6 +156,18 @@ class _SignInScreenState extends State<SignInScreen> {
             text: 'Tiếp tục với Google',
             iconPath: AppAssetIcon.google,
             onTap: () {},
+          ),
+          SizedBox(height: 8),
+          TextButton(
+            onPressed: () {
+              context.read<AuthBloc>().add(AnonymousSignInRequested());
+            },
+            child: Center(
+              child: Text(
+                'Tiếp tục với tư cách khách',
+                style: TextStyle(color: Colors.grey[600], fontSize: 15),
+              ),
+            ),
           ),
         ],
       ),

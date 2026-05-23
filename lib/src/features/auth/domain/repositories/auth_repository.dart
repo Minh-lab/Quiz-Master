@@ -9,20 +9,20 @@ abstract class AuthRepository {
   Stream<UserEntity?> get authStateChanges;
 
   // Đăng nhập bằng Email & Password
-  Future<Either<String, UserEntity>> signInWithEmail(
+  Future<Either> signInWithEmail(
     String email,
     String password,
   );
 
-  Future<Either<String, UserEntity>> signInWithGoogle();
+  Future<Either> signInWithGoogle();
 
-  Future<Either<String, UserEntity>> signInWithFacebook();
+  Future<Either> signInWithFacebook();
 
-  Future<Either<String, UserEntity>> signInAnonymously();
+  Future<Either> signInAnonymously();
 
-  Future<Either<String, UserEntity>> linkAnonymousWithGoogle();
+  Future<Either> linkAnonymousWithGoogle();
 
-  Future<Either<String, UserEntity>> linkAnonymousWithFacebook();
+  Future<Either> linkAnonymousWithFacebook();
 
   Future<Either<String, void>> sendPasswordResetEmail(String email);
 
