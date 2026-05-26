@@ -1,19 +1,22 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/AnonymousSignInUsecase.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/anonymous_sign_in.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/sign_out.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signin_with_email.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signup_with_email.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AnonymoussigninUsecase anonymoussigninUsecase;
+  final AnonymousSignInUsecase anonymoussigninUsecase;
   final SignupWithEmailUsecase signupWithEmailUsecase;
   final SigninWithEmailUsecase signinWithEmailUsecase;
+  final SignOutUsecase signOutUsecase;
 
   AuthBloc({
     required this.anonymoussigninUsecase,
     required this.signupWithEmailUsecase,
     required this.signinWithEmailUsecase,
+    required this.signOutUsecase,
   }) : super(AuthInitial()) {
     on<AnonymousSignInRequested>(_onAnonymousSignIn);
     on<SignOutRequested>(_onSignOut);
@@ -75,7 +78,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
-    // TODO: gọi signOut usecase khi tạo xong
-    emit(AuthSignedOut());
+    final result = await signOutUsecase.call();
+    result.fold((l) => emit(AuthError(l.toString())), (r) {
+      emit(AuthSignedOut(message: r));
+    });
   }
 }

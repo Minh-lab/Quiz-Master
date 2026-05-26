@@ -195,9 +195,16 @@ class _SignInScreenState extends State<SignInScreen> {
               context.read<AuthBloc>().add(AnonymousSignInRequested());
             },
             child: Center(
-              child: Text(
-                'Tiếp tục với tư cách khách',
-                style: TextStyle(color: Colors.grey[600], fontSize: 15),
+              child: TextButton(
+                onPressed: () {
+                  context.read<AuthBloc>().add(AnonymousSignInRequested());
+                },
+                child: Text(
+                  'Tiếp tục với tư cách khách',
+                  style: AppTypography.labelMedium().copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
               ),
             ),
           ),

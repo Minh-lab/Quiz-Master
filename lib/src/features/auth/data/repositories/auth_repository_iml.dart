@@ -69,8 +69,8 @@ class AuthRepositoryIml extends AuthRepository {
   }
 
   @override
-  Future<void> signOut() {
+  Future<Either> signOut() async {
     // TODO: implement signOut
-    throw UnimplementedError();
+    return await authService.signOut();
   }
 }

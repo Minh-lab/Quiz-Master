@@ -8,4 +8,5 @@ abstract class AuthService {
   Future<Either> linkAnonymousWithGoogle();
   Future<Either> signUpWithEmail(SignupRequest signupRequest);
   Future<Either> signInWithEmail(SigninRequest signinRequest);
+  Future<Either> signOut();
 }
