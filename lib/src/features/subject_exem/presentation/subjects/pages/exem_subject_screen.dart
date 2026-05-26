@@ -18,6 +18,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/su
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/subject_card.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/menu.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/top_banner.dart';
 
 class ExemSubjectScreen extends StatelessWidget {
   const ExemSubjectScreen({super.key});
@@ -26,7 +27,7 @@ class ExemSubjectScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _topBanner('Nguyen Van A', 1),
+      // appBar: TopBanner(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Column(
@@ -145,90 +146,91 @@ class ExemSubjectScreen extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _topBanner(String fullName, int streak) {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(120),
-      child: Container(
-        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-        decoration: const BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
-            bottomRight: Radius.circular(30),
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Xin chào!',
-                          style: AppTypography.headlineSmall(
-                            color: Colors.white70,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.waving_hand_rounded,
-                          color: Colors.amber,
-                          size: 22,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      fullName,
-                      style: AppTypography.headlineLarge(color: Colors.white),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Container(
-                height: 40,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      AppAssetIcon.fireIcon,
-                      width: 20,
-                      height: 20,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.red,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '$streak',
-                      style: AppTypography.headlineSmall(color: Colors.black),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+
+  // PreferredSizeWidget _topBanner(String fullName, int streak) {
+  //   return PreferredSize(
+  //     preferredSize: const Size.fromHeight(120),
+  //     child: Container(
+  //       padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+  //       decoration: const BoxDecoration(
+  //         color: AppColors.primary,
+  //         borderRadius: BorderRadius.only(
+  //           bottomLeft: Radius.circular(30),
+  //           bottomRight: Radius.circular(30),
+  //         ),
+  //       ),
+  //       child: SafeArea(
+  //         bottom: false,
+  //         child: Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           crossAxisAlignment: CrossAxisAlignment.end,
+  //           children: [
+  //             Expanded(
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 mainAxisAlignment: MainAxisAlignment.end,
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   Row(
+  //                     children: [
+  //                       Text(
+  //                         'Xin chào!',
+  //                         style: AppTypography.headlineSmall(
+  //                           color: Colors.white70,
+  //                         ),
+  //                       ),
+  //                       const SizedBox(width: 8),
+  //                       const Icon(
+  //                         Icons.waving_hand_rounded,
+  //                         color: Colors.amber,
+  //                         size: 22,
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 8),
+  //                   Text(
+  //                     fullName,
+  //                     style: AppTypography.headlineLarge(color: Colors.white),
+  //                     maxLines: 1,
+  //                     overflow: TextOverflow.ellipsis,
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //             const SizedBox(width: 16),
+  //             Container(
+  //               height: 40,
+  //               padding: const EdgeInsets.symmetric(horizontal: 16),
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white,
+  //                 borderRadius: BorderRadius.circular(20),
+  //               ),
+  //               child: Row(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   SvgPicture.asset(
+  //                     AppAssetIcon.fireIcon,
+  //                     width: 20,
+  //                     height: 20,
+  //                     colorFilter: const ColorFilter.mode(
+  //                       Colors.red,
+  //                       BlendMode.srcIn,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(width: 8),
+  //                   Text(
+  //                     '$streak',
+  //                     style: AppTypography.headlineSmall(color: Colors.black),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   String getIconPath(String iconName) {
     switch (iconName) {

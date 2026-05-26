@@ -95,4 +95,16 @@ class AuthServiceImpl implements AuthService {
       return Left(e.toString());
     }
   }
+
+  @override
+  Future<Either> signOut() async {
+    // TODO: implement signOut
+    try {
+      await _firebaseAuth.signOut();
+      print('Signout Request service');
+      return Right('Signout successfully');
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
 }

@@ -1,12 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/router/go_router_adapter.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_in/signin_screen.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_up.dart/sign_up_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/profile.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/exam.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_event.dart';
@@ -23,6 +27,7 @@ class AppRouter {
   static const String subjectById = '/subject/:subjectId';
   static const String home = '/home';
   static const String intro = '/intro';
+  static const String profile = '/profile';
   static const String exam = '/exam';
   static const String signin = '/signin';
   static const String signup = '/signup';
@@ -36,24 +41,23 @@ class AppRouter {
       '/subject/$subjectId/exam/$examId';
 
   static final router = GoRouter(
-    initialLocation: AppRouter.signin,
+    initialLocation: AppRouter.home,
 
     refreshListenable: GoRouterAdapter(authBloc.stream),
     redirect: (context, state) {
       final authState = AppRouter.authBloc.state;
-      print(
-        'GoRouter Redirect Triggered! Current state: $authState, Location: ${state.matchedLocation}',
-      );
+
+      log(authState.toString());
 
       final isAuthenticated =
           authState is AuthSuccess || authState is GuestModeActive;
 
       final isAuthPage =
           state.matchedLocation == AppRouter.signin ||
-          state.matchedLocation == AppRouter.signup ||
-          state.matchedLocation == AppRouter.intro;
-
-      if (!isAuthenticated && !isAuthPage) {
+          state.matchedLocation == AppRouter.signup;
+      // print(authState);
+      final isProtectedPage = state.matchedLocation == AppRouter.profile;
+      if (!isAuthenticated && isProtectedPage) {
         return AppRouter.signin;
       }
 
@@ -133,20 +137,15 @@ class AppRouter {
             ],
           ),
 
-          /// BRANCH 2
-          // StatefulShellBranch(
-          //   routes: [
-          //     GoRoute(
-          //       path: AppRouter.home,
-          //       builder: (context, state) => BlocProvider(
-          //         create: (context) {
-          //           return sl<SubjectBloc>()..add(FetchSubjectEvent());
-          //         },
-          //         child: const ExemSubjectScreen(),
-          //       ),
-          //     ),
-          //   ],
-          // ),
+          // / BRANCH 2
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRouter.profile,
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
         ],
       ),
     ],
