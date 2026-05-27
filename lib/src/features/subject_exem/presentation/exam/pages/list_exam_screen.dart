@@ -41,16 +41,19 @@ class ListExam extends StatelessWidget {
                         onTap: () {
                           showDialog(
                             context: context,
-                            builder: (context) {
+                            builder: (BuildContext dialogContext) {
                               return ListExamDialog(
                                 exam: exams[index],
-                                onConfirm: () => context.push(
-                                  AppRouter.exambyIdDetail(
-                                    subjectId,
-                                    exams[index].id,
-                                  ),
-                                  extra: exams[index],
-                                ),
+                                  onConfirm: () {
+                                    Navigator.pop(dialogContext);
+                                    context.push(
+                                      AppRouter.exambyIdDetail(
+                                        subjectId,
+                                        exams[index].id,
+                                      ),
+                                      extra: exams[index],
+                                    );
+                                  },
                               );
                             },
                           );

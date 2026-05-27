@@ -27,70 +27,72 @@ class ExemSubjectScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      // appBar: TopBanner(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // const MenuCard(),
-            // const SizedBox(height: 32),
-            _headingExam(),
-            const SizedBox(height: 16),
-
-            BlocBuilder<SubjectBloc, SubjectState>(
-              builder: (context, state) {
-                if (state is SubjectLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (state is SubjectLoaded) {
-                  final List<SubjectEntity> subjects = state.subjects!;
-
-                  return GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: subjects.length,
-                    itemBuilder: (context, index) {
-                    
-                      final subject = subjects[index];
-                      print(subject.iconName);
-
-                      var color = getThemeColor(subject.themeColor);
-                      var iconPath = getIconPath(subject.iconName);
-                      // print(color);
-                      // print(iconPath);
-
-                      return SubjectCard(
-                        title: subject.name,
-                        numberExam:
-                            subjects[index].countExams ??
-                            0, // Thay đổi số lượng bài thi ở đây
-                        color: color.withValues(alpha: 0.15),
-                        image: SvgPicture.asset(
-                          iconPath,
-                          width: 40,
-                          height: 40,
-                        ),
-                        onTap: () {
-                          context.read<ExamBloc>().add(
-                            FetchExamPreviewEvent(subjectId: subject.id),
-                          );
-                          context.push(AppRouter.subjectDetail(subject.id));
-                        },
-                      );
-                    },
-                  );
-                }
-                return const SizedBox();
-              },
-            ),
-          ],
+      appBar: TopBanner(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // const MenuCard(),
+              // const SizedBox(height: 32),
+              _headingExam(),
+              const SizedBox(height: 16),
+        
+              BlocBuilder<SubjectBloc, SubjectState>(
+                builder: (context, state) {
+                  if (state is SubjectLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (state is SubjectLoaded) {
+                    final List<SubjectEntity> subjects = state.subjects!;
+        
+                    return GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                          ),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: subjects.length,
+                      itemBuilder: (context, index) {
+                      
+                        final subject = subjects[index];
+                        print(subject.iconName);
+        
+                        var color = getThemeColor(subject.themeColor);
+                        var iconPath = getIconPath(subject.iconName);
+                        // print(color);
+                        // print(iconPath);
+        
+                        return SubjectCard(
+                          title: subject.name,
+                          numberExam:
+                              subjects[index].countExams ??
+                              0, // Thay đổi số lượng bài thi ở đây
+                          color: color.withValues(alpha: 0.15),
+                          image: SvgPicture.asset(
+                            iconPath,
+                            width: 40,
+                            height: 40,
+                          ),
+                          onTap: () {
+                            context.read<ExamBloc>().add(
+                              FetchExamPreviewEvent(subjectId: subject.id),
+                            );
+                            context.push(AppRouter.subjectDetail(subject.id));
+                          },
+                        );
+                      },
+                    );
+                  }
+                  return const SizedBox();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

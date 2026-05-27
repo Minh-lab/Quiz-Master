@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
 
 class ProfileScreen extends StatelessWidget {
+  // final UserEntity user;
   const ProfileScreen({super.key});
 
   @override

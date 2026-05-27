@@ -60,11 +60,17 @@ class _SignInScreenState extends State<SignInScreen> {
                       SizedBox(height: 24),
                       _buildHeader(),
                       // Expanded(child: Image.asset(AppAssetImage.signinImage, fit: BoxFit.cover, )),
-                      SizedBox(height: 24),
+                      // SizedBox(height: 24),
                       _buildSignInForm(context),
                       // SizedBox(height: 14),
-                      _buildFooter(onTap: () => context.push(AppRouter.signup)),
-                      // SizedBox(height: 14),
+                      _buildFooter(
+                        context: context,
+                        onTap: () => context.push(AppRouter.signup),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).padding.bottom,
+                      ),
+                      // ,
                     ],
                   ),
                 ),
@@ -280,9 +286,12 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  Widget _buildFooter({required VoidCallback onTap}) {
+  Widget _buildFooter({
+    required BuildContext context,
+    required VoidCallback onTap,
+  }) {
     return Container(
-      // padding: const EdgeInsets.only(bottom: 40),
+      // padding: EdgeInsets.only(bottom: 40),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

@@ -18,51 +18,53 @@ class ListExamDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              AppAssetIcon.examDetailPopup,
-              // width: 60,
-              // height: 60,
-            ),
-            SizedBox(height: 16),
-            Text('Bắt đầu thi thử', style: AppTypography.headlineMedium()),
-            Text(
-              '${exam.title}',
-              style: AppTypography.bodyLarge(),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 24),
-            _buildDetail(),
-            SizedBox(height: 24),
-            _buildWarning('Sau khi bắt đầu, thời gian sẽ được tính ngay!'),
-            SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildButtonAction(
-                    label: 'Để sau',
-                    onTap: () => Navigator.pop(context),
-                    isConfirm: false,
+    return SingleChildScrollView(
+      child: Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                AppAssetIcon.examDetailPopup,
+                // width: 60,
+                // height: 60,
+              ),
+              SizedBox(height: 16),
+              Text('Bắt đầu thi thử', style: AppTypography.headlineMedium()),
+              Text(
+                '${exam.title}',
+                style: AppTypography.bodyLarge(),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 24),
+              _buildDetail(),
+              SizedBox(height: 24),
+              _buildWarning('Sau khi bắt đầu, thời gian sẽ được tính ngay!'),
+              SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildButtonAction(
+                      label: 'Để sau',
+                      onTap: () => Navigator.pop(context),
+                      isConfirm: false,
+                    ),
                   ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: _buildButtonAction(
-                    label: 'Bắt đầu',
-                    onTap: onConfirm ?? () {},
-                    isConfirm: true,
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: _buildButtonAction(
+                      label: 'Bắt đầu',
+                      onTap: onConfirm ?? () {},
+                      isConfirm: true,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

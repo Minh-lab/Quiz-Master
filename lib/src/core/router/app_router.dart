@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/router/go_router_adapter.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
@@ -142,7 +143,10 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRouter.profile,
-                builder: (context, state) => const ProfileScreen(),
+                builder: (context, state) {
+                  // final user = state.extra as UserEntity;
+                  return ProfileScreen();
+                },
               ),
             ],
           ),
