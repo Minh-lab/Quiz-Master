@@ -22,10 +22,10 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
       padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
       decoration: const BoxDecoration(
         color: AppColors.primary,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
+        // borderRadius: BorderRadius.only(
+        //   // bottomLeft: Radius.circular(30),
+        //   // bottomRight: Radius.circular(30),
+        // ),
       ),
       child: SafeArea(
         bottom: false,
@@ -36,7 +36,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
             } else if (state is GuestModeActive) {
               return _buildGuestBanner(context);
             }
-            return _buildLoadingBanner();
+            return _buildGuestBanner(context);
           },
         ),
       ),

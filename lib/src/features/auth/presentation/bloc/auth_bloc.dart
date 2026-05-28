@@ -36,7 +36,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await anonymoussigninUsecase.call();
     result.fold(
       (error) => emit(AuthError(error.toString())),
-      (user) => emit(GuestModeActive(user)),
+      (user) => emit(GuestModeActive(guestUser: user)),
     );
   }
 

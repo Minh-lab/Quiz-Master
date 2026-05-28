@@ -13,7 +13,7 @@ class AuthSuccess extends AuthState {
 
 class GuestModeActive extends AuthState {
   final UserEntity guestUser;
-  GuestModeActive(this.guestUser);
+  GuestModeActive({required this.guestUser});
 }
 
 class AuthError extends AuthState {

@@ -61,7 +61,8 @@ class AppRouter {
       if (!isAuthenticated && isProtectedPage) {
         return AppRouter.signin;
       }
-
+      log(isAuthenticated.toString());
+      log(isAuthPage.toString());
       if (isAuthenticated && isAuthPage) {
         return AppRouter.home;
       }
