@@ -1,5 +1,6 @@
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signin_request.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signup_request.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 
 abstract class AuthEvent {}
 
@@ -20,12 +21,7 @@ class SignOutRequested extends AuthEvent {}
 
 class CheckAuthStatusRequested extends AuthEvent {}
 
-class SigninWithEmailRequested extends AuthEvent {
-  SigninRequest signinRequest;
-  SigninWithEmailRequested({required this.signinRequest});
-}
-
-class SignupWithEmailRequested extends AuthEvent {
-  SignupRequest signupRequest;
-  SignupWithEmailRequested({required this.signupRequest});
+class UserLoggedIn extends AuthEvent {
+  final UserEntity user;
+  UserLoggedIn(this.user);
 }

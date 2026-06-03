@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -9,12 +10,14 @@ import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.da
 import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
+import 'package:quiz_mater_apllication/src/core/utils/app_validator.dart';
 import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signin_request.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signup_request.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
-import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_in/sign_in_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_in/sign_in_state.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/widgets/social_login_button.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -25,6 +28,7 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  final _formKey = GlobalKey<FormState>();
   bool isHiddenPassword = true;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -41,15 +45,17 @@ class _SignInScreenState extends State<SignInScreen> {
     // TODO: implement build
     return Scaffold(
       body: SafeArea(
-        child: BlocConsumer<AuthBloc, AuthState>(
+        child: BlocConsumer<SignInCubit, SignInState>(
           listener: (context, state) {
-            if (state is AuthError) {
+            if (state is SignInError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Đăng nhập thất bại: ${state.message}')),
               );
+            } else if (state is SignInSuccess) {
+              context.read<AuthBloc>().add(UserLoggedIn(state.user));
             }
           },
-          builder: (BuildContext context, AuthState state) {
+          builder: (BuildContext context, SignInState state) {
             return Stack(
               children: [
                 SingleChildScrollView(
@@ -67,19 +73,18 @@ class _SignInScreenState extends State<SignInScreen> {
                         context: context,
                         onTap: () => context.push(AppRouter.signup),
                       ),
-                      SizedBox(
-                        height: MediaQuery.of(context).padding.bottom,
-                      ),
+                      SizedBox(height: MediaQuery.of(context).padding.bottom),
                       // ,
                     ],
                   ),
                 ),
-                if (state is AuthLoading)
-                  Center(
-                    child: Positioned.fill(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Center(child: CircularProgressIndicator()),
+                if (state is SignInLoading)
+                  Positioned.fill(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        color: Colors.black.withOpacity(0.1),
+                        child: const Center(child: CircularProgressIndicator()),
                       ),
                     ),
                   ),
@@ -121,100 +126,115 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget _buildSignInForm(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Center(
-              child: Text('Đăng nhập', style: AppTypography.headlineSmall()),
-            ),
-          ),
-          SizedBox(height: 24),
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint),
-              hintText: 'Email',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+      child: Form(
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Center(
+                child: Text('Đăng nhập', style: AppTypography.headlineSmall()),
               ),
-              // filled: true,
-              // fillColor: AppColors.surfaceVariant,
             ),
-          ),
-          SizedBox(height: 24),
-          TextField(
-            controller: passwordController,
-            obscureText: isHiddenPassword,
-
-            // obscuringCharacter: '*',
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.lock_outlined, color: AppColors.textHint),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  isHiddenPassword ? Icons.visibility_off : Icons.visibility,
+            SizedBox(height: 24),
+            TextFormField(
+              controller: emailController,
+              validator: AppValidator.validateEmail,
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Icons.email_outlined,
                   color: AppColors.textHint,
                 ),
-                onPressed: () {
-                  setState(() {
-                    isHiddenPassword = !isHiddenPassword;
-                  });
-                },
-              ),
-
-              hintText: 'Mật khẩu',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              // filled: true,
-              // fillColor: AppColors.surfaceVariant,
-            ),
-          ),
-          SizedBox(height: 20),
-          _buildSignInHelper(),
-          SizedBox(height: 16),
-          _buildSigninButton(
-            onTap: () async {
-              context.read<AuthBloc>().add(
-                SigninWithEmailRequested(
-                  signinRequest: SigninRequest(
-                    email: emailController.text,
-                    password: passwordController.text,
-                  ),
+                hintText: 'Email',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              );
-            },
-          ),
-          SizedBox(height: 32),
-          _buildDivider(),
-          SizedBox(height: 16),
-
-          SocialLoginButton(
-            text: 'Tiếp tục với Google',
-            iconPath: AppAssetIcon.google,
-            onTap: () {},
-          ),
-          SizedBox(height: 8),
-          TextButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(AnonymousSignInRequested());
-            },
-            child: Center(
-              child: TextButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(AnonymousSignInRequested());
-                },
-                child: Text(
-                  'Tiếp tục với tư cách khách',
-                  style: AppTypography.labelMedium().copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
+                // filled: true,
+                // fillColor: AppColors.surfaceVariant,
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 24),
+            TextFormField(
+              controller: passwordController,
+              obscureText: isHiddenPassword,
+              validator: AppValidator.validatePassword,
+
+              // obscuringCharacter: '*',
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Icons.lock_outlined,
+                  color: AppColors.textHint,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    isHiddenPassword ? Icons.visibility_off : Icons.visibility,
+                    color: AppColors.textHint,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      isHiddenPassword = !isHiddenPassword;
+                    });
+                  },
+                ),
+
+                hintText: 'Mật khẩu',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                // filled: true,
+                // fillColor: AppColors.surfaceVariant,
+              ),
+            ),
+            SizedBox(height: 20),
+            _buildSignInHelper(),
+            SizedBox(height: 16),
+            _buildSigninButton(
+              onTap: () async {
+                if (_formKey.currentState!.validate()) {
+                  context.read<SignInCubit>().signIn(
+                    SigninRequest(
+                      email: emailController.text.trim(),
+                      password: passwordController.text,
+                    ),
+                  );
+                }
+              },
+            ),
+            SizedBox(height: 32),
+            _buildDivider(),
+            SizedBox(height: 16),
+
+            SocialLoginButton(
+              text: 'Tiếp tục với Google',
+              iconPath: AppAssetIcon.google,
+              onTap: () {
+                log('Sign in with Google');
+                context.read<SignInCubit>().signInWithGoogle();
+              },
+            ),
+            SizedBox(height: 8),
+            // TextButton(
+            //   onPressed: () {
+            //     context.read<AuthBloc>().add(AnonymousSignInRequested());
+            //   },
+            //   child: Center(
+            //     child: TextButton(
+            //       onPressed: () {
+            //         context.read<AuthBloc>().add(AnonymousSignInRequested());
+            //       },
+            //       child: Text(
+            //         'Tiếp tục với tư cách khách',
+            //         style: AppTypography.labelMedium().copyWith(
+            //           color: AppColors.primary,
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
       ),
     );
   }

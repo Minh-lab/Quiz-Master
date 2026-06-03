@@ -1,5 +1,9 @@
+import 'dart:developer';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/app/di/injection_container.dart';
@@ -7,8 +11,14 @@ import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.da
 import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
+import 'package:quiz_mater_apllication/src/core/utils/app_validator.dart';
 import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signup_request.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_in/sign_in_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_up/sign_up_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_up/sign_up_state.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/widgets/social_login_button.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -41,43 +51,70 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _buildHeader(),
-              SizedBox(height: 16),
-              _buildSignupForm(),
-              SizedBox(height: 16),
-              _buildButtonSignup(() async {
-                if (_formKey.currentState!.validate()) {
-                  final result = await sl<AuthService>().signUpWithEmail(
-                    SignupRequest(
-                      email: emailController.text,
-                      userName: userNameController.text,
-                      password: passwordController.text,
+        child: BlocConsumer<SignUpCubit, SignUpState>(
+          builder: (BuildContext context, state) {
+            log(state.toString());
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      _buildHeader(),
+                      SizedBox(height: 16),
+                      _buildSignupForm(),
+                      SizedBox(height: 16),
+                      _buildButtonSignup(() async {
+                        if (_formKey.currentState!.validate()) {
+                          final signupRequest = SignupRequest(
+                            email: emailController.text,
+                            password: passwordController.text,
+                            userName: userNameController.text,
+                          );
+                          context.read<SignUpCubit>().signUp(signupRequest);
+                        }
+                      }),
+                      SizedBox(height: 16),
+                      _buildDivider(),
+                      SizedBox(height: 16),
+                      SocialLoginButton(
+                        text: 'Đăng ký với Google',
+                        iconPath: AppAssetIcon.google,
+                        onTap: () {
+                          log('Sign up with Google');
+                          // context.read<SignInCubit>().signInWithGoogle();
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      _buildFooter(onTap: () => context.push(AppRouter.signin)),
+                    ],
+                  ),
+                ),
+                if (state is SignUpLoading)
+                  Positioned.fill(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        color: Colors.black.withOpacity(0.1),
+                        child: const Center(child: CircularProgressIndicator()),
+                      ),
                     ),
-                  );
-                  result.fold(
-                    (error) => ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(error))),
-                    (r) => context.push(AppRouter.home),
-                  );
-                }
-              }),
-              SizedBox(height: 16),
-              _buildDivider(),
-              SizedBox(height: 16),
-              SocialLoginButton(
-                text: 'Đăng ký với Google',
-                iconPath: AppAssetIcon.google,
-                onTap: () {},
-              ),
-              SizedBox(height: 16),
-              _buildFooter(onTap: () => context.push(AppRouter.signin)),
-            ],
-          ),
+                  ),
+              ],
+            );
+          },
+          listener: (BuildContext context, state) {
+            if (state is SignUpError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppColors.borderWrong,
+                ),
+              );
+            } else if (state is SignUpSuccess) {
+              context.read<AuthBloc>().add(UserLoggedIn(state.user));
+            }
+          },
         ),
       ),
     );
@@ -133,10 +170,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       // padding: const EdgeInsets.all(16),
       child: Form(
         key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
           children: [
-            TextField(
+            TextFormField(
               controller: userNameController,
+              validator: AppValidator.validateName,
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.person_outlined,
@@ -149,8 +188,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             SizedBox(height: 16),
-            TextField(
+            TextFormField(
               controller: emailController,
+              validator: AppValidator.validateEmail,
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.email_outlined,
@@ -163,9 +203,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             SizedBox(height: 16),
-            TextField(
+            TextFormField(
               obscureText: isHiddenPassword,
               controller: passwordController,
+              validator: AppValidator.validatePassword,
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.lock_outlined,
@@ -194,9 +235,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             SizedBox(height: 16),
-            TextField(
+            TextFormField(
               controller: confirmPasswordController,
               obscureText: isHiddenConfirmPassword,
+              validator: (value) => AppValidator.validateConfirmPassword(
+                value,
+                passwordController.text,
+              ),
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.lock_outlined,

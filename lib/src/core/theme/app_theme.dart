@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
-
-/// Theme ứng dụng Quiz Master
-/// Dựa trên Figma design: font Mulish, primary #0088FF
 class AppTheme {
   AppTheme._();
 
-  // ===== Khoảng cách =====
+ 
   static const double spacingXS = 4;
   static const double spacingSM = 8;
   static const double spacingMD = 12;
@@ -16,14 +13,12 @@ class AppTheme {
   static const double spacingXXL = 24;
   static const double spacing3XL = 32;
 
-  // ===== Bo góc (từ Figma) =====
-  static const double radiusSM = 6; // Nút bấm
-  static const double radiusMD = 8; // Card đáp án, input
-  static const double radiusLG = 12; // Card category
-  static const double radiusXL = 16; // Bottom sheet
-  static const double radiusFull = 100; // Hình tròn
 
-  // ===== Light Theme =====
+  static const double radiusSM = 6; 
+  static const double radiusMD = 8; 
+  static const double radiusLG = 12; 
+  static const double radiusXL = 16; 
+  static const double radiusFull = 100;
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,

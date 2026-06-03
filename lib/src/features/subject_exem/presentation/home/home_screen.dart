@@ -16,6 +16,7 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, required this.navigationShell});
   void _onTap({required int index, required BuildContext contextModelSheet}) {
     final AuthBloc authBloc = sl<AuthBloc>();
+    print(authBloc.hashCode);
     log(authBloc.state.toString() + 'home');
     final state = authBloc.state;
     if (state is GuestModeActive || state is AuthSuccess) {

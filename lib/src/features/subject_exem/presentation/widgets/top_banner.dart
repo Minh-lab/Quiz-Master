@@ -48,7 +48,6 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(200);
 
   Widget _buildUserBanner(UserEntity user) {
-    // Xử lý lấy tên hiển thị
     String displayName =
         user.displayName ?? user.email?.split('@').first ?? 'Học viên';
 
@@ -177,13 +176,13 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
         const SizedBox(width: 16),
         OutlinedButton(
           onPressed: () {
-            // Ép đăng xuất tài khoản Khách để GoRouter chuyển về màn SignIn
             context.read<AuthBloc>().add(SignOutRequested());
             context.pushReplacement(AppRouter.signin);
           },
           style: OutlinedButton.styleFrom(
             minimumSize: const Size(0, 40),
-            side: const BorderSide(color: Colors.white),
+            // side: const BorderSide(color: Colors.white),
+            // backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),

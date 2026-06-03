@@ -6,8 +6,11 @@ import 'package:quiz_mater_apllication/src/features/auth/domain/repositories/aut
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/anonymous_sign_in.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/sign_out.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signin_with_email.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signin_with_google.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signup_with_email.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_in/sign_in_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_up/sign_up_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/repository/exam_repository_iml.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/repository/subject_repository_iml.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service/exam_service.dart';
@@ -42,11 +45,17 @@ Future<void> init() async {
   );
 
   //Auth
+  sl.registerFactory(
+    () => SignInCubit(
+      signinWithEmailUsecase: sl(),
+      signinWithGoogleUsecase: sl(),
+    ),
+  );
+  sl.registerFactory(() => SignUpCubit(signupWithEmailUsecase: sl()));
   sl.registerLazySingleton(
     () => AuthBloc(
-      anonymoussigninUsecase: sl(),
-      signinWithEmailUsecase: sl(),
-      signupWithEmailUsecase: sl(),
+      // signinWithEmailUsecase: sl(),
+      // signupWithEmailUsecase: sl(),
       signOutUsecase: sl(),
     ),
   );
@@ -59,4 +68,5 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SignupWithEmailUsecase(repository: sl()));
   sl.registerLazySingleton(() => SigninWithEmailUsecase(repository: sl()));
   sl.registerLazySingleton(() => SignOutUsecase(repository: sl()));
+  sl.registerLazySingleton(() => SigninWithGoogleUsecase(repository: sl()));
 }

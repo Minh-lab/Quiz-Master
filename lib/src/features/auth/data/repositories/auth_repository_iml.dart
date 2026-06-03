@@ -20,29 +20,6 @@ class AuthRepositoryIml extends AuthRepository {
   }
 
   @override
-  Future<Either<String, UserEntity>> linkAnonymousWithFacebook() {
-    // TODO: implement linkAnonymousWithFacebook
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<String, UserEntity>> linkAnonymousWithGoogle() {
-    // TODO: implement linkAnonymousWithGoogle
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<String, void>> sendPasswordResetEmail(String email) {
-    // TODO: implement sendPasswordResetEmail
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either> signInAnonymously() async {
-    return await authService.signInAnonymously();
-  }
-
-  @override
   Future<Either> signInWithEmail(SigninRequest signinRequest) async {
     // TODO: implement signInWithEmail
     return await authService.signInWithEmail(signinRequest);
@@ -57,20 +34,26 @@ class AuthRepositoryIml extends AuthRepository {
   }
 
   @override
-  Future<Either<String, UserEntity>> signInWithFacebook() {
+  Future<Either> signOut() async {
+    // TODO: implement signOut
+    return await authService.signOut();
+  }
+
+  @override
+  Future<Either<String, void>> sendPasswordResetEmail(String email) {
+    // TODO: implement sendPasswordResetEmail
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<dynamic, dynamic>> signInWithFacebook() {
     // TODO: implement signInWithFacebook
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<String, UserEntity>> signInWithGoogle() {
+  Future<Either<dynamic, dynamic>> signInWithGoogle() {
     // TODO: implement signInWithGoogle
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either> signOut() async {
-    // TODO: implement signOut
-    return await authService.signOut();
+    return authService.signInWithGoogle();
   }
 }

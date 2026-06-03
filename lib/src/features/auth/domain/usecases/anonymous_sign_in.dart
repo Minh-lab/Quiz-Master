@@ -5,7 +5,4 @@ class AnonymousSignInUsecase {
   AuthRepository repository;
   AnonymousSignInUsecase({required this.repository});
 
-  Future<Either> call() async {
-    return await repository.signInAnonymously();
-  }
 }
