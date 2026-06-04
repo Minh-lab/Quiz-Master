@@ -6,6 +6,8 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
+class SignUpLoading extends AuthState {}
+
 class AuthSuccess extends AuthState {
   final UserEntity user;
   AuthSuccess(this.user);
@@ -13,7 +15,7 @@ class AuthSuccess extends AuthState {
 
 class GuestModeActive extends AuthState {
   final UserEntity guestUser;
-  GuestModeActive(this.guestUser);
+  GuestModeActive({required this.guestUser});
 }
 
 class AuthError extends AuthState {

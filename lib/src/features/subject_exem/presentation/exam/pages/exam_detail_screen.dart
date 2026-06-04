@@ -469,7 +469,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     }
   }
 
-  // 4.1. Giao diện PHẦN I: Trắc nghiệm lựa chọn (A, B, C, D)
+  //Trắc nghiệm lựa chọn (A, B, C, D)
   Widget _buildMultipleChoiceAnswers(
     QuestionEntity question,
     dynamic userAnswer,
@@ -539,7 +539,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  // 4.2. Giao diện PHẦN II: Trắc nghiệm Đúng / Sai (Bảng lựa chọn cho 4 ý)
+  //Trắc nghiệm Đúng / Sai (Bảng lựa chọn cho 4 ý)
   Widget _buildTrueFalseAnswers(QuestionEntity question, dynamic userAnswer) {
     final Map<String, bool> answers = Map<String, bool>.from(
       userAnswer as Map? ?? {},
@@ -642,7 +642,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  // 4.3. Giao diện PHẦN III: Trắc nghiệm điền câu trả lời ngắn
+  //Trắc nghiệm điền câu trả lời ngắn
   Widget _buildShortAnswerInput(QuestionEntity question, dynamic userAnswer) {
     return ShortAnswerInputField(
       question: question,

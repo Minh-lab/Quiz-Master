@@ -4,9 +4,11 @@ import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signin_
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signup_request.dart';
 
 abstract class AuthService {
-  Future<Either> signInAnonymously();
-  Future<Either> linkAnonymousWithGoogle();
+
+
   Future<Either> signUpWithEmail(SignupRequest signupRequest);
   Future<Either> signInWithEmail(SigninRequest signinRequest);
+  Future<Either> signInWithGoogle();
+
   Future<Either> signOut();
 }

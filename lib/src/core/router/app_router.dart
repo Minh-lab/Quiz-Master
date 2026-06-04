@@ -5,11 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/router/go_router_adapter.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_in/signin_screen.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_up.dart/sign_up_screen.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_in/sign_in_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_up/sign_up_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/profile.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/exam.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
@@ -53,15 +56,17 @@ class AppRouter {
           authState is AuthSuccess || authState is GuestModeActive;
 
       final isAuthPage =
-          state.matchedLocation == AppRouter.signin ||
-          state.matchedLocation == AppRouter.signup;
+          state.uri.path == AppRouter.signin ||
+          state.uri.path == AppRouter.signup;
       // print(authState);
-      final isProtectedPage = state.matchedLocation == AppRouter.profile;
+      final isProtectedPage = state.uri.path == AppRouter.profile;
       if (!isAuthenticated && isProtectedPage) {
         return AppRouter.signin;
       }
-
+      log(isAuthenticated.toString());
+      log(isAuthPage.toString());
       if (isAuthenticated && isAuthPage) {
+        log('Go to Home');
         return AppRouter.home;
       }
 
@@ -75,13 +80,17 @@ class AppRouter {
       ),
       GoRoute(
         path: AppRouter.signup,
-        builder: (context, state) =>
-            BlocProvider.value(value: authBloc, child: const SignUpScreen()),
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<SignUpCubit>(),
+          child: const SignUpScreen(),
+        ),
       ),
       GoRoute(
         path: AppRouter.signin,
-        builder: (context, state) =>
-            BlocProvider.value(value: authBloc, child: const SignInScreen()),
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<SignInCubit>(),
+          child: const SignInScreen(),
+        ),
       ),
 
       /// EXAM DETAIL
@@ -142,7 +151,10 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRouter.profile,
-                builder: (context, state) => const ProfileScreen(),
+                builder: (context, state) {
+                  // final user = state.extra as UserEntity;
+                  return ProfileScreen();
+                },
               ),
             ],
           ),

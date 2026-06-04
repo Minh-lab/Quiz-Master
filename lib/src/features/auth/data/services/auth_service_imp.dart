@@ -12,44 +12,6 @@ class AuthServiceImpl implements AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
-  Future<Either> signInAnonymously() async {
-    try {
-      final credential = await _firebaseAuth.signInAnonymously();
-      return Right(UserModel.fromFirebaseUser(credential.user!));
-    } catch (e) {
-      return Left(e.toString());
-    }
-  }
-
-  @override
-  Future<Either> linkAnonymousWithGoogle() async {
-    try {
-      final GoogleSignInAccount googleUser = await GoogleSignIn.instance
-          .authenticate();
-
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-      );
-
-      final currentUser = _firebaseAuth.currentUser;
-
-      if (currentUser == null) {
-        throw Exception('Chưa có tài khoản ẩn danh để liên kết');
-      }
-
-      final userCredential = await currentUser.linkWithCredential(credential);
-
-      return Right(UserModel.fromFirebaseUser(userCredential.user!));
-    } on GoogleSignInException catch (e) {
-      throw Exception(e.description ?? 'Đăng nhập Google thất bại');
-    } on FirebaseAuthException catch (e) {
-      throw Exception(e.message ?? 'Liên kết tài khoản thất bại');
-    }
-  }
-
-  @override
   Future<Either> signUpWithEmail(SignupRequest signupRequest) async {
     try {
       final credential = await _firebaseAuth.createUserWithEmailAndPassword(
@@ -105,6 +67,43 @@ class AuthServiceImpl implements AuthService {
       return Right('Signout successfully');
     } catch (e) {
       return Left(e.toString());
+    }
+  }
+
+  Future<Either<dynamic, dynamic>> signInWithGoogle() async {
+    try {
+      await GoogleSignIn.instance.initialize(
+        serverClientId:
+            '795544707095-rfdd4gb4teugpt0hjjkch5cmjlgc78k5.apps.googleusercontent.com',
+      );
+
+      final googleUser = await GoogleSignIn.instance.authenticate();
+
+      final googleAuth = googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await _firebaseAuth.signInWithCredential(
+        credential,
+      );
+
+      final user = userCredential.user;
+      if (user == null) {
+        return Left('Không lấy được thông tin người dùng từ Firebase.');
+      }
+
+      final userModel = UserModel.fromFirebaseUser(user);
+
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .set(userModel.toJson(), SetOptions(merge: true));
+
+      return Right(userModel.toEntity());
+    } catch (e) {
+      return Left('Đăng nhập Google thất bại: $e');
     }
   }
 }

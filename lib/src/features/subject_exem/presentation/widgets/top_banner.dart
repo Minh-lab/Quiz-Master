@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
+import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
@@ -11,17 +13,19 @@ import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
 
 class TopBanner extends StatelessWidget implements PreferredSizeWidget {
-  @override
+  const TopBanner({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
       decoration: const BoxDecoration(
         color: AppColors.primary,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
+        // borderRadius: BorderRadius.only(
+        //   // bottomLeft: Radius.circular(30),
+        //   // bottomRight: Radius.circular(30),
+        // ),
       ),
       child: SafeArea(
         bottom: false,
@@ -32,7 +36,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
             } else if (state is GuestModeActive) {
               return _buildGuestBanner(context);
             }
-            return _buildLoadingBanner();
+            return _buildGuestBanner(context);
           },
         ),
       ),
@@ -41,10 +45,9 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   // TODO: implement preferredSize
-  Size get preferredSize => const Size.fromHeight(120);
+  Size get preferredSize => const Size.fromHeight(200);
 
   Widget _buildUserBanner(UserEntity user) {
-    // Xử lý lấy tên hiển thị
     String displayName =
         user.displayName ?? user.email?.split('@').first ?? 'Học viên';
 
@@ -173,11 +176,13 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
         const SizedBox(width: 16),
         OutlinedButton(
           onPressed: () {
-            // Ép đăng xuất tài khoản Khách để GoRouter chuyển về màn SignIn
             context.read<AuthBloc>().add(SignOutRequested());
+            context.pushReplacement(AppRouter.signin);
           },
           style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Colors.white),
+            minimumSize: const Size(0, 40),
+            // side: const BorderSide(color: Colors.white),
+            // backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),

@@ -1,36 +1,254 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
+import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    // Lấy màu text dựa trên theme (Hỗ trợ Dark Mode / Light Mode)
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Colors.black;
+
     return Scaffold(
-      body: Center(
-        child: _buildSignoutButton(() {
-          context.read<AuthBloc>().add(SignOutRequested());
-        }),
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          "Cá nhân",
+          style: AppTypography.headlineMedium().copyWith(
+            color: Colors.white,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.settings_outlined, color: Colors.white),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            _buildUserInfo(context, textColor),
+            const SizedBox(height: 32),
+            _buildSettingsSection(context, textColor),
+            const SizedBox(height: 16),
+            _buildAccountSection(context, textColor),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildSignoutButton(VoidCallback onTap) {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 40),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          minimumSize: const Size(double.infinity, 50),
+  Widget _buildUserInfo(BuildContext context, Color textColor) {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is AuthSuccess) {
+          final String name = (state.user.displayName?.isEmpty ?? true) ? "Khách" : state.user.displayName!;
+          final String initial = name.isNotEmpty ? name.substring(0, 1).toUpperCase() : "K";
+          final String email = state.user.email ?? "";
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: AppColors.primary,
+                  child: Text(
+                    initial,
+                    style: AppTypography.headlineMedium().copyWith(
+                      color: Colors.white,
+                      fontSize: 32,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: AppTypography.headlineSmall().copyWith(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (email.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          email,
+                          style: AppTypography.bodyMedium().copyWith(
+                            color: textColor.withOpacity(0.7),
+                          ),
+                        ),
+                      ]
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text('Không có thông tin người dùng', style: AppTypography.bodyMedium().copyWith(color: textColor)),
+        );
+      },
+    );
+  }
+
+  Widget _buildSettingsSection(BuildContext context, Color textColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Text(
+            'Cài đặt',
+            style: AppTypography.headlineSmall().copyWith(color: textColor),
+          ),
         ),
-        onPressed: onTap,
-        child: const Text("Sign out"),
+        _buildListTile(
+          title: "Chế độ tối",
+          leadingIcon: Icons.dark_mode_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Switch(
+            value: false,
+            onChanged: (value) {},
+            activeColor: AppColors.primary,
+          ),
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+        _buildListTile(
+          title: "Thông báo",
+          leadingIcon: Icons.notifications_none_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Switch(
+            value: false,
+            onChanged: (value) {},
+            activeColor: AppColors.primary,
+          ),
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+        _buildListTile(
+          title: "Lịch sử làm bài",
+          leadingIcon: Icons.history_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          onTap: () {},
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+      ],
+    );
+  }
+
+  Widget _buildAccountSection(BuildContext context, Color textColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Text(
+            'Tài khoản',
+            style: AppTypography.headlineSmall().copyWith(color: textColor),
+          ),
+        ),
+        _buildListTile(
+          title: "Đổi mật khẩu",
+          leadingIcon: Icons.lock_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Switch(
+            value: false,
+            onChanged: (value) {},
+            activeColor: AppColors.primary,
+          ),
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+        _buildListTile(
+          title: "Đăng xuất",
+          leadingIcon: Icons.logout_outlined,
+          iconColor: AppColors.borderWrong,
+          textColor: AppColors.borderWrong,
+          onTap: () => _showLogoutDialog(context),
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+      ],
+    );
+  }
+
+  Widget _buildListTile({
+    required String title,
+    required IconData leadingIcon,
+    required Color iconColor,
+    required Color textColor,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      leading: Icon(leadingIcon, color: iconColor),
+      title: Text(
+        title,
+        style: AppTypography.bodyMedium().copyWith(
+          color: textColor,
+          fontSize: 16,
+        ),
       ),
+      trailing: trailing,
+      onTap: onTap,
+    );
+  }
+
+  Future<void> _showLogoutDialog(BuildContext context) async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+        final textColor = isDark ? Colors.white : Colors.black;
+        
+        return AlertDialog(
+          title: Text("Xác nhận đăng xuất", style: AppTypography.headlineSmall().copyWith(color: textColor)),
+          content: Text("Bạn có chắc chắn muốn đăng xuất?", style: AppTypography.bodyMedium().copyWith(color: textColor)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: Text("Hủy", style: TextStyle(color: textColor)),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<AuthBloc>().add(SignOutRequested());
+                Navigator.pop(dialogContext, true);
+              },
+              child: const Text(
+                "Đăng xuất",
+                style: TextStyle(
+                  color: AppColors.borderWrong,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

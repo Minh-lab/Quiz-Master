@@ -35,4 +35,5 @@ class AppAssetIcon {
   static const String prize = 'assets/icons/prize.svg';
   static const String gradurationCap = 'assets/icons/gradurationCap.svg';
   static const String google = 'assets/icons/google.svg';
+  static const String security = 'assets/icons/security.svg';
 }

@@ -18,11 +18,7 @@ abstract class AuthRepository {
 
   Future<Either> signInWithFacebook();
 
-  Future<Either> signInAnonymously();
 
-  Future<Either> linkAnonymousWithGoogle();
-
-  Future<Either> linkAnonymousWithFacebook();
 
   Future<Either<String, void>> sendPasswordResetEmail(String email);
 
