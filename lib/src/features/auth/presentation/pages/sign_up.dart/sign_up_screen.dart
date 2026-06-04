@@ -77,14 +77,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       SizedBox(height: 16),
                       _buildDivider(),
                       SizedBox(height: 16),
-                      SocialLoginButton(
-                        text: 'Đăng ký với Google',
-                        iconPath: AppAssetIcon.google,
-                        onTap: () {
-                          log('Sign up with Google');
-                          // context.read<SignInCubit>().signInWithGoogle();
-                        },
-                      ),
+                      // SocialLoginButton(
+                      //   text: 'Đăng ký với Google',
+                      //   iconPath: AppAssetIcon.google,
+                      //   onTap: () {
+                      //     log('Sign up with Google');
+                      //     // context.read<SignInCubit>().signInWithGoogle();
+                      //   },
+                      // ),
                       SizedBox(height: 16),
                       _buildFooter(onTap: () => context.push(AppRouter.signin)),
                     ],
@@ -95,7 +95,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         child: const Center(child: CircularProgressIndicator()),
                       ),
                     ),

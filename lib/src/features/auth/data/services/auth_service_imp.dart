@@ -70,51 +70,40 @@ class AuthServiceImpl implements AuthService {
     }
   }
 
-  @override
   Future<Either<dynamic, dynamic>> signInWithGoogle() async {
     try {
-      // 1. Kích hoạt luồng đăng nhập Google
       await GoogleSignIn.instance.initialize(
-        serverClientId: '795544707095-rfdd4gb4teugpt0hjjkch5cmjlgc78k5.apps.googleusercontent.com',
+        serverClientId:
+            '795544707095-rfdd4gb4teugpt0hjjkch5cmjlgc78k5.apps.googleusercontent.com',
       );
-      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance
-          .authenticate();
-      if (googleUser == null) {
-        // Người dùng bấm Hủy (Cancel) hộp thoại đăng nhập
-        return Left('Đăng nhập bị hủy bỏ.');
-      }
 
-      // 2. Lấy thông tin xác thực từ request
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final googleUser = await GoogleSignIn.instance.authenticate();
 
-      // 3. Tạo chứng chỉ Firebase (Credential)
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.idToken,
+      final googleAuth = googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
 
-      // 4. Đăng nhập Firebase bằng chứng chỉ vừa tạo
-      final UserCredential userCredential = await _firebaseAuth
-          .signInWithCredential(credential);
-      final User? user = userCredential.user;
+      final userCredential = await _firebaseAuth.signInWithCredential(
+        credential,
+      );
 
-      if (user == null) return Left('Lỗi xác thực Firebase.');
+      final user = userCredential.user;
+      if (user == null) {
+        return Left('Không lấy được thông tin người dùng từ Firebase.');
+      }
 
-      // 5. Cập nhật dữ liệu vào Firestore (Merge để không mất dữ liệu cũ)
-      UserModel userModel = UserModel.fromFirebaseUser(user);
+      final userModel = UserModel.fromFirebaseUser(user);
+
       await _firestore
           .collection('users')
           .doc(user.uid)
-          .set(
-            userModel.toJson(),
-            SetOptions(merge: true), // Quan trọng: Tránh đè mất dữ liệu hiện có
-          );
+          .set(userModel.toJson(), SetOptions(merge: true));
 
-      // 6. Trả về kết quả
       return Right(userModel.toEntity());
     } catch (e) {
-      return Left('Đã xảy ra lỗi khi đăng nhập Google: ${e.toString()}');
+      return Left('Đăng nhập Google thất bại: $e');
     }
   }
 }

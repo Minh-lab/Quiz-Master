@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/entities/signin_request.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signin_with_email.dart';
@@ -27,7 +29,10 @@ class SignInCubit extends Cubit<SignInState> {
     final result = await signinWithGoogleUsecase.call();
     result.fold(
       (error) => emit(SignInError(error.toString())),
-      (user) => emit(SignInSuccess(user)),
+      (user) {
+        
+        log('Sign in with Google successful: ${user.email}');
+        emit(SignInSuccess(user));},
     );
   }
 }
