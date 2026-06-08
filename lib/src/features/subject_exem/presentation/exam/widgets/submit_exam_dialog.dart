@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/item.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/menu.dart';
 
 class SubmitExamDialog extends StatelessWidget {
   final int totalQuestions;
@@ -21,223 +19,176 @@ class SubmitExamDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    final int unansweredQuestions = totalQuestions - answeredQuestions;
+
     return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Stack(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
+            // Header Icon
+            Center(
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                ),
+                child: Icon(
+                  Icons.assignment_turned_in_rounded,
+                  size: 36,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Title
+            Text(
+              'Xác nhận nộp bài',
+              textAlign: TextAlign.center,
+              style: AppTypography.headlineLarge().copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Statistics Row
+            Row(
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.close),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.check_circle_rounded,
+                    iconColor: AppColors.borderCorrect,
+                    value: '$answeredQuestions',
+                    label: 'Đã làm',
+                    bgColor: AppColors.borderCorrect.withValues(alpha: 0.1),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.error_rounded,
+                    iconColor: AppColors.borderWrong,
+                    value: '$unansweredQuestions',
+                    label: 'Chưa làm',
+                    bgColor: AppColors.borderWrong.withValues(alpha: 0.1),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.timer_rounded,
+                    iconColor: AppColors.primary,
+                    value: timeLeft,
+                    label: 'Thời gian',
+                    bgColor: AppColors.primary.withValues(alpha: 0.1),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Warning Messages
+            if (unansweredQuestions > 0)
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.5)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: AppColors.warning),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Bạn còn $unansweredQuestions câu hỏi chưa hoàn thành. Hãy kiểm tra lại!',
+                        style: AppTypography.bodyMedium().copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            // Notes
+            _buildNoteItem(
+              icon: Icons.lock_outline_rounded,
+              text: 'Không thể thay đổi đáp án sau khi nộp.',
+            ),
+            const SizedBox(height: 12),
+            _buildNoteItem(
+              icon: CupertinoIcons.shield_lefthalf_fill,
+              text: 'Hệ thống sẽ chấm điểm và lưu kết quả ngay lập tức.',
+            ),
+            const SizedBox(height: 32),
+
+            // Actions
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: BorderSide(color: AppColors.textSecondary.withValues(alpha: 0.5)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      'LÀM TIẾP',
+                      style: AppTypography.labelLarge().copyWith(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-                Container(
-                  width: 64,
-                  height: 64,
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.warning.withValues(alpha: 0.15),
-                  ),
-                  child: Icon(
-                    size: 40,
-                    Icons.warning,
-                    color: AppColors.warning,
-                  ),
-                ),
-                Text('Xác nhận nộp bài', style: AppTypography.headlineLarge()),
-                (answeredQuestions < totalQuestions)
-                    ? RichText(
-                        text: TextSpan(
-                          // text: 'Câu hỏi chưa nộp: ',
-                          style: AppTypography.headlineSmall().copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: 'Bạn vẫn còn ',
-                              style: AppTypography.bodyMedium(),
-                            ),
-                            TextSpan(
-                              text: '${totalQuestions - answeredQuestions}',
-                              style: AppTypography.bodyMedium(
-                                color: AppColors.primary,
-                              ).copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: ' câu chưa nộp',
-                              style: AppTypography.bodyMedium(),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Container(),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Sau khi nộp bài: ',
-                            style: AppTypography.headlineSmall(),
-                            // textAlign: TextAlign.,
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Container(
-                              width: 28,
-                              height: 28,
-
-                              decoration: BoxDecoration(
-                                color: Color(0XFF64748B).withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(Icons.lock_outlined, size: 16),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Không thể thay đổi đáp án',
-                              style: AppTypography.bodyMedium(),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Container(
-                              width: 28,
-                              height: 28,
-
-                              decoration: BoxDecoration(
-                                color: Color(0XFF64748B).withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(CupertinoIcons.shield, size: 16),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Hệ thống sẽ chấm điểm ngay',
-                              style: AppTypography.bodyMedium(),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 32),
-                        Text(
-                          'Bạn có chắc muốn nộp bài',
-                          style: AppTypography.headlineMedium(),
-                        ),
-                        SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            // color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Item(
-                                icons: Icon(
-                                  Icons.check_rounded,
-                                  color: AppColors.borderCorrect,
-                                ),
-                                label: 'Đã làm',
-                                numberAnswered: answeredQuestions,
-                                timeLeft: timeLeft,
-                                backgroundColor: AppColors.borderCorrect
-                                    .withValues(alpha: 0.4),
-                              ),
-                              Item(
-                                icons: Icon(
-                                  Icons.radio_button_unchecked_rounded,
-                                  color: AppColors.borderWrong,
-                                ),
-                                label: 'Chưa làm',
-                                numberAnswered: totalQuestions - answeredQuestions,
-                                timeLeft: timeLeft,
-                                backgroundColor: AppColors.borderWrong
-                                    .withValues(alpha: 0.4),
-                              ),
-                              Item(
-                                icons: Icon(
-                                  Icons.timelapse_outlined,
-                                  color: AppColors.primary,
-                                ),
-                                label: 'Thời gian',
-                                numberAnswered: answeredQuestions,
-                                timeLeft: timeLeft,
-                                backgroundColor: AppColors.primary.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 32),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                    color: Color(0XFF2563EB),
-                                    width: 2,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-
-                                child: Text(
-                                  'LÀM TIẾP',
-                                  textAlign: TextAlign.center,
-                                  style: AppTypography.headlineSmall().copyWith(
-                                    color: Color(0XFF2563EB),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor: AppColors.borderWrong,
-                                  side: BorderSide(
-                                    color: AppColors.borderWrong,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context); // Đóng dialog
-                                  if (onSubmit != null) {
-                                    onSubmit!(); // Kích hoạt callback nộp bài
-                                  }
-                                },
-
-                                child: Text(
-                                  'NỘP BÀI',
-                                  style: AppTypography.headlineSmall().copyWith(
-                                    color: AppColors.background,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      if (onSubmit != null) onSubmit!();
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      'NỘP BÀI',
+                      style: AppTypography.labelLarge().copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -246,6 +197,67 @@ class SubmitExamDialog extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required Color iconColor,
+    required String value,
+    required String label,
+    required Color bgColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: iconColor, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: AppTypography.headlineMedium().copyWith(
+              fontWeight: FontWeight.bold,
+              color: iconColor,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: AppTypography.labelSmall().copyWith(
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoteItem({required IconData icon, required String text}) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceVariant,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 16, color: AppColors.textSecondary),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: AppTypography.bodyMedium().copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

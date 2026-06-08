@@ -32,7 +32,7 @@ class ExamDetailBloc extends Bloc<ExamDetailEvent, ExamDetailState> {
         },
       );
     } catch (e) {
-      print('❌ LỖI TẠI EXAM_DETAIL_BLOC: $e');
+      print('LỖI TẠI EXAM_DETAIL_BLOC: $e');
       emit(ExamDetailError(messageError: e.toString()));
     }
   }
@@ -60,7 +60,7 @@ class ExamDetailBloc extends Bloc<ExamDetailEvent, ExamDetailState> {
         },
       );
     } catch (e) {
-      print('❌ LỖI TẠI EXAM_DETAIL_BLOC: $e');
+      print('LỖI TẠI EXAM_DETAIL_BLOC: $e');
       emit(ExamDetailError(messageError: e.toString()));
     }
   }
