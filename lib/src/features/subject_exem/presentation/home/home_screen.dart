@@ -17,7 +17,6 @@ class HomeScreen extends StatelessWidget {
   void _onTap({required int index, required BuildContext contextModelSheet}) {
     final AuthBloc authBloc = sl<AuthBloc>();
     print(authBloc.hashCode);
-    log(authBloc.state.toString() + 'home');
     final state = authBloc.state;
     if (state is GuestModeActive || state is AuthSuccess) {
       navigationShell.goBranch(
@@ -64,7 +63,8 @@ class HomeScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         'Đăng nhập/ Đăng ký ngay',
-                        style: AppTypography.headlineMedium().copyWith(
+                        textAlign: TextAlign.center,
+                        style: AppTypography.headlineSmall().copyWith(
                           color: Colors.white,
                         ),
                       ),

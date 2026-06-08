@@ -13,6 +13,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_state.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_event.dart'
     hide SelectAnswerEvent;
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/timer_cubit/timer_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/firebase_image.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/short_answer_input_field.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/submit_exam_dialog.dart';
@@ -35,7 +36,7 @@ class ExamDetailScreen extends StatefulWidget {
   State<ExamDetailScreen> createState() => _ExamDetailScreenState();
 }
 
-class _ExamDetailScreenState extends State<ExamDetailScreen> {
+class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBindingObserver {
   List<String> indexToLetter = ['A', 'B', 'C', 'D'];
   int? duration;
 
@@ -44,16 +45,27 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
   final ScrollController _scrollController = ScrollController();
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
     _pageController.dispose();
     super.dispose();
   }
 
+  @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    context.read<TimerCubit>().startTimer(widget.duration);
     context.read<ExamDetailBloc>().add(
       FetchExamDetailEvent(examId: widget.examId, subjectId: widget.subjectId),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<TimerCubit>().onAppResumed();
+    }
   }
 
   @override
@@ -61,7 +73,29 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     // TODO: implement build
     return Scaffold(
       appBar: _buildAppBar(),
-      body: BlocBuilder<ExamDetailBloc, ExamDetailState>(
+      body: BlocListener<TimerCubit, int>(
+        listener: (context, remainingSeconds) {
+          if (remainingSeconds == 0) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => AlertDialog(
+                title: Text('Hết giờ!'),
+                content: Text('Thời gian làm bài đã kết thúc. Hệ thống tự động nộp bài.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // TODO: Gọi sự kiện SubmitExamEvent và chuyển hướng
+                    },
+                    child: Text('Đóng'),
+                  )
+                ],
+              ),
+            );
+          }
+        },
+        child: BlocBuilder<ExamDetailBloc, ExamDetailState>(
         buildWhen: (previous, current) =>
             previous.runtimeType != current.runtimeType,
         builder: (BuildContext context, state) {
@@ -100,7 +134,8 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
           return SizedBox();
         },
       ),
-      bottomNavigationBar: _buildBottomNav(),
+    ),
+      bottomNavigationBar: _buildBottomNav(context),
     );
   }
 
@@ -110,19 +145,41 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
       preferredSize: const Size.fromHeight(70),
       child: AppAppbar(
         title: 'Đề thi ${widget.title} ',
-        actions: _timeCountdown(duration: 90),
+        actions: _timeCountdown(duration: duration),
       ),
     );
   }
 
   Widget _timeCountdown({required int duration}) {
-    return Container(
-      margin: EdgeInsets.only(right: 15),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 5,
-        children: [Icon(Icons.timer_outlined), Text('$duration phút')],
-      ),
+    return BlocBuilder<TimerCubit, int>(
+      builder: (context, remainingSeconds) {
+        if (remainingSeconds < 0) return const SizedBox();
+        
+        final minutes = (remainingSeconds / 60).floor().toString().padLeft(2, '0');
+        final seconds = (remainingSeconds % 60).toString().padLeft(2, '0');
+        final isWarning = remainingSeconds <= 60; // Báo đỏ khi còn dưới 1 phút
+
+        return Container(
+          margin: EdgeInsets.only(right: 15),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 5,
+            children: [
+              Icon(
+                Icons.timer_outlined, 
+                color: isWarning ? AppColors.borderWrong : null,
+              ), 
+              Text(
+                '$minutes:$seconds',
+                style: TextStyle(
+                  color: isWarning ? AppColors.borderWrong : null,
+                  fontWeight: isWarning ? FontWeight.bold : null,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -330,85 +387,178 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 
-  Widget _buildBottomNav() {
-    return Container(
-      height: MediaQuery.sizeOf(context).height * 0.07,
-      padding: EdgeInsets.symmetric(horizontal: 26),
-      margin: EdgeInsets.only(bottom: MediaQuery.sizeOf(context).height * 0.01),
-      child: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildButtonAction(
-            label: 'TRƯỚC',
-            onTap: () => _pageController.previousPage(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            ),
-          ),
-          Spacer(),
-          _buildButtonAction(
-            label: 'NỘP BÀI',
-            onTap: () {
-              final state = context.read<ExamDetailBloc>().state;
-              if (state is ExamDetailLoaded) {
-                final total = state.questions.length;
-                final answered = state.selectedAnswers!.values
-                    .where((v) => v != null)
-                    .length;
+  Widget _buildBottomNav(BuildContext context) {
+    return BlocBuilder<ExamDetailBloc, ExamDetailState>(
+      builder: (context, state) {
+        int currentIndex = 0;
+        int totalQuestions = 0;
 
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return SubmitExamDialog(
-                      totalQuestions: total,
-                      answeredQuestions: answered,
-                      timeLeft:
-                          '14:14', // Đang để tạm thời, sau này lấy từ bộ đếm ngược
-                      onSubmit: () {
-                        // TODO: Gọi sự kiện nộp bài chính thức
-                        // context.read<ExamDetailBloc>().add(SubmitExamEvent());
-                      },
-                    );
-                  },
-                );
-              }
-            },
-          ),
-          Spacer(),
-          _buildButtonAction(
-            label: 'SAU',
-            onTap: () => _pageController.nextPage(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
+        if (state is ExamDetailLoaded) {
+          currentIndex = state.currentIndex;
+          totalQuestions = state.questions.length;
+        }
+
+        bool isFirstQuestion = currentIndex == 0;
+        bool isLastQuestion = totalQuestions > 0 && currentIndex == totalQuestions - 1;
+
+        return SafeArea(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // Nút TRƯỚC
+                _buildNavigationButton(
+                  label: 'TRƯỚC',
+                  icon: Icons.arrow_back_ios_new_rounded,
+                  onTap: isFirstQuestion
+                      ? null
+                      : () {
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                  isIconRight: false,
+                ),
+                
+                const SizedBox(width: 12),
+                
+                // Nút NỘP BÀI
+                Expanded(
+                  child: _buildSubmitButton(
+                    onTap: () {
+                      if (state is ExamDetailLoaded) {
+                        final total = state.questions.length;
+                        final answered = state.selectedAnswers!.values
+                            .where((v) => v != null)
+                            .length;
+
+                        final remaining = context.read<TimerCubit>().state;
+                        final timeLeftStr = remaining > 0 
+                            ? '${(remaining / 60).floor().toString().padLeft(2, '0')}:${(remaining % 60).toString().padLeft(2, '0')}'
+                            : '00:00';
+
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            return SubmitExamDialog(
+                              totalQuestions: total,
+                              answeredQuestions: answered,
+                              timeLeft: timeLeftStr,
+                              onSubmit: () {
+                                context.read<TimerCubit>().stopTimer();
+                                // TODO: Gọi sự kiện nộp bài chính thức
+                                // context.read<ExamDetailBloc>().add(SubmitExamEvent());
+                              },
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                // Nút SAU
+                _buildNavigationButton(
+                  label: 'SAU',
+                  icon: Icons.arrow_forward_ios_rounded,
+                  onTap: isLastQuestion
+                      ? null
+                      : () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                  isIconRight: true,
+                ),
+              ],
             ),
           ),
-        ],
+        );
+      },
+    );
+  }
+
+  Widget _buildSubmitButton({required VoidCallback onTap}) {
+    return Material(
+      color: AppColors.primary,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 2,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'NỘP BÀI',
+                style: AppTypography.labelMedium().copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildButtonAction({
+  Widget _buildNavigationButton({
     required String label,
-    required VoidCallback onTap,
+    required IconData icon,
+    required VoidCallback? onTap,
+    required bool isIconRight,
   }) {
+    final bool isDisabled = onTap == null;
+    final Color contentColor = isDisabled 
+        ? AppColors.textSecondary.withValues(alpha: 0.5) 
+        : AppColors.primary;
+    final Color bgColor = isDisabled 
+        ? AppColors.surfaceVariant.withValues(alpha: 0.5) 
+        : AppColors.primary.withValues(alpha: 0.1);
+
     return Material(
-      // elevation: 1,
-      color: AppColors.background,
+      color: bgColor,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border, width: 1.5),
-          ),
-          child: Center(
-            child: Text(
-              label.toUpperCase(),
-              style: AppTypography.labelMedium(),
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!isIconRight) Icon(icon, size: 18, color: contentColor),
+              if (!isIconRight) const SizedBox(width: 4),
+              Text(
+                label,
+                style: AppTypography.labelMedium().copyWith(
+                  color: contentColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (isIconRight) const SizedBox(width: 4),
+              if (isIconRight) Icon(icon, size: 18, color: contentColor),
+            ],
           ),
         ),
       ),
@@ -425,6 +575,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
       // height: MediaQuery.sizeOf(context).height  * 0.00333,
       child: PageView.builder(
         controller: _pageController,
+        allowImplicitScrolling: true, // Cho phép tải trước các trang lân cận (precaching)
         onPageChanged: (index) {
           context.read<ExamDetailBloc>().add(
             ChangeQuestionEvent(newIndex: index),
@@ -433,7 +584,9 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
         },
         itemCount: listQuestion.length,
         itemBuilder: (context, index) {
-          return _buildQuestionCard(context, index + 1, listQuestion[index]);
+          return KeepAliveWrapper(
+            child: _buildQuestionCard(context, index + 1, listQuestion[index]),
+          );
         },
       ),
     );
@@ -658,3 +811,25 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> {
     );
   }
 }
+
+class KeepAliveWrapper extends StatefulWidget {
+  final Widget child;
+
+  const KeepAliveWrapper({Key? key, required this.child}) : super(key: key);
+
+  @override
+  State<KeepAliveWrapper> createState() => _KeepAliveWrapperState();
+}
+
+class _KeepAliveWrapperState extends State<KeepAliveWrapper>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+}
+

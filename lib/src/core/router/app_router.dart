@@ -18,6 +18,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/e
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_event.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_state.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/timer_cubit/timer_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/exam_detail_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/list_exam_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/home/home_screen.dart';
@@ -101,9 +102,16 @@ class AppRouter {
 
           final String examId = state.pathParameters['examId']!;
           final exam = state.extra as ExamEntity;
-          return BlocProvider(
-            create: (context) => sl<ExamDetailBloc>()
-              ..add(FetchExamDetailEvent(examId: examId, subjectId: subjectId)),
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => sl<ExamDetailBloc>()
+                  ..add(FetchExamDetailEvent(examId: examId, subjectId: subjectId)),
+              ),
+              BlocProvider(
+                create: (context) => TimerCubit(),
+              ),
+            ],
             child: ExamDetailScreen(
               subjectId: subjectId,
               examId: examId,
