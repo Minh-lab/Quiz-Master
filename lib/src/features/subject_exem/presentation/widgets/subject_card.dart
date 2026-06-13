@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_container.dart';
 
@@ -21,12 +20,14 @@ class SubjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return AppContainer(
       padding: EdgeInsets
           .zero, // Padding is handled by inner widget for InkWell effect
       child: Material(
         elevation: 0.0,
-        // color: Colors.transparent, // Allow AppContainer background to show
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
@@ -40,8 +41,9 @@ class SubjectCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: color ?? AppColors.success.withValues(alpha: 0.15),
+                    color: color ?? colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: colorScheme.outlineVariant),
                   ),
                   child: image,
                 ),
@@ -49,7 +51,7 @@ class SubjectCard extends StatelessWidget {
                 Text(
                   title,
                   style: AppTypography.headlineSmall(
-                    color: AppColors.textPrimary,
+                    color: colorScheme.onSurface,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 1,
@@ -59,7 +61,7 @@ class SubjectCard extends StatelessWidget {
                 Text(
                   '$numberExam+ đề thi',
                   style: AppTypography.labelMedium(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ).copyWith(fontWeight: FontWeight.w500),
                 ),
               ],

@@ -19,7 +19,16 @@ class SubmitExamDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int unansweredQuestions = totalQuestions - answeredQuestions;
+    final unansweredQuestions = totalQuestions - answeredQuestions;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final successColor = isDark ? AppColors.darkSuccess : AppColors.success;
+    final successBg = isDark ? AppColors.darkSuccessBackground : AppColors.successBackground;
+    final errorColor = isDark ? AppColors.darkError : AppColors.error;
+    final errorBg = isDark ? AppColors.darkErrorBackground : AppColors.errorBackground;
+    final warningColor = isDark ? AppColors.darkWarning : AppColors.warning;
+    final warningBg = isDark ? AppColors.darkWarningBackground : AppColors.warningBackground;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -30,188 +39,191 @@ class SubmitExamDialog extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: colorScheme.outlineVariant),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Header Icon
-            Center(
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                ),
-                child: Icon(
-                  Icons.assignment_turned_in_rounded,
-                  size: 36,
-                  color: AppColors.primary,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colorScheme.primaryContainer,
+                  ),
+                  child: Icon(
+                    Icons.assignment_turned_in_rounded,
+                    size: 36,
+                    color: colorScheme.primary,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Title
-            Text(
-              'Xác nhận nộp bài',
-              textAlign: TextAlign.center,
-              style: AppTypography.headlineLarge().copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+              const SizedBox(height: 16),
+              Text(
+                'Xác nhận nộp bài',
+                textAlign: TextAlign.center,
+                style: AppTypography.headlineLarge().copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-
-            // Statistics Row
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    icon: Icons.check_circle_rounded,
-                    iconColor: AppColors.borderCorrect,
-                    value: '$answeredQuestions',
-                    label: 'Đã làm',
-                    bgColor: AppColors.borderCorrect.withValues(alpha: 0.1),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      context: context,
+                      icon: Icons.check_circle_rounded,
+                      iconColor: successColor,
+                      value: '$answeredQuestions',
+                      label: 'Đã làm',
+                      bgColor: successBg,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard(
+                      context: context,
+                      icon: Icons.error_rounded,
+                      iconColor: errorColor,
+                      value: '$unansweredQuestions',
+                      label: 'Chưa làm',
+                      bgColor: errorBg,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard(
+                      context: context,
+                      icon: Icons.timer_rounded,
+                      iconColor: colorScheme.primary,
+                      value: timeLeft,
+                      label: 'Thời gian',
+                      bgColor: colorScheme.primaryContainer,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              if (unansweredQuestions > 0)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: warningBg,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: warningColor),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.warning_amber_rounded, color: warningColor),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Bạn còn $unansweredQuestions câu hỏi chưa hoàn thành. Hãy kiểm tra lại!',
+                          style: AppTypography.bodyMedium().copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    icon: Icons.error_rounded,
-                    iconColor: AppColors.borderWrong,
-                    value: '$unansweredQuestions',
-                    label: 'Chưa làm',
-                    bgColor: AppColors.borderWrong.withValues(alpha: 0.1),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    icon: Icons.timer_rounded,
-                    iconColor: AppColors.primary,
-                    value: timeLeft,
-                    label: 'Thời gian',
-                    bgColor: AppColors.primary.withValues(alpha: 0.1),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Warning Messages
-            if (unansweredQuestions > 0)
-              Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.5)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.warning_amber_rounded, color: AppColors.warning),
-                    const SizedBox(width: 12),
-                    Expanded(
+              _buildNoteItem(
+                context: context,
+                icon: Icons.lock_outline_rounded,
+                text: 'Không thể thay đổi đáp án sau khi nộp.',
+              ),
+              const SizedBox(height: 12),
+              _buildNoteItem(
+                context: context,
+                icon: CupertinoIcons.shield_lefthalf_fill,
+                text: 'Hệ thống sẽ chấm điểm và lưu kết quả ngay lập tức.',
+              ),
+              const SizedBox(height: 32),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: colorScheme.surfaceContainerHigh,
+                        side: BorderSide(color: colorScheme.outline),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
                       child: Text(
-                        'Bạn còn $unansweredQuestions câu hỏi chưa hoàn thành. Hãy kiểm tra lại!',
-                        style: AppTypography.bodyMedium().copyWith(
-                          color: AppColors.textPrimary,
+                        'LÀM TIẾP',
+                        style: AppTypography.labelLarge().copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        onSubmit?.call();
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        'NỘP BÀI',
+                        style: AppTypography.labelLarge().copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-
-            // Notes
-            _buildNoteItem(
-              icon: Icons.lock_outline_rounded,
-              text: 'Không thể thay đổi đáp án sau khi nộp.',
-            ),
-            const SizedBox(height: 12),
-            _buildNoteItem(
-              icon: CupertinoIcons.shield_lefthalf_fill,
-              text: 'Hệ thống sẽ chấm điểm và lưu kết quả ngay lập tức.',
-            ),
-            const SizedBox(height: 32),
-
-            // Actions
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(color: AppColors.textSecondary.withValues(alpha: 0.5)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: Text(
-                      'LÀM TIẾP',
-                      style: AppTypography.labelLarge().copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      if (onSubmit != null) onSubmit!();
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: Text(
-                      'NỘP BÀI',
-                      style: AppTypography.labelLarge().copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildStatCard({
+    required BuildContext context,
     required IconData icon,
     required Color iconColor,
     required String value,
     required String label,
     required Color bgColor,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: iconColor.withValues(alpha: 0.55)),
       ),
       child: Column(
         children: [
@@ -228,7 +240,8 @@ class SubmitExamDialog extends StatelessWidget {
           Text(
             label,
             style: AppTypography.labelSmall().copyWith(
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
           ),
@@ -237,23 +250,31 @@ class SubmitExamDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildNoteItem({required IconData icon, required String text}) {
+  Widget _buildNoteItem({
+    required BuildContext context,
+    required IconData icon,
+    required String text,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: colorScheme.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: colorScheme.outlineVariant),
           ),
-          child: Icon(icon, size: 16, color: AppColors.textSecondary),
+          child: Icon(icon, size: 16, color: colorScheme.onSurfaceVariant),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             text,
             style: AppTypography.bodyMedium().copyWith(
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),

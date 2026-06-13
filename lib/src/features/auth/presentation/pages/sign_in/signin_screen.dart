@@ -53,6 +53,9 @@ class _SignInScreenState extends State<SignInScreen> {
               );
             } else if (state is SignInSuccess) {
               context.read<AuthBloc>().add(UserLoggedIn(state.user));
+              if (context.mounted) {
+                context.go(AppRouter.home);
+              }
             }
           },
           builder: (BuildContext context, SignInState state) {
@@ -80,11 +83,13 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 if (state is SignInLoading)
                   Positioned.fill(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        child: const Center(child: CircularProgressIndicator()),
+                    child: ClipRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          child: const Center(child: CircularProgressIndicator()),
+                        ),
                       ),
                     ),
                   ),
@@ -192,6 +197,7 @@ class _SignInScreenState extends State<SignInScreen> {
             SizedBox(height: 16),
             _buildSigninButton(
               onTap: () async {
+                FocusScope.of(context).unfocus(); // Ẩn bàn phím để tránh kẹt giao diện
                 if (_formKey.currentState!.validate()) {
                   context.read<SignInCubit>().signIn(
                     SigninRequest(
@@ -210,6 +216,7 @@ class _SignInScreenState extends State<SignInScreen> {
               text: 'Tiếp tục với Google',
               iconPath: AppAssetIcon.google,
               onTap: () {
+                FocusScope.of(context).unfocus(); // Ẩn bàn phím
                 log('Sign in with Google');
                 context.read<SignInCubit>().signInWithGoogle();
               },

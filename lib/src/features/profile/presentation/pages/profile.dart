@@ -5,6 +5,8 @@ import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
+import 'package:quiz_mater_apllication/src/core/theme/bloc/theme_cubit.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -22,9 +24,7 @@ class ProfileScreen extends StatelessWidget {
         elevation: 0,
         title: Text(
           "Cá nhân",
-          style: AppTypography.headlineMedium().copyWith(
-            color: Colors.white,
-          ),
+          style: AppTypography.headlineMedium().copyWith(color: Colors.white),
         ),
         actions: [
           IconButton(
@@ -40,10 +40,13 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
             _buildUserInfo(context, textColor),
             const SizedBox(height: 32),
+            _buildLearningSection(context, textColor),
+            const SizedBox(height: 16),
             _buildSettingsSection(context, textColor),
             const SizedBox(height: 16),
             _buildAccountSection(context, textColor),
-            const SizedBox(height: 40),
+            const SizedBox(height: 16),
+  
           ],
         ),
       ),
@@ -54,8 +57,12 @@ class ProfileScreen extends StatelessWidget {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is AuthSuccess) {
-          final String name = (state.user.displayName?.isEmpty ?? true) ? "Khách" : state.user.displayName!;
-          final String initial = name.isNotEmpty ? name.substring(0, 1).toUpperCase() : "K";
+          final String name = (state.user.displayName?.isEmpty ?? true)
+              ? "Khách"
+              : state.user.displayName!;
+          final String initial = name.isNotEmpty
+              ? name.substring(0, 1).toUpperCase()
+              : "K";
           final String email = state.user.email ?? "";
 
           return Padding(
@@ -64,7 +71,8 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primary,          // _buildSupportSection(context, textColor),
+            // const SizedBox(height: 40),
                   child: Text(
                     initial,
                     style: AppTypography.headlineMedium().copyWith(
@@ -93,9 +101,13 @@ class ProfileScreen extends StatelessWidget {
                             color: textColor.withOpacity(0.7),
                           ),
                         ),
-                      ]
+                      ],
                     ],
                   ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit_outlined, color: AppColors.primary),
+                  onPressed: () => context.push('/profile/edit'),
                 ),
               ],
             ),
@@ -103,9 +115,105 @@ class ProfileScreen extends StatelessWidget {
         }
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text('Không có thông tin người dùng', style: AppTypography.bodyMedium().copyWith(color: textColor)),
+          child: Text(
+            'Không có thông tin người dùng',
+            style: AppTypography.bodyMedium().copyWith(color: textColor),
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildLearningSection(BuildContext context, Color textColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Text(
+            'Học tập',
+            style: AppTypography.headlineSmall().copyWith(color: textColor),
+          ),
+        ),
+        _buildListTile(
+          title: "Lịch sử làm bài",
+          leadingIcon: Icons.history_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          onTap: () => context.push('/profile/exam-history'),
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+        _buildListTile(
+          title: "Sổ lỗi sai",
+          leadingIcon: Icons.menu_book_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          onTap: () => context.push('/profile/wrong-answers'),
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+        _buildListTile(
+          title: "Đề đã lưu",
+          leadingIcon: Icons.bookmark_outline,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          onTap: () => context.push('/profile/saved-exams'),
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+        _buildListTile(
+          title: "Thống kê học tập",
+          leadingIcon: Icons.bar_chart_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          onTap: () => context.push('/profile/learning-statistics'),
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+      ],
+    );
+  }
+
+  Widget _buildSupportSection(BuildContext context, Color textColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Text(
+            'Hỗ trợ',
+            style: AppTypography.headlineSmall().copyWith(color: textColor),
+          ),
+        ),
+        _buildListTile(
+          title: "Điều khoản sử dụng",
+          leadingIcon: Icons.description_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          onTap: () {},
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+        _buildListTile(
+          title: "Chính sách bảo mật",
+          leadingIcon: Icons.privacy_tip_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          onTap: () {},
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+        _buildListTile(
+          title: "Góp ý / Báo lỗi",
+          leadingIcon: Icons.feedback_outlined,
+          iconColor: AppColors.primary,
+          textColor: textColor,
+          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          onTap: () {},
+        ),
+        const Divider(height: 1, indent: 20, endIndent: 20),
+      ],
     );
   }
 
@@ -120,16 +228,27 @@ class ProfileScreen extends StatelessWidget {
             style: AppTypography.headlineSmall().copyWith(color: textColor),
           ),
         ),
-        _buildListTile(
-          title: "Chế độ tối",
-          leadingIcon: Icons.dark_mode_outlined,
-          iconColor: AppColors.primary,
-          textColor: textColor,
-          trailing: Switch(
-            value: false,
-            onChanged: (value) {},
-            activeColor: AppColors.primary,
-          ),
+        BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            final isDarkMode =
+                themeMode == ThemeMode.dark ||
+                (themeMode == ThemeMode.system &&
+                    MediaQuery.platformBrightnessOf(context) ==
+                        Brightness.dark);
+            return _buildListTile(
+              title: "Chế độ tối",
+              leadingIcon: Icons.dark_mode_outlined,
+              iconColor: AppColors.primary,
+              textColor: textColor,
+              trailing: Switch(
+                value: isDarkMode,
+                onChanged: (value) {
+                  context.read<ThemeCubit>().toggleTheme();
+                },
+                activeColor: AppColors.primary,
+              ),
+            );
+          },
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
         _buildListTile(
@@ -145,11 +264,18 @@ class ProfileScreen extends StatelessWidget {
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
         _buildListTile(
-          title: "Lịch sử làm bài",
-          leadingIcon: Icons.history_outlined,
+          title: "Ngôn ngữ",
+          leadingIcon: Icons.language_outlined,
           iconColor: AppColors.primary,
           textColor: textColor,
-          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Tiếng Việt', style: TextStyle(color: textColor.withOpacity(0.6))),
+              const SizedBox(width: 8),
+              Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+            ],
+          ),
           onTap: () {},
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
@@ -173,11 +299,12 @@ class ProfileScreen extends StatelessWidget {
           leadingIcon: Icons.lock_outlined,
           iconColor: AppColors.primary,
           textColor: textColor,
-          trailing: Switch(
-            value: false,
-            onChanged: (value) {},
-            activeColor: AppColors.primary,
+          trailing: Icon(
+            Icons.arrow_forward_ios_outlined,
+            size: 16,
+            color: textColor.withOpacity(0.5),
           ),
+          onTap: () => context.push('/profile/change-password'),
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
         _buildListTile(
@@ -221,11 +348,19 @@ class ProfileScreen extends StatelessWidget {
       builder: (BuildContext dialogContext) {
         final isDark = Theme.of(dialogContext).brightness == Brightness.dark;
         final textColor = isDark ? Colors.white : Colors.black;
-        
+
         return AlertDialog(
-          title: Text("Xác nhận đăng xuất", style: AppTypography.headlineSmall().copyWith(color: textColor)),
-          content: Text("Bạn có chắc chắn muốn đăng xuất?", style: AppTypography.bodyMedium().copyWith(color: textColor)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            "Xác nhận đăng xuất",
+            style: AppTypography.headlineSmall().copyWith(color: textColor),
+          ),
+          content: Text(
+            "Bạn có chắc chắn muốn đăng xuất?",
+            style: AppTypography.bodyMedium().copyWith(color: textColor),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           actions: [
             TextButton(
               onPressed: () {
