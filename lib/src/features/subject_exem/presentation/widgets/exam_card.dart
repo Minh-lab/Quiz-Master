@@ -1,17 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
-import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/app_container.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ExamCard extends StatelessWidget {
   final String title;
   final VoidCallback? onTap;
   final String numberQuestion;
-
   final String time;
+
   const ExamCard({
     super.key,
     required this.title,
@@ -22,64 +18,39 @@ class ExamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    final colorScheme = Theme.of(context).colorScheme;
 
     return AppContainer(
-      color: AppColors.background,
+      color: colorScheme.surfaceContainer,
       width: double.infinity,
-      // height: 200,
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-      // height: 200,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       child: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Container(
-          //   // width: 50,
-          //   // height: 100,
-          //   child: SvgPicture.asset(
-          //     AppAssetIcon.engIcon,
-          //     width: 60,
-          //     height: 60,
-          //     colorFilter: ColorFilter.mode(
-          //       AppColors.borderSelected.withValues(alpha: 0.7),
-          //       BlendMode.srcIn,
-          //     ),
-          //   ),
-          // ),
-          SizedBox(width: 16),
-          Expanded(child: _detailExam()),
+          Expanded(child: _detailExam(context)),
+          const SizedBox(width: 12),
           Column(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Text('Độ Khó'),
-              // Text('Khó'),
-              SizedBox(height: 50),
-              AppContainer(
-                color: AppColors.borderSelected.withValues(alpha: 0.7),
+              const SizedBox(height: 46),
+              SizedBox(
                 width: 100,
-                height: 36,
-                child: ElevatedButton(
+                height: 38,
+                child: FilledButton(
                   onPressed: onTap,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    // spacing: 5,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Icon(
-                      //   Icons.edit_outlined,
-                      //   color: Colors.white.withValues(alpha: 0.8),
-
-                      // ),
-                      Text(
-                        'Thi thử',
-                        style: AppTypography.bodyMedium().copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(100, 38),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    'Thi thử',
+                    style: AppTypography.bodyMedium().copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -90,38 +61,55 @@ class ExamCard extends StatelessWidget {
     );
   }
 
-  Widget _detailExam() {
-    return Container(
-      // width: 100,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 10,
-        children: [
-          Text(title, style: AppTypography.headlineSmall(), softWrap: true),
+  Widget _detailExam(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.question_answer_outlined),
-                  Text('$numberQuestion câu'),
-                ],
-              ),
-              SizedBox(width: 10),
-
-              Row(
-                children: [
-                  Icon(Icons.timer_outlined),
-                  Text('$time phút'),
-                ],
-              ),
-            ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        Text(
+          title,
+          style: AppTypography.headlineSmall().copyWith(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.w800,
           ),
-        ],
-      ),
+          softWrap: true,
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.question_answer_outlined,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '$numberQuestion câu',
+                  style: AppTypography.bodyMedium(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 10),
+            Row(
+              children: [
+                Icon(Icons.timer_outlined, color: colorScheme.onSurfaceVariant),
+                const SizedBox(width: 4),
+                Text(
+                  '$time phút',
+                  style: AppTypography.bodyMedium(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

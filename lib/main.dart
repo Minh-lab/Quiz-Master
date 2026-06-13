@@ -15,6 +15,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/domain/usecases
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/pages/exem_subject_screen.dart';
+import 'package:quiz_mater_apllication/src/core/theme/bloc/theme_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,12 +40,18 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => sl<ExamBloc>()),
         BlocProvider.value(value: sl<AuthBloc>()),
+        BlocProvider(create: (context) => sl<ThemeCubit>()),
       ],
-      child: MaterialApp.router(
-        title: 'Flutter Demo',
-        theme: AppTheme.lightTheme,
-        // darkTheme: AppTheme.darkTheme,
-        routerConfig: AppRouter.router,
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return MaterialApp.router(
+            title: 'Flutter Demo',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeMode,
+            routerConfig: AppRouter.router,
+          );
+        },
       ),
     );
   }

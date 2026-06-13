@@ -25,6 +25,12 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ho
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_event.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/pages/exem_subject_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/edit_profile_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/change_password_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/exam_history_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/wrong_answers_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/saved_exams_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/learning_statistics_screen.dart';
 
 class AppRouter {
   static final AuthBloc authBloc = sl<AuthBloc>();
@@ -163,6 +169,32 @@ class AppRouter {
                   // final user = state.extra as UserEntity;
                   return ProfileScreen();
                 },
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    builder: (context, state) => const EditProfileScreen(),
+                  ),
+                  GoRoute(
+                    path: 'change-password',
+                    builder: (context, state) => const ChangePasswordScreen(),
+                  ),
+                  GoRoute(
+                    path: 'exam-history',
+                    builder: (context, state) => const ExamHistoryScreen(),
+                  ),
+                  GoRoute(
+                    path: 'wrong-answers',
+                    builder: (context, state) => const WrongAnswersScreen(),
+                  ),
+                  GoRoute(
+                    path: 'saved-exams',
+                    builder: (context, state) => const SavedExamsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'learning-statistics',
+                    builder: (context, state) => const LearningStatisticsScreen(),
+                  ),
+                ],
               ),
             ],
           ),

@@ -15,7 +15,7 @@ class AppAssetIcon {
   static const String calculatingIcon = 'assets/icons/calculating.svg';
   static const String clockIcon = 'assets/icons/clock.svg';
   static const String crossIcon = 'assets/icons/cross.svg';
-  static const String engIcon = 'assets/icons/eng.svg';
+  static const String englishIcon = 'assets/icons/englishIcon.svg';
   static const String examIcon = 'assets/icons/exam.svg';
   static const String fireIcon = 'assets/icons/fire.svg';
   static const String minusIcon = 'assets/icons/minus.svg';
@@ -36,4 +36,6 @@ class AppAssetIcon {
   static const String gradurationCap = 'assets/icons/gradurationCap.svg';
   static const String google = 'assets/icons/google.svg';
   static const String security = 'assets/icons/security.svg';
+  static const String biologyIcon = 'assets/icons/biologyIcon.svg';
+  static const String geographyIcon = 'assets/icons/geographyIcon.svg';
 }

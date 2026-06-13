@@ -17,6 +17,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/firebase_image.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/short_answer_input_field.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/submit_exam_dialog.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/exam_result_screen.dart';
 
 class ExamDetailScreen extends StatefulWidget {
   final String subjectId;
@@ -167,12 +168,12 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
             children: [
               Icon(
                 Icons.timer_outlined, 
-                color: isWarning ? AppColors.borderWrong : null,
+                color: isWarning ? Theme.of(context).colorScheme.error : null,
               ), 
               Text(
                 '$minutes:$seconds',
                 style: TextStyle(
-                  color: isWarning ? AppColors.borderWrong : null,
+                  color: isWarning ? Theme.of(context).colorScheme.error : null,
                   fontWeight: isWarning ? FontWeight.bold : null,
                 ),
               ),
@@ -209,10 +210,8 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                       ? (totalQuestionAnswered / totalQuestion)
                       : 0.0,
                   borderRadius: BorderRadius.circular(30),
-                  color: (totalQuestionAnswered > 0)
-                      ? AppColors.primary
-                      : AppColors.surface,
-                  backgroundColor: AppColors.surfaceVariant,
+                  color: Theme.of(context).colorScheme.primary,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
                 ),
               ),
             ],
@@ -252,17 +251,16 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
               bool isCurrent = currentIndex == index;
 
               Color bgColor = isCurrent
-                  ? AppColors
-                        .background //
-                  : (isAnswered ? AppColors.primary : AppColors.surfaceVariant);
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : (isAnswered ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceContainerHighest);
 
               Color textColor = isCurrent
-                  ? AppColors.primary
-                  : (isAnswered ? Colors.white : AppColors.textSecondary);
+                  ? Theme.of(context).colorScheme.onPrimaryContainer
+                  : (isAnswered ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant);
 
               Color borderColor = isCurrent
-                  ? AppColors.primary
-                  : Colors.transparent;
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.outlineVariant;
 
               return InkWell(
                 onTap: () => _pageController.jumpToPage(index),
@@ -277,7 +275,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                     boxShadow: isCurrent
                         ? [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.3),
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
@@ -319,9 +317,9 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
         // height: 200,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: Theme.of(context).colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border, width: 3),
+          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
         ),
         child: Column(
           spacing: 20,
@@ -334,7 +332,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                   child: Text(
                     'Câu $index',
                     style: AppTypography.headlineSmall().copyWith(
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -345,14 +343,21 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.15),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.darkWarningBackground
+                        : AppColors.warningBackground,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.darkWarning
+                          : AppColors.warning,
+                    ),
                   ),
                   child: Center(
                     child: Text(
                       question.score.toString(),
                       style: AppTypography.labelSmall(
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -405,10 +410,15 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: Theme.of(context).colorScheme.surface,
+              border: Border(
+                top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(
+                    alpha: Theme.of(context).brightness == Brightness.dark ? 0.28 : 0.08,
+                  ),
                   blurRadius: 10,
                   offset: const Offset(0, -5),
                 ),
@@ -418,6 +428,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
               children: [
                 // Nút TRƯỚC
                 _buildNavigationButton(
+                  context: context,
                   label: 'TRƯỚC',
                   icon: Icons.arrow_back_ios_new_rounded,
                   onTap: isFirstQuestion
@@ -436,6 +447,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                 // Nút NỘP BÀI
                 Expanded(
                   child: _buildSubmitButton(
+                    context: context,
                     onTap: () {
                       if (state is ExamDetailLoaded) {
                         final total = state.questions.length;
@@ -457,8 +469,21 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                               timeLeft: timeLeftStr,
                               onSubmit: () {
                                 context.read<TimerCubit>().stopTimer();
-                                // TODO: Gọi sự kiện nộp bài chính thức
-                                // context.read<ExamDetailBloc>().add(SubmitExamEvent());
+                                
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ExamResultScreen(
+                                      questions: state.questions,
+                                      userAnswers: state.selectedAnswers ?? {},
+                                      timeTakenInSeconds: (widget.duration * 60) - remaining,
+                                      subjectId: widget.subjectId,
+                                      examId: widget.examId,
+                                      title: widget.title,
+                                      duration: widget.duration,
+                                    ),
+                                  ),
+                                );
                               },
                             );
                           },
@@ -472,6 +497,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
 
                 // Nút SAU
                 _buildNavigationButton(
+                  context: context,
                   label: 'SAU',
                   icon: Icons.arrow_forward_ios_rounded,
                   onTap: isLastQuestion
@@ -492,9 +518,9 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
     );
   }
 
-  Widget _buildSubmitButton({required VoidCallback onTap}) {
+  Widget _buildSubmitButton({required VoidCallback onTap, required BuildContext context}) {
     return Material(
-      color: AppColors.primary,
+      color: Theme.of(context).colorScheme.primary,
       borderRadius: BorderRadius.circular(16),
       elevation: 2,
       child: InkWell(
@@ -505,12 +531,12 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+              Icon(Icons.send_rounded, color: Theme.of(context).colorScheme.onPrimary, size: 20),
               const SizedBox(width: 8),
               Text(
                 'NỘP BÀI',
                 style: AppTypography.labelMedium().copyWith(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                 ),
@@ -523,6 +549,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
   }
 
   Widget _buildNavigationButton({
+    required BuildContext context,
     required String label,
     required IconData icon,
     required VoidCallback? onTap,
@@ -530,11 +557,11 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
   }) {
     final bool isDisabled = onTap == null;
     final Color contentColor = isDisabled 
-        ? AppColors.textSecondary.withValues(alpha: 0.5) 
-        : AppColors.primary;
+        ? Theme.of(context).disabledColor
+        : Theme.of(context).colorScheme.onPrimaryContainer;
     final Color bgColor = isDisabled 
-        ? AppColors.surfaceVariant.withValues(alpha: 0.5) 
-        : AppColors.primary.withValues(alpha: 0.1);
+        ? Theme.of(context).colorScheme.surfaceContainerHighest
+        : Theme.of(context).colorScheme.primaryContainer;
 
     return Material(
       color: bgColor,
@@ -647,10 +674,10 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.1)
-                    : AppColors.surface,
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : Theme.of(context).colorScheme.surfaceContainerHigh,
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.border,
+                  color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outlineVariant,
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(12),
@@ -660,14 +687,14 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                   CircleAvatar(
                     radius: 16,
                     backgroundColor: isSelected
-                        ? AppColors.primary
-                        : AppColors.surfaceVariant,
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.surfaceVariant,
                     child: Text(
                       letter,
                       style: TextStyle(
                         color: isSelected
-                            ? Colors.white
-                            : AppColors.textPrimary,
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -678,8 +705,9 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                       optionText,
                       style: AppTypography.bodyLarge().copyWith(
                         color: isSelected
-                            ? AppColors.primary
-                            : AppColors.textPrimary,
+                            ? Theme.of(context).colorScheme.onPrimaryContainer
+                            : Theme.of(context).colorScheme.onSurface,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                       ),
                     ),
                   ),
@@ -706,7 +734,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
           child: Text(
             'Chọn Đúng hoặc Sai cho mỗi ý kiến dưới đây:',
             style: AppTypography.headlineSmall().copyWith(
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -718,21 +746,24 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
             margin: const EdgeInsets.symmetric(vertical: 6),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
             ),
             child: Row(
               children: [
                 Expanded(
-                  child: Text(optionText, style: AppTypography.bodyLarge()),
+                  child: Text(optionText, style: AppTypography.bodyLarge().copyWith(color: Theme.of(context).colorScheme.onSurface)),
                 ),
                 const SizedBox(width: 8),
                 // Nút Đúng
                 _buildTrueFalseOptionButton(
+                  context: context,
                   label: 'Đúng',
                   isSelected: currentSelection == true,
-                  selectedColor: Colors.green,
+                  selectedColor: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.darkSuccess
+                      : AppColors.success,
                   onTap: () {
                     answers[key] = true;
                     context.read<ExamDetailBloc>().add(
@@ -746,9 +777,12 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                 const SizedBox(width: 8),
                 // Nút Sai
                 _buildTrueFalseOptionButton(
+                  context: context,
                   label: 'Sai',
                   isSelected: currentSelection == false,
-                  selectedColor: Colors.red,
+                  selectedColor: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.darkError
+                      : AppColors.error,
                   onTap: () {
                     answers[key] = false;
                     context.read<ExamDetailBloc>().add(
@@ -768,6 +802,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
   }
 
   Widget _buildTrueFalseOptionButton({
+    required BuildContext context,
     required String label,
     required bool isSelected,
     required Color selectedColor,
@@ -778,16 +813,16 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? selectedColor : Colors.transparent,
+          color: isSelected ? selectedColor : Theme.of(context).colorScheme.surfaceContainer,
           border: Border.all(
-            color: isSelected ? selectedColor : AppColors.border,
+            color: isSelected ? selectedColor : Theme.of(context).colorScheme.outline,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textSecondary,
+            color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
           ),
         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_theme.dart';
 
 class AppContainer extends StatelessWidget {
@@ -18,20 +17,23 @@ class AppContainer extends StatelessWidget {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: width,
       height: height,
       padding: padding,
       decoration: BoxDecoration(
-        color: color ?? AppColors.surface.withValues(alpha: 0.8), //
+        color: color ?? colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: AppTheme.radiusLG,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.08),
+            blurRadius: isDark ? 18 : 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),

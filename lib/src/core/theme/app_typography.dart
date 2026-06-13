@@ -10,28 +10,28 @@ class AppTypography {
   static TextStyle displayLarge({Color? color}) => GoogleFonts.mulish(
         fontSize: 40,
         fontWeight: FontWeight.w700,
-        color: color ?? Colors.black,
+        color: color,
       );
 
 
   static TextStyle headlineLarge({Color? color}) => GoogleFonts.mulish(
         fontSize: 24,
         fontWeight: FontWeight.w600,
-        color: color ?? Colors.black,
+        color: color,
       );
 
 
   static TextStyle headlineMedium({Color? color}) => GoogleFonts.mulish(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        color: color ?? Colors.black,
+        color: color,
       );
 
 
   static TextStyle headlineSmall({Color? color}) => GoogleFonts.mulish(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: color ?? Colors.black,
+        color: color,
       );
 
  
@@ -40,7 +40,7 @@ class AppTypography {
   static TextStyle bodyLarge({Color? color}) => GoogleFonts.mulish(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: color ?? Colors.black,
+        color: color,
         height: 1.5,
       );
 
@@ -49,7 +49,7 @@ class AppTypography {
   static TextStyle bodyMedium({Color? color}) => GoogleFonts.mulish(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: color ?? Colors.black,
+        color: color,
         height: 1.4,
       );
 
@@ -57,40 +57,40 @@ class AppTypography {
   static TextStyle bodySmall({Color? color}) => GoogleFonts.mulish(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        color: color ?? Colors.black,
+        color: color,
       );
 
 
   static TextStyle labelLarge({Color? color}) => GoogleFonts.mulish(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: color ?? Colors.white,
+        color: color,
       );
 
   static TextStyle labelMedium({Color? color}) => GoogleFonts.mulish(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        color: color ?? Colors.black,
+        color: color,
       );
 
   
   static TextStyle labelSmall({Color? color}) => GoogleFonts.mulish(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        color: color ?? const Color(0xFF757575),
+        color: color,
       );
 
 
   static TextStyle scoreDisplay({Color? color}) => GoogleFonts.mulish(
         fontSize: 48,
         fontWeight: FontWeight.w800,
-        color: color ?? Colors.black,
+        color: color,
       );
 
  
   static TextStyle timer({Color? color}) => GoogleFonts.mulish(
         fontSize: 20,
         fontWeight: FontWeight.w700,
-        color: color ?? Colors.black,
+        color: color,
       );
 }

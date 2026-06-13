@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
 import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
-import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
@@ -28,6 +27,7 @@ class HomeScreen extends StatelessWidget {
       showModalBottomSheet(
         context: contextModelSheet,
         builder: (contextModelSheet) {
+          final colorScheme = Theme.of(contextModelSheet).colorScheme;
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 24),
             child: Column(
@@ -51,6 +51,7 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(height: 12),
                 InkWell(
                   onTap: () {
+                    Navigator.pop(contextModelSheet); // Pop bottom sheet first
                     contextModelSheet.push(AppRouter.signin);
                   },
                   child: Container(
@@ -58,14 +59,14 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      color: AppColors.primary,
+                      color: colorScheme.primary,
                     ),
                     child: Center(
                       child: Text(
                         'Đăng nhập/ Đăng ký ngay',
                         textAlign: TextAlign.center,
                         style: AppTypography.headlineSmall().copyWith(
-                          color: Colors.white,
+                            color: colorScheme.onPrimary,
                         ),
                       ),
                     ),
@@ -83,13 +84,14 @@ class HomeScreen extends StatelessWidget {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: AppColors.background,
+                        color: colorScheme.surfaceContainerHigh,
+                        border: Border.all(color: colorScheme.outline),
                       ),
                       child: Center(
                         child: Text(
                           'Để sau',
                           style: AppTypography.headlineMedium().copyWith(
-                            color: AppColors.primary,
+                            color: colorScheme.primary,
                           ),
                         ),
                       ),

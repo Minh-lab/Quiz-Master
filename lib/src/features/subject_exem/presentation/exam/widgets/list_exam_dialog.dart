@@ -1,5 +1,3 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:quiz_mater_apllication/src/core/constants/AppAssets/app_asset.dart';
@@ -11,50 +9,63 @@ class ListExamDialog extends StatelessWidget {
   final ExamEntity exam;
   final VoidCallback? onConfirm;
 
-  const ListExamDialog({Key? key, required this.exam, required this.onConfirm})
-    : super(key: key);
+  const ListExamDialog({super.key, required this.exam, required this.onConfirm});
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SingleChildScrollView(
       child: Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              SvgPicture.asset(
-                AppAssetIcon.examDetailPopup,
-                // width: 60,
-                // height: 60,
-              ),
-              SizedBox(height: 16),
-              Text('Bắt đầu thi thử', style: AppTypography.headlineMedium()),
+              SvgPicture.asset(AppAssetIcon.examDetailPopup),
+              const SizedBox(height: 16),
               Text(
-                '${exam.title}',
-                style: AppTypography.bodyLarge(),
+                'Bắt đầu thi thử',
+                style: AppTypography.headlineMedium(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              Text(
+                exam.title,
+                style: AppTypography.bodyLarge(
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 24),
-              _buildDetail(),
-              SizedBox(height: 24),
-              _buildWarning('Sau khi bắt đầu, thời gian sẽ được tính ngay!'),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
+              _buildDetail(context),
+              const SizedBox(height: 24),
+              _buildWarning(
+                context,
+                'Sau khi bắt đầu, thời gian sẽ được tính ngay!',
+              ),
+              const SizedBox(height: 24),
               Row(
                 children: [
                   Expanded(
                     child: _buildButtonAction(
+                      context: context,
                       label: 'Để sau',
                       onTap: () => Navigator.pop(context),
                       isConfirm: false,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: _buildButtonAction(
+                      context: context,
                       label: 'Bắt đầu',
                       onTap: onConfirm ?? () {},
                       isConfirm: true,
@@ -69,67 +80,90 @@ class ListExamDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildDetail() {
+  Widget _buildDetail(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: AppColors.primary.withValues(alpha: 0.09),
+        color: colorScheme.primaryContainer,
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.45)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.description_outlined, color: AppColors.primary),
-              SizedBox(width: 8),
-              Text('Số câu hỏi:', style: AppTypography.bodyMedium()),
-              Expanded(child: SizedBox()),
-              Text(
-                '${exam.questions.length} câu',
-                style: AppTypography.bodyLarge().copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          _buildDetailRow(
+            context: context,
+            icon: Icons.description_outlined,
+            label: 'Số câu hỏi:',
+            value: '${exam.questions.length} câu',
           ),
-          SizedBox(height: 16),
-          Row(
-            children: [
-              Icon(Icons.access_time_outlined, color: AppColors.primary),
-              SizedBox(width: 8),
-              Text('Thời gian làm bài:', style: AppTypography.bodyMedium()),
-              Expanded(child: SizedBox()),
-              Text(
-                '${exam.duration} phút',
-                style: AppTypography.bodyLarge().copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          const SizedBox(height: 16),
+          _buildDetailRow(
+            context: context,
+            icon: Icons.access_time_outlined,
+            label: 'Thời gian làm bài:',
+            value: '${exam.duration} phút',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildWarning(String message) {
+  Widget _buildDetailRow({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        Icon(icon, color: colorScheme.primary),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: AppTypography.bodyMedium().copyWith(
+            color: colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const Spacer(),
+        Text(
+          value,
+          style: AppTypography.bodyLarge().copyWith(
+            color: colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWarning(BuildContext context, String message) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final warningColor = isDark ? AppColors.darkWarning : AppColors.warning;
+    final warningBg = isDark ? AppColors.darkWarningBackground : AppColors.warningBackground;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: AppColors.warning.withValues(alpha: 0.09),
+        color: warningBg,
+        border: Border.all(color: warningColor),
       ),
       child: Row(
         children: [
-          Icon(Icons.warning, color: AppColors.warning),
-          SizedBox(width: 8),
+          Icon(Icons.warning_amber_rounded, color: warningColor),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: AppTypography.bodyMedium(),
+              style: AppTypography.bodyMedium().copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
               softWrap: true,
             ),
           ),
@@ -139,25 +173,27 @@ class ListExamDialog extends StatelessWidget {
   }
 
   Widget _buildButtonAction({
+    required BuildContext context,
     required String label,
     required VoidCallback onTap,
-    required isConfirm,
+    required bool isConfirm,
   }) {
-    return OutlinedButton(
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        backgroundColor: isConfirm ? AppColors.primary : Colors.white,
-      ),
-      child: Center(
-        child: Text(
-          label,
-          style: AppTypography.headlineSmall().copyWith(
-            color: isConfirm ? Colors.white : AppColors.primary,
-            fontWeight: FontWeight.w600
-          ),
-        ),
-      ),
-    );
+    final colorScheme = Theme.of(context).colorScheme;
+    return isConfirm
+        ? FilledButton(onPressed: onTap, child: Text(label))
+        : OutlinedButton(
+            onPressed: onTap,
+            style: OutlinedButton.styleFrom(
+              backgroundColor: colorScheme.surfaceContainerHigh,
+              side: BorderSide(color: colorScheme.outline),
+            ),
+            child: Text(
+              label,
+              style: AppTypography.headlineSmall().copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          );
   }
 }

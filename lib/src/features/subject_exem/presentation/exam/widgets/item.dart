@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 
 class Item extends StatelessWidget {
@@ -21,10 +19,9 @@ class Item extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Container(
-      // padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
         spacing: 5,
         children: [
           Container(
@@ -32,8 +29,9 @@ class Item extends StatelessWidget {
             height: 32,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: BoxBorder.all(
-                color: backgroundColor ?? AppColors.primary.withValues(alpha: 0.4),
+              color: colorScheme.surfaceContainerHigh,
+              border: Border.all(
+                color: backgroundColor ?? colorScheme.primary,
                 width: 2,
               ),
             ),
@@ -42,13 +40,15 @@ class Item extends StatelessWidget {
           Text(
             '$label',
             style: AppTypography.bodyMedium().copyWith(
-              color: AppColors.navInactive,
+              color: colorScheme.onSurfaceVariant,
             ),
             softWrap: true,
           ),
-          Text('$numberAnswered', style: AppTypography.headlineSmall()),
+          Text(
+            '$numberAnswered',
+            style: AppTypography.headlineSmall(color: colorScheme.onSurface),
+          ),
         ],
-      ),
     );
   }
 }

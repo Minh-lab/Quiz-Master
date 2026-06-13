@@ -52,7 +52,7 @@ class _ShortAnswerInputFieldState extends State<ShortAnswerInputField> {
         Text(
           'Nhập đáp án số của bạn dưới đây:',
           style: AppTypography.headlineSmall().copyWith(
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 12),
@@ -66,10 +66,10 @@ class _ShortAnswerInputFieldState extends State<ShortAnswerInputField> {
             hintText: 'Nhập câu trả lời (Ví dụ: 19.2, -5, 26...)',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border, width:3),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.surfaceVariant, width:3),
             ),
             filled: true,
-            fillColor: AppColors.surface,
+            fillColor: Theme.of(context).colorScheme.surface,
 
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,

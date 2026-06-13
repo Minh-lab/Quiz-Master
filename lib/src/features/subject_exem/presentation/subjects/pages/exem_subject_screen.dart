@@ -26,7 +26,7 @@ class ExemSubjectScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: TopBanner(),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -36,7 +36,7 @@ class ExemSubjectScreen extends StatelessWidget {
             children: [
               // const MenuCard(),
               // const SizedBox(height: 32),
-              _headingExam(),
+              _headingExam(context),
               const SizedBox(height: 16),
         
               BlocBuilder<SubjectBloc, SubjectState>(
@@ -67,17 +67,45 @@ class ExemSubjectScreen extends StatelessWidget {
                         // print(color);
                         // print(iconPath);
         
+                        final isDark =
+                            Theme.of(context).brightness == Brightness.dark;
+                        final colorScheme = Theme.of(context).colorScheme;
+                        final subjectTint = isDark
+                            ? Color.lerp(
+                                colorScheme.surfaceContainerHigh,
+                                color,
+                                0.55,
+                              )!
+                            : Color.lerp(colorScheme.surface, color, 0.16)!;
+                        final iconColor = isDark
+                            ? Color.lerp(color, Colors.white, 0.62)!
+                            : color;
+                        final shouldTintIcon = _isMonochromeIcon(
+                          subject.iconName,
+                        );
+
                         return SubjectCard(
                           title: subject.name,
                           numberExam:
-                              subjects[index].countExams ??
-                              0, // Thay đổi số lượng bài thi ở đây
-                          color: color.withValues(alpha: 0.15),
-                          image: SvgPicture.asset(
-                            iconPath,
-                            width: 40,
-                            height: 40,
-                          ),
+                              subjects[index].countExams, // Thay đổi số lượng bài thi ở đây
+                          color: subjectTint,
+                          image: shouldTintIcon
+                              ? ColorFiltered(
+                                  colorFilter: ColorFilter.mode(
+                                    iconColor,
+                                    BlendMode.srcIn,
+                                  ),
+                                  child: SvgPicture.asset(
+                                    iconPath,
+                                    width: 40,
+                                    height: 40,
+                                  ),
+                                )
+                              : SvgPicture.asset(
+                                  iconPath,
+                                  width: 40,
+                                  height: 40,
+                                ),
                           onTap: () {
                             context.read<ExamBloc>().add(
                               FetchExamPreviewEvent(subjectId: subject.id),
@@ -98,7 +126,19 @@ class ExemSubjectScreen extends StatelessWidget {
     );
   }
 
-  Widget _headingExam() {
+  bool _isMonochromeIcon(String iconName) {
+    switch (iconName) {
+      case 'biologyIcon':
+      case 'englishIcon':
+      case 'geographyIcon':
+      case 'historyIcon':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  Widget _headingExam(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -109,20 +149,20 @@ class ExemSubjectScreen extends StatelessWidget {
               width: 5,
               height: 24,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(width: 8),
             Text(
               'Ôn theo môn học',
-              style: AppTypography.headlineMedium(color: AppColors.textPrimary),
+              style: AppTypography.headlineMedium(color: Theme.of(context).colorScheme.onSurface),
             ),
           ],
         ),
         InkWell(
           onTap: () {
-            // TODO: Navigate to All Subjects
+
           },
           borderRadius: BorderRadius.circular(20),
           child: Padding(
@@ -132,12 +172,12 @@ class ExemSubjectScreen extends StatelessWidget {
               children: [
                 Text(
                   'Xem tất cả',
-                  style: AppTypography.labelMedium(color: AppColors.primary),
+                  style: AppTypography.labelMedium(color: Theme.of(context).colorScheme.primary),
                 ),
                 const SizedBox(width: 4),
-                const Icon(
+                Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 14,
                 ),
               ],
@@ -147,116 +187,43 @@ class ExemSubjectScreen extends StatelessWidget {
       ],
     );
   }
-
-
-  // PreferredSizeWidget _topBanner(String fullName, int streak) {
-  //   return PreferredSize(
-  //     preferredSize: const Size.fromHeight(120),
-  //     child: Container(
-  //       padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-  //       decoration: const BoxDecoration(
-  //         color: AppColors.primary,
-  //         borderRadius: BorderRadius.only(
-  //           bottomLeft: Radius.circular(30),
-  //           bottomRight: Radius.circular(30),
-  //         ),
-  //       ),
-  //       child: SafeArea(
-  //         bottom: false,
-  //         child: Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           crossAxisAlignment: CrossAxisAlignment.end,
-  //           children: [
-  //             Expanded(
-  //               child: Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 mainAxisAlignment: MainAxisAlignment.end,
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   Row(
-  //                     children: [
-  //                       Text(
-  //                         'Xin chào!',
-  //                         style: AppTypography.headlineSmall(
-  //                           color: Colors.white70,
-  //                         ),
-  //                       ),
-  //                       const SizedBox(width: 8),
-  //                       const Icon(
-  //                         Icons.waving_hand_rounded,
-  //                         color: Colors.amber,
-  //                         size: 22,
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(height: 8),
-  //                   Text(
-  //                     fullName,
-  //                     style: AppTypography.headlineLarge(color: Colors.white),
-  //                     maxLines: 1,
-  //                     overflow: TextOverflow.ellipsis,
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //             const SizedBox(width: 16),
-  //             Container(
-  //               height: 40,
-  //               padding: const EdgeInsets.symmetric(horizontal: 16),
-  //               decoration: BoxDecoration(
-  //                 color: Colors.white,
-  //                 borderRadius: BorderRadius.circular(20),
-  //               ),
-  //               child: Row(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   SvgPicture.asset(
-  //                     AppAssetIcon.fireIcon,
-  //                     width: 20,
-  //                     height: 20,
-  //                     colorFilter: const ColorFilter.mode(
-  //                       Colors.red,
-  //                       BlendMode.srcIn,
-  //                     ),
-  //                   ),
-  //                   const SizedBox(width: 8),
-  //                   Text(
-  //                     '$streak',
-  //                     style: AppTypography.headlineSmall(color: Colors.black),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   String getIconPath(String iconName) {
     switch (iconName) {
-      case 'engIcon':
-        return AppAssetIcon.engIcon;
       case 'mathIcon':
         return AppAssetIcon.mathIcon;
-      case 'atomColorIcon':
+      case 'physicsIcon':
         return AppAssetIcon.atomColorIcon; // Vật Lý
       case 'chemistryIcon':
         return AppAssetIcon.chemistryIcon; // Hóa học
+      case 'biologyIcon':
+        return AppAssetIcon.biologyIcon; // Sinh học (tạm dùng ovalIcon)
+      case 'historyIcon':
+        return AppAssetIcon.clockIcon; // Lịch sử (tạm dùng clockIcon)
+      case 'geographyIcon':
+        return AppAssetIcon.geographyIcon; // Địa lý (tạm dùng newMoonIcon)
+      case 'englishIcon':
+        return AppAssetIcon.englishIcon; // Tiếng Anh
       default:
-        return AppAssetIcon.fireIcon;
+        return AppAssetIcon.bookopenIcon; // Mặc định
     }
   }
 
   Color getThemeColor(String colorName) {
     switch (colorName) {
+      case 'primary':
       case 'primaryLight':
-        return AppColors.primaryLight;
-      case 'warning':
-        return AppColors.warning;
+        return AppColors.primary;
+      case 'purple':
+        return Colors.purple;
+      case 'pink':
+        return Colors.pink;
+      case 'green':
       case 'success':
         return AppColors.success;
+      case 'warning':
+        return AppColors.warning;
+      case 'teal':
+        return Colors.teal;
       case 'error':
         return AppColors.error;
       default:

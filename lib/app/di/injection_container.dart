@@ -25,10 +25,16 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/domain/usecases
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:quiz_mater_apllication/src/core/theme/bloc/theme_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
 Future<void> init() async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
+  sl.registerFactory(() => ThemeCubit(prefs: sl()));
+
   sl.registerFactory(() => ExamBloc(getExamsBySubject: sl()));
   sl.registerFactory(() => ExamDetailBloc(getExamDetailUseCase: sl()));
   sl.registerFactory(() => SubjectBloc(getSubjectUsecase: sl()));
