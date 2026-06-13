@@ -71,9 +71,20 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Scaffold(
-      appBar: _buildAppBar(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        
+        final shouldPop = await _showExitConfirmationDialog(context);
+        if (shouldPop == true) {
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: _buildAppBar(),
       body: BlocListener<TimerCubit, int>(
         listener: (context, remainingSeconds) {
           if (remainingSeconds == 0) {
@@ -137,6 +148,32 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
       ),
     ),
       bottomNavigationBar: _buildBottomNav(context),
+      ),
+    );
+  }
+
+  Future<bool?> _showExitConfirmationDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Thoát bài thi?'),
+          content: Text('Bạn đang làm bài thi. Nếu thoát bây giờ, kết quả của bạn sẽ không được lưu. Bạn có chắc chắn muốn thoát?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Tiếp tục làm bài'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(
+                'Thoát',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -750,48 +787,55 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(optionText, style: AppTypography.bodyLarge().copyWith(color: Theme.of(context).colorScheme.onSurface)),
-                ),
-                const SizedBox(width: 8),
-                // Nút Đúng
-                _buildTrueFalseOptionButton(
-                  context: context,
-                  label: 'Đúng',
-                  isSelected: currentSelection == true,
-                  selectedColor: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.darkSuccess
-                      : AppColors.success,
-                  onTap: () {
-                    answers[key] = true;
-                    context.read<ExamDetailBloc>().add(
-                      SelectAnswerEvent(
-                        questionIndex: question.order,
-                        answerIndex: answers,
+                Text(optionText, style: AppTypography.bodyLarge().copyWith(color: Theme.of(context).colorScheme.onSurface)),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    // Nút Đúng
+                    Expanded(
+                      child: _buildTrueFalseOptionButton(
+                        context: context,
+                        label: 'Đúng',
+                        isSelected: currentSelection == true,
+                        selectedColor: Theme.of(context).brightness == Brightness.dark
+                            ? AppColors.darkSuccess
+                            : AppColors.success,
+                        onTap: () {
+                          answers[key] = true;
+                          context.read<ExamDetailBloc>().add(
+                            SelectAnswerEvent(
+                              questionIndex: question.order,
+                              answerIndex: answers,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
-                // Nút Sai
-                _buildTrueFalseOptionButton(
-                  context: context,
-                  label: 'Sai',
-                  isSelected: currentSelection == false,
-                  selectedColor: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.darkError
-                      : AppColors.error,
-                  onTap: () {
-                    answers[key] = false;
-                    context.read<ExamDetailBloc>().add(
-                      SelectAnswerEvent(
-                        questionIndex: question.order,
-                        answerIndex: answers,
+                    ),
+                    const SizedBox(width: 8),
+                    // Nút Sai
+                    Expanded(
+                      child: _buildTrueFalseOptionButton(
+                        context: context,
+                        label: 'Sai',
+                        isSelected: currentSelection == false,
+                        selectedColor: Theme.of(context).brightness == Brightness.dark
+                            ? AppColors.darkError
+                            : AppColors.error,
+                        onTap: () {
+                          answers[key] = false;
+                          context.read<ExamDetailBloc>().add(
+                            SelectAnswerEvent(
+                              questionIndex: question.order,
+                              answerIndex: answers,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -821,6 +865,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
         ),
         child: Text(
           label,
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,

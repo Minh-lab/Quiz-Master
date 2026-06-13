@@ -28,6 +28,13 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/su
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quiz_mater_apllication/src/core/theme/bloc/theme_cubit.dart';
 
+// Profile DI
+import 'package:quiz_mater_apllication/src/features/profile/data/datasources/profile_remote_data_source.dart';
+import 'package:quiz_mater_apllication/src/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:quiz_mater_apllication/src/features/profile/domain/repositories/profile_repository.dart';
+import 'package:quiz_mater_apllication/src/features/profile/domain/usecases/update_profile_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/cubit/profile_cubit.dart';
+
 final GetIt sl = GetIt.instance;
 
 Future<void> init() async {
@@ -75,4 +82,14 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SigninWithEmailUsecase(repository: sl()));
   sl.registerLazySingleton(() => SignOutUsecase(repository: sl()));
   sl.registerLazySingleton(() => SigninWithGoogleUsecase(repository: sl()));
+
+  // Profile
+  sl.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(),
+  );
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
+  sl.registerFactory(() => ProfileCubit(updateProfileUseCase: sl()));
 }

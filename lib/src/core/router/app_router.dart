@@ -26,6 +26,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/su
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_event.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/pages/exem_subject_screen.dart';
 import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/edit_profile_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/change_password_screen.dart';
 import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/exam_history_screen.dart';
 import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/wrong_answers_screen.dart';
@@ -172,7 +173,10 @@ class AppRouter {
                 routes: [
                   GoRoute(
                     path: 'edit',
-                    builder: (context, state) => const EditProfileScreen(),
+                    builder: (context, state) => BlocProvider(
+                      create: (context) => sl<ProfileCubit>(),
+                      child: const EditProfileScreen(),
+                    ),
                   ),
                   GoRoute(
                     path: 'change-password',

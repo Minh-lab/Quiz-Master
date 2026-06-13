@@ -26,12 +26,12 @@ class ProfileScreen extends StatelessWidget {
           "Cá nhân",
           style: AppTypography.headlineMedium().copyWith(color: Colors.white),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings_outlined, color: Colors.white),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {},
+        //     icon: const Icon(Icons.settings_outlined, color: Colors.white),
+        //   ),
+        // ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -70,17 +70,21 @@ class ProfileScreen extends StatelessWidget {
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 40,
-                  backgroundColor: AppColors.primary,          // _buildSupportSection(context, textColor),
-            // const SizedBox(height: 40),
-                  child: Text(
-                    initial,
-                    style: AppTypography.headlineMedium().copyWith(
-                      color: Colors.white,
-                      fontSize: 32,
-                    ),
+                    radius: 16,
+                    
+                    backgroundColor: Colors.white24,
+                    backgroundImage: state.user.photoUrl != null
+                        ? NetworkImage(state.user.photoUrl!,)
+                        : null,
+                    
+                    child: state.user.photoUrl == null
+                        ? const Icon(
+                            Icons.person,
+                            color: Colors.white,
+                            size: 30,
+                          )
+                        : null,
                   ),
-                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -251,33 +255,33 @@ class ProfileScreen extends StatelessWidget {
           },
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
-        _buildListTile(
-          title: "Thông báo",
-          leadingIcon: Icons.notifications_none_outlined,
-          iconColor: AppColors.primary,
-          textColor: textColor,
-          trailing: Switch(
-            value: false,
-            onChanged: (value) {},
-            activeColor: AppColors.primary,
-          ),
-        ),
+        // _buildListTile(
+        //   title: "Thông báo",
+        //   leadingIcon: Icons.notifications_none_outlined,
+        //   iconColor: AppColors.primary,
+        //   textColor: textColor,
+        //   trailing: Switch(
+        //     value: false,
+        //     onChanged: (value) {},
+        //     activeColor: AppColors.primary,
+        //   ),
+        // ),
         const Divider(height: 1, indent: 20, endIndent: 20),
-        _buildListTile(
-          title: "Ngôn ngữ",
-          leadingIcon: Icons.language_outlined,
-          iconColor: AppColors.primary,
-          textColor: textColor,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Tiếng Việt', style: TextStyle(color: textColor.withOpacity(0.6))),
-              const SizedBox(width: 8),
-              Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
-            ],
-          ),
-          onTap: () {},
-        ),
+        // _buildListTile(
+        //   title: "Ngôn ngữ",
+        //   leadingIcon: Icons.language_outlined,
+        //   iconColor: AppColors.primary,
+        //   textColor: textColor,
+        //   trailing: Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       Text('Tiếng Việt', style: TextStyle(color: textColor.withOpacity(0.6))),
+        //       const SizedBox(width: 8),
+        //       Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+        //     ],
+        //   ),
+        //   onTap: () {},
+        // ),
         const Divider(height: 1, indent: 20, endIndent: 20),
       ],
     );
