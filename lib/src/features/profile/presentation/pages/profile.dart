@@ -67,7 +67,7 @@ class ProfileScreen extends StatelessWidget {
           final String email = state.user.email ?? "";
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               children: [
                 CircleAvatar(
@@ -88,14 +88,14 @@ class ProfileScreen extends StatelessWidget {
                         )
                       : null,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         name,
-                        style: AppTypography.headlineSmall().copyWith(
+                        style: AppTypography.bodySmall().copyWith(
                           color: textColor,
                           fontWeight: FontWeight.bold,
                         ),
@@ -104,7 +104,7 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           email,
-                          style: AppTypography.bodyMedium().copyWith(
+                          style: AppTypography.bodySmall().copyWith(
                             color: textColor.withValues(alpha: 0.7),
                           ),
                         ),

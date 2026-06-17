@@ -170,11 +170,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       // padding: const EdgeInsets.all(16),
       child: Form(
         key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
           children: [
             TextFormField(
               controller: userNameController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: AppValidator.validateName,
               decoration: InputDecoration(
                 prefixIcon: Icon(
@@ -190,6 +190,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SizedBox(height: 16),
             TextFormField(
               controller: emailController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: AppValidator.validateEmail,
               decoration: InputDecoration(
                 prefixIcon: Icon(
@@ -206,6 +207,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             TextFormField(
               obscureText: isHiddenPassword,
               controller: passwordController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: AppValidator.validatePassword,
               decoration: InputDecoration(
                 prefixIcon: Icon(
@@ -238,6 +240,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             TextFormField(
               controller: confirmPasswordController,
               obscureText: isHiddenConfirmPassword,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (value) => AppValidator.validateConfirmPassword(
                 value,
                 passwordController.text,

@@ -88,7 +88,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
                           color: Colors.black.withValues(alpha: 0.1),
-                          child: const Center(child: CircularProgressIndicator()),
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
                         ),
                       ),
                     ),
@@ -133,7 +135,6 @@ class _SignInScreenState extends State<SignInScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
       child: Form(
         key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -146,6 +147,7 @@ class _SignInScreenState extends State<SignInScreen> {
             SizedBox(height: 24),
             TextFormField(
               controller: emailController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: AppValidator.validateEmail,
               decoration: InputDecoration(
                 prefixIcon: Icon(
@@ -163,6 +165,7 @@ class _SignInScreenState extends State<SignInScreen> {
             SizedBox(height: 24),
             TextFormField(
               controller: passwordController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               obscureText: isHiddenPassword,
               validator: AppValidator.validatePassword,
 
@@ -197,7 +200,9 @@ class _SignInScreenState extends State<SignInScreen> {
             SizedBox(height: 16),
             _buildSigninButton(
               onTap: () async {
-                FocusScope.of(context).unfocus(); // Ẩn bàn phím để tránh kẹt giao diện
+                FocusScope.of(
+                  context,
+                ).unfocus(); // Ẩn bàn phím để tránh kẹt giao diện
                 if (_formKey.currentState!.validate()) {
                   context.read<SignInCubit>().signIn(
                     SigninRequest(
@@ -271,20 +276,26 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget _buildSignInHelper() {
     return Container(
       width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Checkbox(
-                value: true,
-                onChanged: (value) {},
-                activeColor: AppColors.primary,
-              ),
-              Text('Ghi nhớ đăng nhập', style: AppTypography.bodyMedium()),
-            ],
-          ),
-          // Spacer(),
+          // Row(
+          //   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Row(
+          //       children: [
+          //         Checkbox(
+          //           value: true,
+          //           onChanged: (value) {},
+          //           activeColor: AppColors.primary,
+          //         ),
+          //         Text('Ghi nhớ đăng nhập', style: AppTypography.bodyMedium()),
+          //       ],
+          //     ),
+
+          //     // Spacer(),
+          //   ],
+          // ),
           Text(
             'Quên mật khẩu?',
             style: AppTypography.bodyMedium().copyWith(
