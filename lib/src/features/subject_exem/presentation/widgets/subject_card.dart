@@ -33,7 +33,7 @@ class SubjectCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -60,7 +60,7 @@ class SubjectCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '$numberExam+ đề thi',
-                  style: AppTypography.labelMedium(
+                  style: AppTypography.bodySmall(
                     color: colorScheme.onSurfaceVariant,
                   ).copyWith(fontWeight: FontWeight.w500),
                 ),
