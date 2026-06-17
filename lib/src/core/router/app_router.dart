@@ -1,13 +1,12 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quiz_mater_apllication/app/di/injection_container.dart';
 import 'package:quiz_mater_apllication/src/core/router/go_router_adapter.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/intro_screen.dart';
-import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_in/signin_screen.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/sign_up.dart/sign_up_screen.dart';
@@ -17,7 +16,6 @@ import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/p
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/exam.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_event.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_exam_detail/exam_detail_state.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/timer_cubit/timer_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/exam_detail_screen.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/list_exam_screen.dart';
@@ -26,10 +24,13 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/su
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/bloc/subject_event.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/subjects/pages/exem_subject_screen.dart';
 import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/edit_profile_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/change_password_screen.dart';
-import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/exam_history_screen.dart';
-import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/wrong_answers_screen.dart';
-import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/saved_exams_screen.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/cubit/change_password_cubit/change_password_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/history/presentation/pages/exam_history_screen.dart';
+import 'package:quiz_mater_apllication/src/features/history/presentation/cubit/exam_history_cubit.dart';
+// import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/wrong_answers_screen.dart';
+import 'package:quiz_mater_apllication/src/features/saved_exam/presentation/pages/saved_exams_screen.dart';
 import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/learning_statistics_screen.dart';
 
 class AppRouter {
@@ -38,6 +39,12 @@ class AppRouter {
   static const String home = '/home';
   static const String intro = '/intro';
   static const String profile = '/profile';
+  static const String profileEdit = '/profile/edit';
+  static const String profileChangePassword = '/profile/change-password';
+  static const String profileExamHistory = '/profile/exam-history';
+  static const String profileSavedExams = '/profile/saved-exams';
+  static const String profileLearningStatistics =
+      '/profile/learning-statistics';
   static const String exam = '/exam';
   static const String signin = '/signin';
   static const String signup = '/signup';
@@ -50,7 +57,11 @@ class AppRouter {
   static String exambyIdDetail(String subjectId, String examId) =>
       '/subject/$subjectId/exam/$examId';
 
+  static final GlobalKey<NavigatorState> _rootNavigatorKey =
+      GlobalKey<NavigatorState>(debugLabel: 'root');
+
   static final router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: AppRouter.home,
 
     refreshListenable: GoRouterAdapter(authBloc.stream),
@@ -59,20 +70,20 @@ class AppRouter {
 
       log(authState.toString());
 
-      final isAuthenticated =
-          authState is AuthSuccess || authState is GuestModeActive;
+      final isSignedInUser = authState is AuthSuccess;
 
       final isAuthPage =
           state.uri.path == AppRouter.signin ||
           state.uri.path == AppRouter.signup;
       // print(authState);
-      final isProtectedPage = state.uri.path == AppRouter.profile;
-      if (!isAuthenticated && isProtectedPage) {
+      final isProfilePage = state.uri.path == AppRouter.profile ||
+          state.uri.path.startsWith('${AppRouter.profile}/');
+      if (!isSignedInUser && isProfilePage) {
         return AppRouter.signin;
       }
-      log(isAuthenticated.toString());
+      log(isSignedInUser.toString());
       log(isAuthPage.toString());
-      if (isAuthenticated && isAuthPage) {
+      if (isSignedInUser && isAuthPage) {
         log('Go to Home');
         return AppRouter.home;
       }
@@ -128,6 +139,46 @@ class AppRouter {
         },
       ),
 
+      /// SUBJECT DETAIL (FULL SCREEN)
+      GoRoute(
+        path: AppRouter.subjectById,
+        builder: (context, state) {
+          final subjectId = state.pathParameters['subjectId']!;
+          return ListExam(subjectId: subjectId);
+        },
+      ),
+
+      /// PROFILE SUB-ROUTES (FULL SCREEN)
+      GoRoute(
+        path: AppRouter.profileEdit,
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<ProfileCubit>(),
+          child: const EditProfileScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRouter.profileChangePassword,
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<ChangePasswordCubit>(),
+          child: const ChangePasswordScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRouter.profileExamHistory,
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<ExamHistoryCubit>(),
+          child: const ExamHistoryScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRouter.profileSavedExams,
+        builder: (context, state) => const SavedExamsScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.profileLearningStatistics,
+        builder: (context, state) => const LearningStatisticsScreen(),
+      ),
+
       /// BOTTOM NAVIGATION
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -147,16 +198,6 @@ class AppRouter {
                   child: const ExemSubjectScreen(),
                 ),
               ),
-
-              /// SUBJECT DETAIL
-              GoRoute(
-                path: AppRouter.subjectById,
-                builder: (context, state) {
-                  final subjectId = state.pathParameters['subjectId']!;
-
-                  return ListExam(subjectId: subjectId);
-                },
-              ),
             ],
           ),
 
@@ -169,32 +210,6 @@ class AppRouter {
                   // final user = state.extra as UserEntity;
                   return ProfileScreen();
                 },
-                routes: [
-                  GoRoute(
-                    path: 'edit',
-                    builder: (context, state) => const EditProfileScreen(),
-                  ),
-                  GoRoute(
-                    path: 'change-password',
-                    builder: (context, state) => const ChangePasswordScreen(),
-                  ),
-                  GoRoute(
-                    path: 'exam-history',
-                    builder: (context, state) => const ExamHistoryScreen(),
-                  ),
-                  GoRoute(
-                    path: 'wrong-answers',
-                    builder: (context, state) => const WrongAnswersScreen(),
-                  ),
-                  GoRoute(
-                    path: 'saved-exams',
-                    builder: (context, state) => const SavedExamsScreen(),
-                  ),
-                  GoRoute(
-                    path: 'learning-statistics',
-                    builder: (context, state) => const LearningStatisticsScreen(),
-                  ),
-                ],
               ),
             ],
           ),

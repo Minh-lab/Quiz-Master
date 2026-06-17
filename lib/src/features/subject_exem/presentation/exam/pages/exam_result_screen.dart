@@ -12,6 +12,9 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:quiz_mater_apllication/src/core/widgets/app_appbar.dart';
 import 'package:quiz_mater_apllication/src/core/widgets/math_text_builder.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/exam_detail_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quiz_mater_apllication/src/features/history/domain/entities/exam_history_entity.dart';
+import 'package:quiz_mater_apllication/src/features/history/domain/usecases/save_exam_history_usecase.dart';
 
 class ExamResultScreen extends StatefulWidget {
   final List<QuestionEntity> questions;
@@ -53,7 +56,36 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
   void initState() {
     super.initState();
     _calculateResult();
+    _saveHistory();
     _filteredQuestions = widget.questions;
+  }
+
+  Future<void> _saveHistory() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final history = ExamHistoryEntity(
+      id: '', // Firestore sẽ tự tạo ID
+      uid: uid,
+      examId: widget.examId,
+      examTitle: widget.title,
+      subjectId: widget.subjectId,
+      subjectName: widget
+          .subjectId, // Có thể thêm subjectName vào constructor sau nếu cần
+      score: earnedScore,
+      totalQuestions: widget.questions.length,
+      correctAnswers: correctCount,
+      wrongAnswers: wrongCount,
+      skippedAnswers: skippedCount,
+      accuracy: widget.questions.isEmpty
+          ? 0
+          : (correctCount / widget.questions.length) * 100,
+      duration: widget.duration * 60,
+      timeSpent: widget.timeTakenInSeconds,
+      submittedAt: DateTime.now(),
+    );
+
+    await sl<SaveExamHistoryUseCase>().call(history);
   }
 
   void _calculateResult() {
@@ -136,7 +168,7 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
         Navigator.of(context).popUntil((route) => route.isFirst);
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: AppAppbar(
@@ -169,6 +201,15 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
   }
 
   Widget _buildResultSummaryCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final successColor = isDark ? AppColors.darkSuccess : AppColors.success;
+    final successBg = isDark
+        ? AppColors.darkSuccessBackground
+        : AppColors.successBackground;
+    final errorColor = isDark ? AppColors.darkError : AppColors.error;
+    final textSecondary = Theme.of(context).colorScheme.onSurfaceVariant;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
     double accuracy = widget.questions.isEmpty
         ? 0
         : (correctCount / widget.questions.length) * 100;
@@ -179,9 +220,12 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0FDF4), // Nền xanh ngọc bích nhạt
+        color: successBg,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFDCFCE7), width: 2),
+        border: Border.all(
+          color: successColor.withValues(alpha: 0.3),
+          width: 2,
+        ),
       ),
       child: Column(
         children: [
@@ -190,17 +234,15 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
           const SizedBox(height: 12),
           Text(
             'Hoàn thành!',
-            style: AppTypography.headlineLarge().copyWith(
-              color: AppColors.success,
+            style: AppTypography.headlineMedium().copyWith(
+              color: successColor,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'Chúc mừng bạn đã hoàn thành bài thi.',
-            style: AppTypography.bodyMedium().copyWith(
-              color: AppColors.textSecondary,
-            ),
+            style: AppTypography.bodyMedium().copyWith(color: textSecondary),
           ),
           const SizedBox(height: 24),
 
@@ -208,11 +250,11 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -223,7 +265,12 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
               children: [
                 Column(
                   children: [
-                    Text('Điểm số', style: AppTypography.labelMedium()),
+                    Text(
+                      'Điểm số',
+                      style: AppTypography.labelMedium().copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -231,16 +278,16 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
                       children: [
                         Text(
                           earnedScore.toStringAsFixed(1),
-                          style: AppTypography.headlineLarge().copyWith(
-                            color: AppColors.success,
-                            fontSize: 48,
+                          style: AppTypography.headlineMedium().copyWith(
+                            color: successColor,
+                            fontSize: 40,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           ' / ${totalScore.toStringAsFixed(1)}',
                           style: AppTypography.headlineMedium().copyWith(
-                            color: AppColors.textSecondary,
+                            color: textSecondary,
                           ),
                         ),
                       ],
@@ -258,52 +305,56 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
               Expanded(
                 child: _buildStatItem(
                   icon: Icons.check_circle_rounded,
-                  iconColor: AppColors.success,
+                  iconColor: successColor,
                   label: 'Đúng',
                   value: '$correctCount / ${widget.questions.length}',
-                  valueColor: AppColors.success,
+                  valueColor: successColor,
                 ),
               ),
-              Container(width: 1, height: 40, color: AppColors.border),
+              Container(
+                width: 1,
+                height: 40,
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
               Expanded(
                 child: _buildStatItem(
                   icon: Icons.cancel_rounded,
-                  iconColor: AppColors.error,
+                  iconColor: errorColor,
                   label: 'Sai',
                   value: '$wrongCount / ${widget.questions.length}',
-                  valueColor: AppColors.error,
+                  valueColor: errorColor,
                 ),
               ),
-              Container(width: 1, height: 40, color: AppColors.border),
+              Container(
+                width: 1,
+                height: 40,
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
               Expanded(
                 child: _buildStatItem(
                   icon: Icons.pie_chart_rounded,
-                  iconColor: AppColors.primary,
+                  iconColor: primaryColor,
                   label: 'Tỷ lệ',
                   value: '${accuracy.toStringAsFixed(0)}%',
-                  valueColor: AppColors.primary,
+                  valueColor: primaryColor,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 24),
-          const Divider(),
+          Divider(color: Theme.of(context).colorScheme.outlineVariant),
           const SizedBox(height: 16),
 
           // Thời gian hoàn thành
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.schedule_rounded,
-                color: AppColors.textSecondary,
-                size: 18,
-              ),
+              Icon(Icons.schedule_rounded, color: textSecondary, size: 18),
               const SizedBox(width: 8),
               Text(
                 'Thời gian: $minutes phút $seconds giây',
                 style: AppTypography.bodyMedium().copyWith(
-                  color: AppColors.textSecondary,
+                  color: textSecondary,
                 ),
               ),
             ],
@@ -333,7 +384,7 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
         const SizedBox(height: 8),
         Text(
           value,
-          style: AppTypography.headlineSmall().copyWith(
+          style: AppTypography.titleMedium().copyWith(
             color: valueColor,
             fontWeight: FontWeight.bold,
           ),
@@ -350,35 +401,43 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
         children: [
           Text(
             'Xem lại đáp án',
-            style: AppTypography.headlineMedium().copyWith(
+            style: AppTypography.titleLarge().copyWith(
               fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.border),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: _filter,
-                icon: const Icon(
+                icon: Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 items: _filters.map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.filter_alt_outlined,
                           size: 16,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 8),
-                        Text(value, style: AppTypography.bodyMedium()),
+                        Text(
+                          value,
+                          style: AppTypography.bodyMedium().copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -398,14 +457,19 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
 
   Widget _buildQuestionReviewCard(QuestionEntity question) {
     var userAnswer = widget.userAnswers[question.order];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final warningColor = isDark ? AppColors.darkWarning : AppColors.warning;
+    final warningBg = isDark
+        ? AppColors.darkWarningBackground
+        : AppColors.warningBackground;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -416,8 +480,8 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
             children: [
               Text(
                 'Câu ${question.order}',
-                style: AppTypography.headlineSmall().copyWith(
-                  color: AppColors.primary,
+                style: AppTypography.titleLarge().copyWith(
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -427,13 +491,14 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.warningBackground,
+                  color: warningBg,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   '${question.score} điểm',
                   style: AppTypography.labelSmall().copyWith(
-                    color: AppColors.textPrimary,
+                    color: warningColor,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -444,7 +509,9 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
           // Nội dung câu hỏi
           MathTextBuilder(
             text: question.content,
-            style: AppTypography.bodyLarge(),
+            style: AppTypography.bodyLarge().copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
 
           // Hình ảnh
@@ -461,24 +528,22 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
               margin: const EdgeInsets.only(bottom: 16),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.warningBackground,
+                color: warningBg,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: AppColors.warning.withValues(alpha: 0.5),
-                ),
+                border: Border.all(color: warningColor.withValues(alpha: 0.5)),
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.warning_amber_rounded,
-                    color: AppColors.warning,
+                    color: warningColor,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Bạn chưa chọn đáp án',
                     style: AppTypography.labelMedium().copyWith(
-                      color: AppColors.warning,
+                      color: warningColor,
                     ),
                   ),
                 ],
@@ -486,13 +551,28 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
             ),
 
           // Danh sách đáp án
-          _buildReviewOptions(question, userAnswer),
+          _buildReviewOptions(question, userAnswer, isDark),
         ],
       ),
     );
   }
 
-  Widget _buildReviewOptions(QuestionEntity question, dynamic userAnswer) {
+  Widget _buildReviewOptions(
+    QuestionEntity question,
+    dynamic userAnswer,
+    bool isDark,
+  ) {
+    final successColor = isDark ? AppColors.darkSuccess : AppColors.success;
+    final errorColor = isDark ? AppColors.darkError : AppColors.error;
+    final errorBg = isDark
+        ? AppColors.darkErrorBackground
+        : AppColors.errorBackground;
+    final surfaceVariant = Theme.of(
+      context,
+    ).colorScheme.surfaceContainerHighest;
+    final borderCol = Theme.of(context).colorScheme.outlineVariant;
+    final textSecondary = Theme.of(context).colorScheme.onSurfaceVariant;
+
     if (question.type == 'multiple_choice') {
       List<String> labels = ['A', 'B', 'C', 'D'];
       return Column(
@@ -509,6 +589,7 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
             text: optionText,
             isSelected: isSelected,
             isCorrectAnswer: isCorrectAnswer,
+            isDark: isDark,
           );
         }),
       );
@@ -538,35 +619,40 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: !isSelected
-                  ? AppColors.surfaceVariant
+                  ? surfaceVariant
                   : (isCorrect
-                        ? AppColors.success.withValues(alpha: 0.05)
-                        : AppColors.errorBackground),
+                        ? successColor.withValues(alpha: 0.05)
+                        : errorBg),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: !isSelected
-                    ? AppColors.border
+                    ? borderCol
                     : (isCorrect
-                          ? AppColors.success.withValues(alpha: 0.5)
-                          : AppColors.error),
+                          ? successColor.withValues(alpha: 0.5)
+                          : errorColor),
                 width: (!isCorrect && isSelected) ? 2.0 : 1.0,
               ),
             ),
             child: Row(
               children: [
                 Expanded(
-                  child: Text(optionText, style: AppTypography.bodyMedium()),
+                  child: Text(
+                    optionText,
+                    style: AppTypography.bodyMedium().copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                 ),
                 if (isSelected)
                   Icon(
                     isCorrect ? Icons.check_circle : Icons.cancel,
-                    color: isCorrect ? AppColors.success : AppColors.error,
+                    color: isCorrect ? successColor : errorColor,
                   ),
                 if (!isSelected)
                   Text(
                     'Bỏ qua',
                     style: AppTypography.labelSmall().copyWith(
-                      color: AppColors.textSecondary,
+                      color: textSecondary,
                     ),
                   ),
               ],
@@ -582,17 +668,15 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: (userAnswer == null || userAnswer == '')
-              ? AppColors.surfaceVariant
-              : (isCorrect
-                    ? AppColors.success.withValues(alpha: 0.05)
-                    : AppColors.errorBackground),
+              ? surfaceVariant
+              : (isCorrect ? successColor.withValues(alpha: 0.05) : errorBg),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: (userAnswer == null || userAnswer == '')
-                ? AppColors.border
+                ? borderCol
                 : (isCorrect
-                      ? AppColors.success.withValues(alpha: 0.5)
-                      : AppColors.error),
+                      ? successColor.withValues(alpha: 0.5)
+                      : errorColor),
             width: (!isCorrect && userAnswer != null && userAnswer != '')
                 ? 2.0
                 : 1.0,
@@ -626,31 +710,38 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
     required String text,
     required bool isSelected,
     required bool isCorrectAnswer,
+    required bool isDark,
   }) {
-    Color bgColor = AppColors.surface;
-    Color borderColor = AppColors.border;
-    Color textColor = AppColors.textPrimary;
-    Color circleBg = AppColors.surfaceVariant;
-    Color circleText = AppColors.textPrimary;
+    final successColor = isDark ? AppColors.darkSuccess : AppColors.success;
+    final errorColor = isDark ? AppColors.darkError : AppColors.error;
+    final errorBg = isDark
+        ? AppColors.darkErrorBackground
+        : AppColors.errorBackground;
+
+    Color bgColor = Theme.of(context).colorScheme.surface;
+    Color borderColor = Theme.of(context).colorScheme.outlineVariant;
+    Color textColor = Theme.of(context).colorScheme.onSurface;
+    Color circleBg = Theme.of(context).colorScheme.surfaceContainerHighest;
+    Color circleText = Theme.of(context).colorScheme.onSurfaceVariant;
     IconData? suffixIcon;
     Color? suffixColor;
 
     if (isCorrectAnswer) {
       // Đáp án đúng luôn được đánh dấu xanh (nhạt hơn)
-      bgColor = AppColors.success.withValues(alpha: 0.05);
-      borderColor = AppColors.success.withValues(alpha: 0.5);
-      circleBg = AppColors.success.withValues(alpha: 0.1);
-      circleText = AppColors.success;
+      bgColor = successColor.withValues(alpha: 0.05);
+      borderColor = successColor.withValues(alpha: 0.5);
+      circleBg = successColor.withValues(alpha: 0.1);
+      circleText = successColor;
       suffixIcon = Icons.check_circle_rounded;
-      suffixColor = AppColors.success;
+      suffixColor = successColor;
     } else if (isSelected && !isCorrectAnswer) {
       // Đáp án người dùng chọn bị sai -> Nổi bật hơn với viền đậm
-      bgColor = AppColors.errorBackground;
-      borderColor = AppColors.error;
-      circleBg = AppColors.error;
+      bgColor = errorBg;
+      borderColor = errorColor;
+      circleBg = errorColor;
       circleText = Colors.white;
       suffixIcon = Icons.close_rounded;
-      suffixColor = AppColors.error;
+      suffixColor = errorColor;
     }
 
     return Container(
@@ -688,13 +779,14 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
   }
 
   Widget _buildBottomBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -713,11 +805,14 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
                         providers: [
                           BlocProvider(
                             create: (context) => sl<ExamDetailBloc>()
-                              ..add(FetchExamDetailEvent(examId: widget.examId, subjectId: widget.subjectId)),
+                              ..add(
+                                FetchExamDetailEvent(
+                                  examId: widget.examId,
+                                  subjectId: widget.subjectId,
+                                ),
+                              ),
                           ),
-                          BlocProvider(
-                            create: (context) => TimerCubit(),
-                          ),
+                          BlocProvider(create: (context) => TimerCubit()),
                         ],
                         child: ExamDetailScreen(
                           subjectId: widget.subjectId,
@@ -731,19 +826,22 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
                 },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: AppColors.primary, width: 1.5),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 1.5,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                icon: const Icon(
+                icon: Icon(
                   Icons.refresh_rounded,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 label: Text(
                   'Luyện lại bài',
                   style: AppTypography.labelLarge().copyWith(
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
@@ -755,17 +853,20 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                icon: const Icon(Icons.home_rounded, color: Colors.white),
+                icon: Icon(
+                  Icons.home_rounded,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
                 label: Text(
                   'Luyện đề khác',
                   style: AppTypography.labelLarge().copyWith(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ),

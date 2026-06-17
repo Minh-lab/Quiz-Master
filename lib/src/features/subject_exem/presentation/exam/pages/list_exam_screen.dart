@@ -10,7 +10,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/bloc/bloc_list_exam/exam_event.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/list_exam_dialog.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/exam_card.dart';
-import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/widgets/subject_card.dart';
+import 'package:quiz_mater_apllication/src/features/saved_exam/presentation/widgets/save_exam_button.dart';
 
 class ListExam extends StatelessWidget {
   final String subjectId;
@@ -38,25 +38,35 @@ class ListExam extends StatelessWidget {
                         title: exams[index].title,
                         numberQuestion: exams[index].totalQuestions.toString(),
                         time: exams[index].duration.toString(),
-                        onTap: () {
-                          showDialog(
+                        trailing: SaveExamButton(
+                          examId: exams[index].id,
+                          title: exams[index].title,
+                          subjectId: subjectId,
+                          duration: exams[index].duration,
+                          totalQuestions: exams[index].totalQuestions,
+                        ),
+                        onTap: () async {
+                          final result = await showDialog<bool>(
                             context: context,
                             builder: (BuildContext dialogContext) {
                               return ListExamDialog(
                                 exam: exams[index],
-                                  onConfirm: () {
-                                    Navigator.pop(dialogContext);
-                                    context.push(
-                                      AppRouter.exambyIdDetail(
-                                        subjectId,
-                                        exams[index].id,
-                                      ),
-                                      extra: exams[index],
-                                    );
-                                  },
+                                onConfirm: () {
+                                  Navigator.pop(dialogContext, true);
+                                },
                               );
                             },
                           );
+
+                          if (result == true && context.mounted) {
+                            context.push(
+                              AppRouter.exambyIdDetail(
+                                subjectId,
+                                exams[index].id,
+                              ),
+                              extra: exams[index],
+                            );
+                          }
                         },
                       );
                     },

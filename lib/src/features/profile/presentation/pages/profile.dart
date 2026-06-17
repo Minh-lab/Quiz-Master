@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_colors.dart';
 import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/entities/user.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_event.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_state.dart';
 import 'package:quiz_mater_apllication/src/core/theme/bloc/theme_cubit.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quiz_mater_apllication/src/core/router/app_router.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -26,12 +28,12 @@ class ProfileScreen extends StatelessWidget {
           "Cá nhân",
           style: AppTypography.headlineMedium().copyWith(color: Colors.white),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings_outlined, color: Colors.white),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {},
+        //     icon: const Icon(Icons.settings_outlined, color: Colors.white),
+        //   ),
+        // ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -46,7 +48,6 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _buildAccountSection(context, textColor),
             const SizedBox(height: 16),
-  
           ],
         ),
       ),
@@ -70,16 +71,22 @@ class ProfileScreen extends StatelessWidget {
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 40,
-                  backgroundColor: AppColors.primary,          // _buildSupportSection(context, textColor),
-            // const SizedBox(height: 40),
-                  child: Text(
-                    initial,
-                    style: AppTypography.headlineMedium().copyWith(
-                      color: Colors.white,
-                      fontSize: 32,
-                    ),
-                  ),
+                  radius: 16,
+
+                  backgroundColor: Colors.white24,
+                  backgroundImage: state.user.photoUrl != null
+                      ? NetworkImage(state.user.photoUrl!)
+                      : null,
+
+                  child: state.user.photoUrl == null
+                      ? Icon(
+                          Icons.person,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.warningBackground
+                              : AppColors.darkWarningBackground,
+                          size: 30,
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -98,7 +105,7 @@ class ProfileScreen extends StatelessWidget {
                         Text(
                           email,
                           style: AppTypography.bodyMedium().copyWith(
-                            color: textColor.withOpacity(0.7),
+                            color: textColor.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -107,7 +114,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 IconButton(
                   icon: Icon(Icons.edit_outlined, color: AppColors.primary),
-                  onPressed: () => context.push('/profile/edit'),
+                  onPressed: () => context.push(AppRouter.profileEdit),
                 ),
               ],
             ),
@@ -140,36 +147,41 @@ class ProfileScreen extends StatelessWidget {
           leadingIcon: Icons.history_outlined,
           iconColor: AppColors.primary,
           textColor: textColor,
-          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
-          onTap: () => context.push('/profile/exam-history'),
+          trailing: Icon(
+            Icons.arrow_forward_ios_outlined,
+            size: 16,
+            color: textColor.withValues(alpha: 0.5),
+          ),
+          onTap: () => context.push(AppRouter.profileExamHistory),
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
-        _buildListTile(
-          title: "Sổ lỗi sai",
-          leadingIcon: Icons.menu_book_outlined,
-          iconColor: AppColors.primary,
-          textColor: textColor,
-          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
-          onTap: () => context.push('/profile/wrong-answers'),
-        ),
+
         const Divider(height: 1, indent: 20, endIndent: 20),
         _buildListTile(
           title: "Đề đã lưu",
           leadingIcon: Icons.bookmark_outline,
           iconColor: AppColors.primary,
           textColor: textColor,
-          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
-          onTap: () => context.push('/profile/saved-exams'),
+          trailing: Icon(
+            Icons.arrow_forward_ios_outlined,
+            size: 16,
+            color: textColor.withValues(alpha: 0.5),
+          ),
+          onTap: () => context.push(AppRouter.profileSavedExams),
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
-        _buildListTile(
-          title: "Thống kê học tập",
-          leadingIcon: Icons.bar_chart_outlined,
-          iconColor: AppColors.primary,
-          textColor: textColor,
-          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
-          onTap: () => context.push('/profile/learning-statistics'),
-        ),
+        // _buildListTile(
+        //   title: "Thống kê học tập",
+        //   leadingIcon: Icons.bar_chart_outlined,
+        //   iconColor: AppColors.primary,
+        //   textColor: textColor,
+        //   trailing: Icon(
+        //     Icons.arrow_forward_ios_outlined,
+        //     size: 16,
+        //     color: textColor.withValues(alpha: 0.5),
+        //   ),
+        //   onTap: () => context.push(AppRouter.profileLearningStatistics),
+        // ),
         const Divider(height: 1, indent: 20, endIndent: 20),
       ],
     );
@@ -191,7 +203,11 @@ class ProfileScreen extends StatelessWidget {
           leadingIcon: Icons.description_outlined,
           iconColor: AppColors.primary,
           textColor: textColor,
-          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          trailing: Icon(
+            Icons.arrow_forward_ios_outlined,
+            size: 16,
+            color: textColor.withValues(alpha: 0.5),
+          ),
           onTap: () {},
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
@@ -200,7 +216,11 @@ class ProfileScreen extends StatelessWidget {
           leadingIcon: Icons.privacy_tip_outlined,
           iconColor: AppColors.primary,
           textColor: textColor,
-          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          trailing: Icon(
+            Icons.arrow_forward_ios_outlined,
+            size: 16,
+            color: textColor.withValues(alpha: 0.5),
+          ),
           onTap: () {},
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
@@ -209,7 +229,11 @@ class ProfileScreen extends StatelessWidget {
           leadingIcon: Icons.feedback_outlined,
           iconColor: AppColors.primary,
           textColor: textColor,
-          trailing: Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
+          trailing: Icon(
+            Icons.arrow_forward_ios_outlined,
+            size: 16,
+            color: textColor.withValues(alpha: 0.5),
+          ),
           onTap: () {},
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
@@ -251,71 +275,82 @@ class ProfileScreen extends StatelessWidget {
           },
         ),
         const Divider(height: 1, indent: 20, endIndent: 20),
-        _buildListTile(
-          title: "Thông báo",
-          leadingIcon: Icons.notifications_none_outlined,
-          iconColor: AppColors.primary,
-          textColor: textColor,
-          trailing: Switch(
-            value: false,
-            onChanged: (value) {},
-            activeColor: AppColors.primary,
-          ),
-        ),
+        // _buildListTile(
+        //   title: "Thông báo",
+        //   leadingIcon: Icons.notifications_none_outlined,
+        //   iconColor: AppColors.primary,
+        //   textColor: textColor,
+        //   trailing: Switch(
+        //     value: false,
+        //     onChanged: (value) {},
+        //     activeColor: AppColors.primary,
+        //   ),
+        // ),
         const Divider(height: 1, indent: 20, endIndent: 20),
-        _buildListTile(
-          title: "Ngôn ngữ",
-          leadingIcon: Icons.language_outlined,
-          iconColor: AppColors.primary,
-          textColor: textColor,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Tiếng Việt', style: TextStyle(color: textColor.withOpacity(0.6))),
-              const SizedBox(width: 8),
-              Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withOpacity(0.5)),
-            ],
-          ),
-          onTap: () {},
-        ),
+        // _buildListTile(
+        //   title: "Ngôn ngữ",
+        //   leadingIcon: Icons.language_outlined,
+        //   iconColor: AppColors.primary,
+        //   textColor: textColor,
+        //   trailing: Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       Text('Tiếng Việt', style: TextStyle(color: textColor.withValues(alpha: 0.6))),
+        //       const SizedBox(width: 8),
+        //       Icon(Icons.arrow_forward_ios_outlined, size: 16, color: textColor.withValues(alpha: 0.5)),
+        //     ],
+        //   ),
+        //   onTap: () {},
+        // ),
         const Divider(height: 1, indent: 20, endIndent: 20),
       ],
     );
   }
 
   Widget _buildAccountSection(BuildContext context, Color textColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Text(
-            'Tài khoản',
-            style: AppTypography.headlineSmall().copyWith(color: textColor),
-          ),
-        ),
-        _buildListTile(
-          title: "Đổi mật khẩu",
-          leadingIcon: Icons.lock_outlined,
-          iconColor: AppColors.primary,
-          textColor: textColor,
-          trailing: Icon(
-            Icons.arrow_forward_ios_outlined,
-            size: 16,
-            color: textColor.withOpacity(0.5),
-          ),
-          onTap: () => context.push('/profile/change-password'),
-        ),
-        const Divider(height: 1, indent: 20, endIndent: 20),
-        _buildListTile(
-          title: "Đăng xuất",
-          leadingIcon: Icons.logout_outlined,
-          iconColor: AppColors.borderWrong,
-          textColor: AppColors.borderWrong,
-          onTap: () => _showLogoutDialog(context),
-        ),
-        const Divider(height: 1, indent: 20, endIndent: 20),
-      ],
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        final isGoogleOrAnonymous =
+            state is AuthSuccess &&
+            (state.user.provider == AppAuthProvider.google ||
+                state.user.provider == AppAuthProvider.anonymous);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Text(
+                'Tài khoản',
+                style: AppTypography.headlineSmall().copyWith(color: textColor),
+              ),
+            ),
+            if (!isGoogleOrAnonymous) ...[
+              _buildListTile(
+                title: "Đổi mật khẩu",
+                leadingIcon: Icons.lock_outlined,
+                iconColor: AppColors.primary,
+                textColor: textColor,
+                trailing: Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  size: 16,
+                  color: textColor.withValues(alpha: 0.5),
+                ),
+                onTap: () => context.push(AppRouter.profileChangePassword),
+              ),
+              const Divider(height: 1, indent: 20, endIndent: 20),
+            ],
+            _buildListTile(
+              title: "Đăng xuất",
+              leadingIcon: Icons.logout_outlined,
+              iconColor: AppColors.borderWrong,
+              textColor: AppColors.borderWrong,
+              onTap: () => _showLogoutDialog(context),
+            ),
+            const Divider(height: 1, indent: 20, endIndent: 20),
+          ],
+        );
+      },
     );
   }
 

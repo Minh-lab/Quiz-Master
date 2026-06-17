@@ -19,7 +19,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+      // padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
       decoration: const BoxDecoration(
         color: AppColors.primary,
         // borderRadius: BorderRadius.only(
@@ -32,12 +32,14 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthSuccess) {
-              return _buildUserBanner(state.user);
+              return _buildUserBanner(context,state.user);
             } else if (state is GuestModeActive) {
               return _buildGuestBanner(context);
             }
             return _buildGuestBanner(context);
           },
+          
+
         ),
       ),
     );
@@ -47,7 +49,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
   // TODO: implement preferredSize
   Size get preferredSize => const Size.fromHeight(200);
 
-  Widget _buildUserBanner(UserEntity user) {
+  Widget _buildUserBanner(BuildContext context,UserEntity user) {
     String displayName =
         user.displayName ?? user.email?.split('@').first ?? 'Học viên';
 
@@ -65,7 +67,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   Text(
                     'Xin chào!',
-                    style: AppTypography.headlineSmall(color: Colors.white),
+                    style: AppTypography.titleMedium(color: Colors.white),
                   ),
                   const SizedBox(width: 8),
                   const Icon(
@@ -85,9 +87,11 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
                         ? NetworkImage(user.photoUrl!)
                         : null,
                     child: user.photoUrl == null
-                        ? const Icon(
+                        ? Icon(
                             Icons.person,
-                            color: Colors.white,
+                            color: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.warningBackground
+                              : AppColors.darkWarningBackground,
                             size: 20,
                           )
                         : null,
@@ -96,7 +100,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
                   Expanded(
                     child: Text(
                       displayName,
-                      style: AppTypography.headlineLarge(color: Colors.white),
+                      style: AppTypography.titleLarge(color: Colors.white),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -129,7 +133,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
               const SizedBox(width: 8),
               Text(
                 '1',
-                style: AppTypography.headlineSmall(color: Colors.black),
+                style: AppTypography.titleMedium(color: Colors.black),
               ),
             ],
           ),
@@ -153,7 +157,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   Text(
                     'Xin chào, Khách!',
-                    style: AppTypography.headlineSmall(color: Colors.white),
+                    style: AppTypography.titleMedium(color: Colors.white),
                   ),
                   const SizedBox(width: 8),
                   const Icon(

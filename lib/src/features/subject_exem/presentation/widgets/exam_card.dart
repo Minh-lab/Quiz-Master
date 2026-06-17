@@ -7,6 +7,7 @@ class ExamCard extends StatelessWidget {
   final VoidCallback? onTap;
   final String numberQuestion;
   final String time;
+  final Widget? trailing;
 
   const ExamCard({
     super.key,
@@ -14,6 +15,7 @@ class ExamCard extends StatelessWidget {
     required this.numberQuestion,
     required this.time,
     this.onTap,
+    this.trailing,
   });
 
   @override
@@ -31,8 +33,10 @@ class ExamCard extends StatelessWidget {
           const SizedBox(width: 12),
           Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const SizedBox(height: 46),
+              if (trailing != null) trailing!,
+              if (trailing == null) const SizedBox(height: 46),
               SizedBox(
                 width: 100,
                 height: 38,
@@ -70,19 +74,22 @@ class ExamCard extends StatelessWidget {
       children: [
         Text(
           title,
-          style: AppTypography.headlineSmall().copyWith(
+          style: AppTypography.titleLarge().copyWith(
             color: colorScheme.onSurface,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.bold,
           ),
           softWrap: true,
         ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
+        Wrap(
+          spacing: 10,
+          runSpacing: 4,
           children: [
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
                   Icons.question_answer_outlined,
+                  size: 18,
                   color: colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 4),
@@ -94,10 +101,14 @@ class ExamCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(width: 10),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.timer_outlined, color: colorScheme.onSurfaceVariant),
+                Icon(
+                  Icons.timer_outlined, 
+                  size: 18,
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '$time phút',

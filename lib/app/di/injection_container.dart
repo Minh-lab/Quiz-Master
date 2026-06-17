@@ -28,6 +28,32 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/su
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quiz_mater_apllication/src/core/theme/bloc/theme_cubit.dart';
 
+// Profile DI
+import 'package:quiz_mater_apllication/src/features/profile/data/datasources/profile_remote_data_source.dart';
+import 'package:quiz_mater_apllication/src/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:quiz_mater_apllication/src/features/profile/domain/repositories/profile_repository.dart';
+import 'package:quiz_mater_apllication/src/features/profile/domain/usecases/update_profile_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/cubit/profile_cubit.dart';
+
+import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/change_password_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/profile/presentation/cubit/change_password_cubit/change_password_cubit.dart';
+
+import 'package:quiz_mater_apllication/src/features/history/data/datasources/history_remote_data_source.dart';
+import 'package:quiz_mater_apllication/src/features/history/data/repositories/history_repository_impl.dart';
+import 'package:quiz_mater_apllication/src/features/history/domain/repositories/history_repository.dart';
+import 'package:quiz_mater_apllication/src/features/history/domain/usecases/get_exam_history_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/history/domain/usecases/delete_exam_history_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/history/domain/usecases/save_exam_history_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/history/presentation/cubit/exam_history_cubit.dart';
+
+// Saved Exam DI
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quiz_mater_apllication/src/features/saved_exam/data/datasources/saved_exam_remote_datasource.dart';
+import 'package:quiz_mater_apllication/src/features/saved_exam/data/repositories/saved_exam_repository_impl.dart';
+import 'package:quiz_mater_apllication/src/features/saved_exam/domain/repositories/saved_exam_repository.dart';
+import 'package:quiz_mater_apllication/src/features/saved_exam/domain/usecases/saved_exam_usecases.dart';
+import 'package:quiz_mater_apllication/src/features/saved_exam/presentation/cubit/saved_exam_cubit.dart';
+
 final GetIt sl = GetIt.instance;
 
 Future<void> init() async {
@@ -75,4 +101,56 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SigninWithEmailUsecase(repository: sl()));
   sl.registerLazySingleton(() => SignOutUsecase(repository: sl()));
   sl.registerLazySingleton(() => SigninWithGoogleUsecase(repository: sl()));
+
+  // Profile
+  sl.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(),
+  );
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
+  sl.registerFactory(() => ProfileCubit(updateProfileUseCase: sl()));
+  
+  // Change Password
+  sl.registerLazySingleton(() => ChangePasswordUseCase(sl()));
+  sl.registerFactory(() => ChangePasswordCubit(changePasswordUseCase: sl()));
+
+  // Exam History
+  sl.registerLazySingleton<HistoryRemoteDataSource>(
+    () => HistoryRemoteDataSourceImpl(),
+  );
+  sl.registerLazySingleton<HistoryRepository>(
+    () => HistoryRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => GetExamHistoryUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteExamHistoryUseCase(sl()));
+  sl.registerLazySingleton(() => SaveExamHistoryUseCase(sl()));
+  sl.registerFactory(
+    () => ExamHistoryCubit(
+      getHistoryUseCase: sl(),
+      deleteHistoryUseCase: sl(),
+    ),
+  );
+
+  // Saved Exam
+  sl.registerLazySingleton(() => FirebaseFirestore.instance);
+  sl.registerLazySingleton<SavedExamRemoteDataSource>(
+    () => SavedExamRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<SavedExamRepository>(
+    () => SavedExamRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => SaveExamUseCase(sl()));
+  sl.registerLazySingleton(() => RemoveSavedExamUseCase(sl()));
+  sl.registerLazySingleton(() => CheckExamSavedUseCase(sl()));
+  sl.registerLazySingleton(() => GetSavedExamsUseCase(sl()));
+  sl.registerLazySingleton(
+    () => SavedExamCubit(
+      getSavedExamsUseCase: sl(),
+      saveExamUseCase: sl(),
+      removeSavedExamUseCase: sl(),
+      checkExamSavedUseCase: sl(),
+    ),
+  );
 }

@@ -18,6 +18,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/short_answer_input_field.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/submit_exam_dialog.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/exam_result_screen.dart';
+import 'package:quiz_mater_apllication/src/features/saved_exam/presentation/widgets/save_exam_button.dart';
 
 class ExamDetailScreen extends StatefulWidget {
   final String subjectId;
@@ -71,9 +72,20 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Scaffold(
-      appBar: _buildAppBar(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        
+        final shouldPop = await _showExitConfirmationDialog(context);
+        if (shouldPop == true) {
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: _buildAppBar(),
       body: BlocListener<TimerCubit, int>(
         listener: (context, remainingSeconds) {
           if (remainingSeconds == 0) {
@@ -137,6 +149,32 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
       ),
     ),
       bottomNavigationBar: _buildBottomNav(context),
+      ),
+    );
+  }
+
+  Future<bool?> _showExitConfirmationDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Thoát bài thi?'),
+          content: Text('Bạn đang làm bài thi. Nếu thoát bây giờ, kết quả của bạn sẽ không được lưu. Bạn có chắc chắn muốn thoát?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Tiếp tục làm bài'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(
+                'Thoát',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -146,7 +184,27 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
       preferredSize: const Size.fromHeight(70),
       child: AppAppbar(
         title: 'Đề thi ${widget.title} ',
-        actions: _timeCountdown(duration: duration),
+        actions: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            BlocBuilder<ExamDetailBloc, ExamDetailState>(
+              builder: (context, state) {
+                int totalQs = 0;
+                if (state is ExamDetailLoaded) {
+                  totalQs = state.questions.length;
+                }
+                return SaveExamButton(
+                  examId: widget.examId,
+                  title: widget.title,
+                  subjectId: widget.subjectId,
+                  duration: widget.duration,
+                  totalQuestions: totalQs,
+                );
+              },
+            ),
+            _timeCountdown(duration: duration),
+          ],
+        ),
       ),
     );
   }
@@ -199,8 +257,8 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
           child: Row(
             children: [
               Text(
-                'Câu ${totalQuestionAnswered}/${totalQuestion}',
-                style: AppTypography.headlineSmall(),
+                'Câu $totalQuestionAnswered/$totalQuestion',
+                style: AppTypography.titleMedium(),
               ),
               SizedBox(width: 20),
               Expanded(
@@ -285,7 +343,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                   child: Center(
                     child: Text(
                       (index + 1).toString(),
-                      style: AppTypography.headlineSmall().copyWith(
+                      style: AppTypography.titleMedium().copyWith(
                         color: textColor,
                         fontWeight: isCurrent
                             ? FontWeight.w900
@@ -331,7 +389,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                 Expanded(
                   child: Text(
                     'Câu $index',
-                    style: AppTypography.headlineSmall().copyWith(
+                    style: AppTypography.titleLarge().copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.w900,
                     ),
@@ -366,7 +424,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
             ),
             MathTextBuilder(
               text: question.content,
-              style: AppTypography.headlineMedium(),
+              style: AppTypography.bodyLarge(),
             ),
             (question.imageUrl != null && question.imageUrl!.isNotEmpty)
                 ? Center(child: FirebaseImage(imageUrl: question.imageUrl!))
@@ -750,48 +808,55 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(optionText, style: AppTypography.bodyLarge().copyWith(color: Theme.of(context).colorScheme.onSurface)),
-                ),
-                const SizedBox(width: 8),
-                // Nút Đúng
-                _buildTrueFalseOptionButton(
-                  context: context,
-                  label: 'Đúng',
-                  isSelected: currentSelection == true,
-                  selectedColor: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.darkSuccess
-                      : AppColors.success,
-                  onTap: () {
-                    answers[key] = true;
-                    context.read<ExamDetailBloc>().add(
-                      SelectAnswerEvent(
-                        questionIndex: question.order,
-                        answerIndex: answers,
+                Text(optionText, style: AppTypography.bodyLarge().copyWith(color: Theme.of(context).colorScheme.onSurface)),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    // Nút Đúng
+                    Expanded(
+                      child: _buildTrueFalseOptionButton(
+                        context: context,
+                        label: 'Đúng',
+                        isSelected: currentSelection == true,
+                        selectedColor: Theme.of(context).brightness == Brightness.dark
+                            ? AppColors.darkSuccess
+                            : AppColors.success,
+                        onTap: () {
+                          answers[key] = true;
+                          context.read<ExamDetailBloc>().add(
+                            SelectAnswerEvent(
+                              questionIndex: question.order,
+                              answerIndex: answers,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
-                // Nút Sai
-                _buildTrueFalseOptionButton(
-                  context: context,
-                  label: 'Sai',
-                  isSelected: currentSelection == false,
-                  selectedColor: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.darkError
-                      : AppColors.error,
-                  onTap: () {
-                    answers[key] = false;
-                    context.read<ExamDetailBloc>().add(
-                      SelectAnswerEvent(
-                        questionIndex: question.order,
-                        answerIndex: answers,
+                    ),
+                    const SizedBox(width: 8),
+                    // Nút Sai
+                    Expanded(
+                      child: _buildTrueFalseOptionButton(
+                        context: context,
+                        label: 'Sai',
+                        isSelected: currentSelection == false,
+                        selectedColor: Theme.of(context).brightness == Brightness.dark
+                            ? AppColors.darkError
+                            : AppColors.error,
+                        onTap: () {
+                          answers[key] = false;
+                          context.read<ExamDetailBloc>().add(
+                            SelectAnswerEvent(
+                              questionIndex: question.order,
+                              answerIndex: answers,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -821,6 +886,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
         ),
         child: Text(
           label,
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
