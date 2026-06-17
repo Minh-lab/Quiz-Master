@@ -34,8 +34,23 @@ class AppTypography {
         color: color,
       );
 
- 
+  static TextStyle titleLarge({Color? color}) => GoogleFonts.mulish(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        color: color,
+      );
 
+  static TextStyle titleMedium({Color? color}) => GoogleFonts.mulish(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: color,
+      );
+
+  static TextStyle titleSmall({Color? color}) => GoogleFonts.mulish(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: color,
+      );
 
   static TextStyle bodyLarge({Color? color}) => GoogleFonts.mulish(
         fontSize: 16,

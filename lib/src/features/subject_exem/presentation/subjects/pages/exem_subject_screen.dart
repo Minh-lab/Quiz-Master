@@ -49,8 +49,9 @@ class ExemSubjectScreen extends StatelessWidget {
         
                     return GridView.builder(
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200,
+                            childAspectRatio: 0.95,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
                           ),
@@ -156,34 +157,34 @@ class ExemSubjectScreen extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               'Ôn theo môn học',
-              style: AppTypography.headlineMedium(color: Theme.of(context).colorScheme.onSurface),
+              style: AppTypography.headlineSmall(color: Theme.of(context).colorScheme.onSurface),
             ),
           ],
         ),
-        InkWell(
-          onTap: () {
+        // InkWell(
+        //   onTap: () {
 
-          },
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Xem tất cả',
-                  style: AppTypography.labelMedium(color: Theme.of(context).colorScheme.primary),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 14,
-                ),
-              ],
-            ),
-          ),
-        ),
+        //   },
+        //   borderRadius: BorderRadius.circular(20),
+        //   child: Padding(
+        //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        //     child: Row(
+        //       mainAxisSize: MainAxisSize.min,
+        //       children: [
+        //         Text(
+        //           'Xem tất cả',
+        //           style: AppTypography.labelMedium(color: Theme.of(context).colorScheme.primary),
+        //         ),
+        //         const SizedBox(width: 4),
+        //         Icon(
+        //           Icons.arrow_forward_ios_rounded,
+        //           color: Theme.of(context).colorScheme.primary,
+        //           size: 14,
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

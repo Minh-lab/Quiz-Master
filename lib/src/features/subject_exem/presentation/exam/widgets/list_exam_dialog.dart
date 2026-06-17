@@ -96,7 +96,7 @@ class ListExamDialog extends StatelessWidget {
             context: context,
             icon: Icons.description_outlined,
             label: 'Số câu hỏi:',
-            value: '${exam.questions.length} câu',
+            value: '${exam.totalQuestions} câu',
           ),
           const SizedBox(height: 16),
           _buildDetailRow(

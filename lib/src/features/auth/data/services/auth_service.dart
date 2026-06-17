@@ -11,4 +11,5 @@ abstract class AuthService {
   Future<Either> signInWithGoogle();
 
   Future<Either> signOut();
+  Future<Either> changePassword({required String currentPassword, required String newPassword});
 }

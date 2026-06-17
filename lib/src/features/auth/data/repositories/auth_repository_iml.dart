@@ -56,4 +56,20 @@ class AuthRepositoryIml extends AuthRepository {
     // TODO: implement signInWithGoogle
     return authService.signInWithGoogle();
   }
+
+  @override
+  Future<Either<String, void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final result = await authService.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+    // AuthService trả về Either, ta ép kiểu sang Either<String, void>
+    return result.fold(
+      (l) => Left(l.toString()),
+      (r) => const Right(null),
+    );
+  }
 }
