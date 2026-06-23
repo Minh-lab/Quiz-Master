@@ -19,7 +19,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      // padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
+      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
       decoration: const BoxDecoration(
         color: AppColors.primary,
         // borderRadius: BorderRadius.only(
@@ -32,14 +32,12 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthSuccess) {
-              return _buildUserBanner(context,state.user);
+              return _buildUserBanner(context, state.user);
             } else if (state is GuestModeActive) {
               return _buildGuestBanner(context);
             }
             return _buildGuestBanner(context);
           },
-          
-
         ),
       ),
     );
@@ -49,7 +47,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
   // TODO: implement preferredSize
   Size get preferredSize => const Size.fromHeight(200);
 
-  Widget _buildUserBanner(BuildContext context,UserEntity user) {
+  Widget _buildUserBanner(BuildContext context, UserEntity user) {
     String displayName =
         user.displayName ?? user.email?.split('@').first ?? 'Học viên';
 
@@ -67,7 +65,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   Text(
                     'Xin chào!',
-                    style: AppTypography.titleMedium(color: Colors.white),
+                    style: AppTypography.headlineSmall(color: Colors.white),
                   ),
                   const SizedBox(width: 8),
                   const Icon(
@@ -89,9 +87,10 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
                     child: user.photoUrl == null
                         ? Icon(
                             Icons.person,
-                            color: Theme.of(context).brightness == Brightness.dark
-                              ? AppColors.warningBackground
-                              : AppColors.darkWarningBackground,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? AppColors.warningBackground
+                                : AppColors.darkWarningBackground,
                             size: 20,
                           )
                         : null,
@@ -100,7 +99,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
                   Expanded(
                     child: Text(
                       displayName,
-                      style: AppTypography.titleLarge(color: Colors.white),
+                      style: AppTypography.headlineSmall(color: Colors.white),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -111,33 +110,6 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         const SizedBox(width: 16),
-        Container(
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SvgPicture.asset(
-                AppAssetIcon.fireIcon,
-                width: 20,
-                height: 20,
-                colorFilter: const ColorFilter.mode(
-                  Colors.red,
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '1',
-                style: AppTypography.titleMedium(color: Colors.black),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -157,7 +129,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   Text(
                     'Xin chào, Khách!',
-                    style: AppTypography.titleMedium(color: Colors.white),
+                    style: AppTypography.headlineSmall(color: Colors.white),
                   ),
                   const SizedBox(width: 8),
                   const Icon(

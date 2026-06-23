@@ -258,7 +258,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
             children: [
               Text(
                 'Câu $totalQuestionAnswered/$totalQuestion',
-                style: AppTypography.titleMedium(),
+                style: AppTypography.bodySmall(),
               ),
               SizedBox(width: 20),
               Expanded(
@@ -343,7 +343,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                   child: Center(
                     child: Text(
                       (index + 1).toString(),
-                      style: AppTypography.titleMedium().copyWith(
+                      style: AppTypography.bodySmall().copyWith(
                         color: textColor,
                         fontWeight: isCurrent
                             ? FontWeight.w900
@@ -389,7 +389,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                 Expanded(
                   child: Text(
                     'Câu $index',
-                    style: AppTypography.titleLarge().copyWith(
+                    style: AppTypography.headlineSmall().copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.w900,
                     ),
@@ -878,7 +878,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? selectedColor : Theme.of(context).colorScheme.surfaceContainer,
+          color: isSelected ? selectedColor.withValues(alpha: 0.15) : Theme.of(context).colorScheme.surfaceContainer,
           border: Border.all(
             color: isSelected ? selectedColor : Theme.of(context).colorScheme.outline,
           ),
@@ -888,7 +888,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurfaceVariant,
+            color: isSelected ? selectedColor : Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
           ),
         ),

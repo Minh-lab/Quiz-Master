@@ -15,6 +15,7 @@ import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/ex
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quiz_mater_apllication/src/features/history/domain/entities/exam_history_entity.dart';
 import 'package:quiz_mater_apllication/src/features/history/domain/usecases/save_exam_history_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/data/models/question.dart';
 
 class ExamResultScreen extends StatefulWidget {
   final List<QuestionEntity> questions;
@@ -24,6 +25,7 @@ class ExamResultScreen extends StatefulWidget {
   final String examId;
   final String title;
   final int duration;
+  final bool isViewingHistory;
 
   const ExamResultScreen({
     Key? key,
@@ -34,6 +36,7 @@ class ExamResultScreen extends StatefulWidget {
     required this.examId,
     required this.title,
     required this.duration,
+    this.isViewingHistory = false,
   }) : super(key: key);
 
   @override
@@ -56,7 +59,9 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
   void initState() {
     super.initState();
     _calculateResult();
-    _saveHistory();
+    if (!widget.isViewingHistory) {
+      _saveHistory();
+    }
     _filteredQuestions = widget.questions;
   }
 
@@ -83,6 +88,8 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
       duration: widget.duration * 60,
       timeSpent: widget.timeTakenInSeconds,
       submittedAt: DateTime.now(),
+      userAnswers: widget.userAnswers.map((key, value) => MapEntry(key.toString(), value)),
+      questionsData: widget.questions.map((q) => QuestionModel.fromEntity(q).toJson()).toList(),
     );
 
     await sl<SaveExamHistoryUseCase>().call(history);
@@ -351,10 +358,13 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
             children: [
               Icon(Icons.schedule_rounded, color: textSecondary, size: 18),
               const SizedBox(width: 8),
-              Text(
-                'Thời gian: $minutes phút $seconds giây',
-                style: AppTypography.bodyMedium().copyWith(
-                  color: textSecondary,
+              Flexible(
+                child: Text(
+                  'Thời gian: $minutes phút $seconds giây',
+                  style: AppTypography.bodyMedium().copyWith(
+                    color: textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
@@ -384,7 +394,7 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
         const SizedBox(height: 8),
         Text(
           value,
-          style: AppTypography.titleMedium().copyWith(
+          style: AppTypography.headlineSmall().copyWith(
             color: valueColor,
             fontWeight: FontWeight.bold,
           ),
@@ -399,13 +409,16 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            'Xem lại đáp án',
-            style: AppTypography.titleLarge().copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
+          Expanded(
+            child: Text(
+              'Xem lại đáp án',
+              style: AppTypography.headlineSmall().copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
@@ -478,13 +491,16 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Câu ${question.order}',
-                style: AppTypography.titleLarge().copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  'Câu ${question.order}',
+                  style: AppTypography.headlineSmall().copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -838,10 +854,13 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
                   Icons.refresh_rounded,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                label: Text(
-                  'Luyện lại bài',
-                  style: AppTypography.labelLarge().copyWith(
-                    color: Theme.of(context).colorScheme.primary,
+                label: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'Luyện lại bài',
+                    style: AppTypography.labelLarge().copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
               ),
@@ -863,10 +882,13 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
                   Icons.home_rounded,
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
-                label: Text(
-                  'Luyện đề khác',
-                  style: AppTypography.labelLarge().copyWith(
-                    color: Theme.of(context).colorScheme.onPrimary,
+                label: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'Luyện đề khác',
+                    style: AppTypography.labelLarge().copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                   ),
                 ),
               ),

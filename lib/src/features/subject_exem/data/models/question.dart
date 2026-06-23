@@ -39,4 +39,32 @@ class QuestionModel extends QuestionEntity {
       type: type,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'order': order,
+      'content': content,
+      'imageUrl': imageUrl,
+      'options': options,
+      'correctAnswer': correctAnswer,
+      'score': score,
+      'explanation': explanation,
+      'type': type,
+    };
+  }
+
+  factory QuestionModel.fromEntity(QuestionEntity entity) {
+    return QuestionModel(
+      id: entity.id,
+      order: entity.order,
+      content: entity.content,
+      imageUrl: entity.imageUrl,
+      options: entity.options,
+      correctAnswer: entity.correctAnswer,
+      score: entity.score,
+      explanation: entity.explanation,
+      type: entity.type,
+    );
+  }
 }

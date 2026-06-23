@@ -121,14 +121,15 @@ class ListExamDialog extends StatelessWidget {
       children: [
         Icon(icon, color: colorScheme.primary),
         const SizedBox(width: 8),
-        Text(
-          label,
-          style: AppTypography.bodyMedium().copyWith(
-            color: colorScheme.onPrimaryContainer,
-            fontWeight: FontWeight.w600,
+        Expanded(
+          child: Text(
+            label,
+            style: AppTypography.bodyMedium().copyWith(
+              color: colorScheme.onPrimaryContainer,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
-        const Spacer(),
         Text(
           value,
           style: AppTypography.bodyLarge().copyWith(

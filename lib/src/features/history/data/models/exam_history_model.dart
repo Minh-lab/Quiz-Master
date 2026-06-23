@@ -18,6 +18,8 @@ class ExamHistoryModel extends ExamHistoryEntity {
     required super.duration,
     required super.timeSpent,
     required super.submittedAt,
+    super.userAnswers,
+    super.questionsData,
   });
 
   factory ExamHistoryModel.fromJson(Map<String, dynamic> json, String id) {
@@ -37,6 +39,8 @@ class ExamHistoryModel extends ExamHistoryEntity {
       duration: json['duration'] ?? 0,
       timeSpent: json['timeSpent'] ?? 0,
       submittedAt: (json['submittedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      userAnswers: json['userAnswers'] as Map<String, dynamic>?,
+      questionsData: json['questionsData'] as List<dynamic>?,
     );
   }
 
@@ -56,6 +60,8 @@ class ExamHistoryModel extends ExamHistoryEntity {
       'duration': duration,
       'timeSpent': timeSpent,
       'submittedAt': Timestamp.fromDate(submittedAt),
+      'userAnswers': userAnswers,
+      'questionsData': questionsData,
     };
   }
 
@@ -76,6 +82,8 @@ class ExamHistoryModel extends ExamHistoryEntity {
       duration: duration,
       timeSpent: timeSpent,
       submittedAt: submittedAt,
+      userAnswers: userAnswers,
+      questionsData: questionsData,
     );
   }
 
@@ -96,6 +104,8 @@ class ExamHistoryModel extends ExamHistoryEntity {
       duration: entity.duration,
       timeSpent: entity.timeSpent,
       submittedAt: entity.submittedAt,
+      userAnswers: entity.userAnswers,
+      questionsData: entity.questionsData,
     );
   }
 }

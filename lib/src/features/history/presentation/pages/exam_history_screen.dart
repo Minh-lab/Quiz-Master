@@ -7,6 +7,9 @@ import 'package:quiz_mater_apllication/src/core/widgets/app_appbar.dart';
 import 'package:quiz_mater_apllication/src/features/history/domain/entities/exam_history_entity.dart';
 import 'package:quiz_mater_apllication/src/features/history/presentation/cubit/exam_history_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/history/presentation/cubit/exam_history_state.dart';
+import 'package:quiz_mater_apllication/src/features/history/presentation/widgets/history_card.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/data/models/question.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/pages/exam_result_screen.dart';
 
 class ExamHistoryScreen extends StatefulWidget {
   const ExamHistoryScreen({super.key});
@@ -120,94 +123,50 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
           return RefreshIndicator(
             onRefresh: () => context.read<ExamHistoryCubit>().fetchHistory(),
             child: ListView.separated(
-              padding: const EdgeInsets.all(16),
+              // padding: const EdgeInsets.all(16),
               itemCount: histories.length,
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final history = histories[index];
                 final isDeleting = state is ExamHistoryDeleting;
                 
-                return Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                history.examTitle,
-                                style: AppTypography.headlineSmall().copyWith(fontWeight: FontWeight.bold),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primaryContainer,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '${history.score.toStringAsFixed(1)} điểm',
-                                style: AppTypography.labelLarge().copyWith(color: Theme.of(context).colorScheme.primary),
-                              ),
-                            )
-                          ],
+                return HistoryCard(
+                  history: history,
+                  isDeleting: isDeleting,
+                  onViewDetail: () {
+                    if (history.questionsData != null && history.userAnswers != null) {
+                      final questions = history.questionsData!
+                          .map((q) => QuestionModel.fromJson(q as Map<String, dynamic>, q['id']))
+                          .toList();
+                      final userAnswers = history.userAnswers!.map(
+                          (key, value) => MapEntry(int.parse(key), value));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ExamResultScreen(
+                            questions: questions,
+                            userAnswers: userAnswers,
+                            timeTakenInSeconds: history.timeSpent,
+                            subjectId: history.subjectId,
+                            examId: history.examId,
+                            title: history.examTitle,
+                            duration: history.duration ~/ 60,
+                            isViewingHistory: true,
+                          ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Môn: ${history.subjectName}',
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Icon(Icons.access_time, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                            const SizedBox(width: 4),
-                            Text('${history.timeSpent ~/ 60}p ${history.timeSpent % 60}s', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                            const SizedBox(width: 16),
-                            Icon(Icons.check_circle_outline, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                            const SizedBox(width: 4),
-                            Text('${history.correctAnswers}/${history.totalQuestions}', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                            const SizedBox(width: 16),
-                            Icon(Icons.calendar_today, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                            const SizedBox(width: 4),
-                            Text('${history.submittedAt.day.toString().padLeft(2, '0')}/${history.submittedAt.month.toString().padLeft(2, '0')}/${history.submittedAt.year} ${history.submittedAt.hour.toString().padLeft(2, '0')}:${history.submittedAt.minute.toString().padLeft(2, '0')}', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {},
-                                style: OutlinedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                ),
-                                child: const Text('Xem chi tiết'),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            IconButton(
-                              onPressed: isDeleting
-                                  ? null
-                                  : () async {
-                                      final confirm = await _showDeleteConfirmDialog(context);
-                                      if (confirm && context.mounted) {
-                                        context.read<ExamHistoryCubit>().deleteHistory(history.id);
-                                      }
-                                    },
-                              icon: const Icon(Icons.delete_outline, color: Colors.red),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Dữ liệu chi tiết của bài thi cũ không được lưu')),
+                      );
+                    }
+                  },
+                  onDelete: () async {
+                    final confirm = await _showDeleteConfirmDialog(context);
+                    if (confirm && context.mounted) {
+                      context.read<ExamHistoryCubit>().deleteHistory(history.id);
+                    }
+                  },
                 );
               },
             ),
