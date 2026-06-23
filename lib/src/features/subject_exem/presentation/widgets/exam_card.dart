@@ -74,7 +74,7 @@ class ExamCard extends StatelessWidget {
       children: [
         Text(
           title,
-          style: AppTypography.titleLarge().copyWith(
+          style: AppTypography.headlineSmall().copyWith(
             color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
           ),

@@ -50,7 +50,7 @@ class SubjectCard extends StatelessWidget {
                 const Spacer(),
                 Text(
                   title,
-                  style: AppTypography.titleMedium(
+                  style: AppTypography.headlineSmall(
                     color: colorScheme.onSurface,
                   ),
                   textAlign: TextAlign.center,

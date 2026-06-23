@@ -16,6 +16,8 @@ class ExamHistoryEntity extends Equatable {
   final int duration; // Thời gian tối đa của bài thi (giây)
   final int timeSpent; // Thời gian đã làm (giây)
   final DateTime submittedAt;
+  final Map<String, dynamic>? userAnswers;
+  final List<dynamic>? questionsData;
 
   const ExamHistoryEntity({
     required this.id,
@@ -33,6 +35,8 @@ class ExamHistoryEntity extends Equatable {
     required this.duration,
     required this.timeSpent,
     required this.submittedAt,
+    this.userAnswers,
+    this.questionsData,
   });
 
   @override
@@ -52,5 +56,7 @@ class ExamHistoryEntity extends Equatable {
         duration,
         timeSpent,
         submittedAt,
+        userAnswers,
+        questionsData,
       ];
 }

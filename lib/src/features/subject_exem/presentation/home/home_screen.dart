@@ -57,7 +57,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     'Đăng nhập để xem hồ sơ và lịch sử làm bài của bạn',
-                    style: AppTypography.titleLarge(
+                    style: AppTypography.bodyMedium().copyWith(
                       color: colorScheme.onSurface,
                     ),
                     textAlign: TextAlign.center,
@@ -79,7 +79,7 @@ class HomeScreen extends StatelessWidget {
                         child: Text(
                           'Đăng nhập / Đăng ký ngay',
                           textAlign: TextAlign.center,
-                          style: AppTypography.titleMedium().copyWith(
+                          style: AppTypography.bodyMedium().copyWith(
                             color: colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
                           ),
@@ -104,7 +104,7 @@ class HomeScreen extends StatelessWidget {
                         child: Center(
                           child: Text(
                             'Để sau',
-                            style: AppTypography.titleMedium().copyWith(
+                            style: AppTypography.bodyMedium().copyWith(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.bold,
                             ),
