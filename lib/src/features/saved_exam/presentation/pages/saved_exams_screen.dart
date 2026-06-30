@@ -46,11 +46,16 @@ class SavedExamsScreen extends StatelessWidget {
                       style: AppTypography.bodyMedium(),
                     ),
                     const SizedBox(height: 16),
-                    FilledButton(
-                      onPressed: () {
-                        context.go(AppRouter.home);
-                      },
-                      child: const Text('Khám phá đề thi'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: 
+                        FilledButton(
+                          onPressed: () {
+                            context.go(AppRouter.home);
+                          },
+                          child: const Text('Khám phá đề thi'),
+                        ),
+                      
                     ),
                   ],
                 ),

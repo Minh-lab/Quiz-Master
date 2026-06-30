@@ -99,7 +99,7 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      // TODO: Gọi sự kiện SubmitExamEvent và chuyển hướng
+
                     },
                     child: Text('Đóng'),
                   )

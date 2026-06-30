@@ -29,10 +29,17 @@ class ExemSubjectScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: TopBanner(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            final bloc = context.read<SubjectBloc>();
+            bloc.add(FetchSubjectEvent());
+            await bloc.stream.firstWhere((state) => state is! SubjectLoading);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // const MenuCard(),
               // const SizedBox(height: 32),
@@ -41,9 +48,9 @@ class ExemSubjectScreen extends StatelessWidget {
         
               BlocBuilder<SubjectBloc, SubjectState>(
                 builder: (context, state) {
-                  if (state is SubjectLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+                  // if (state is SubjectLoading) {
+                  //   return const Center(child: CircularProgressIndicator());
+                  // }
                   if (state is SubjectLoaded) {
                     final List<SubjectEntity> subjects = state.subjects!;
         
@@ -121,6 +128,7 @@ class ExemSubjectScreen extends StatelessWidget {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

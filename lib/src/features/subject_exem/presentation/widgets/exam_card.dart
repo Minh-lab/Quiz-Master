@@ -25,102 +25,99 @@ class ExamCard extends StatelessWidget {
     return AppContainer(
       color: colorScheme.surfaceContainer,
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      child: Row(
+      padding: const EdgeInsets.all(16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: _detailExam(context)),
-          const SizedBox(width: 12),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
+          // Hàng 1: Tiêu đề đề thi
+          Text(
+            title,
+            style: AppTypography.headlineSmall().copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 12),
+          
+          // Hàng 2: Metadata (Số câu, Thời gian)
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
             children: [
-              if (trailing != null) trailing!,
-              if (trailing == null) const SizedBox(height: 46),
-              SizedBox(
-                width: 100,
-                height: 38,
-                child: FilledButton(
-                  onPressed: onTap,
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(100, 38),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.question_answer_outlined,
+                    size: 20,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '$numberQuestion câu',
+                    style: AppTypography.bodyMedium().copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  child: Text(
-                    'Thi thử',
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.timer_outlined,
+                    size: 20,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '$time phút',
                     style: AppTypography.bodyMedium().copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Hàng 3: Action Row
+          Row(
+            children: [
+             
+              Expanded(
+                child: SizedBox(
+                  height: 48,
+                  child: FilledButton(
+                    onPressed: onTap,
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                    ),
+                    child: Text(
+                      'Thi thử',
+                      style: AppTypography.bodyMedium().copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ],
+               if (trailing != null) ...[
+                trailing!,
+                const SizedBox(width: 12),
+              ],            ],
           ),
         ],
       ),
-    );
-  }
-
-  Widget _detailExam(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10,
-      children: [
-        Text(
-          title,
-          style: AppTypography.headlineSmall().copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-          softWrap: true,
-        ),
-        Wrap(
-          spacing: 10,
-          runSpacing: 4,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.question_answer_outlined,
-                  size: 18,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '$numberQuestion câu',
-                  style: AppTypography.bodyMedium(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.timer_outlined, 
-                  size: 18,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '$time phút',
-                  style: AppTypography.bodyMedium(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
