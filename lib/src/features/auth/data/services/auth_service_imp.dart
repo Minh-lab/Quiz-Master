@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quiz_mater_apllication/src/features/auth/data/models/user.dart';
 import 'package:quiz_mater_apllication/src/features/auth/data/services/auth_service.dart';
@@ -98,8 +99,7 @@ class AuthServiceImpl implements AuthService {
     try {
       await GoogleSignIn.instance.signOut();
       await GoogleSignIn.instance.initialize(
-        serverClientId:
-            '795544707095-rfdd4gb4teugpt0hjjkch5cmjlgc78k5.apps.googleusercontent.com',
+        serverClientId: dotenv.env['GOOGLE_SERVER_CLIENT_ID'],
       );
 
       final googleUser = await GoogleSignIn.instance.authenticate();
