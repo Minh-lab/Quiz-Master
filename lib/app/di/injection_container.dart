@@ -11,6 +11,7 @@ import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signup_
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_in/sign_in_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_up/sign_up_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/domain/usecases/delete_chat_session_usecase.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/repository/exam_repository_iml.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/repository/subject_repository_iml.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/services/exam_service/exam_service.dart';
@@ -54,6 +55,17 @@ import 'package:quiz_mater_apllication/src/features/saved_exam/domain/repositori
 import 'package:quiz_mater_apllication/src/features/saved_exam/domain/usecases/saved_exam_usecases.dart';
 import 'package:quiz_mater_apllication/src/features/saved_exam/presentation/cubit/saved_exam_cubit.dart';
 
+// Chatbot DI
+import 'package:quiz_mater_apllication/src/features/chatbot/data/datasources/chatbot_remote_datasource.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/data/repositories/chatbot_repository_impl.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/domain/repositories/chatbot_repository.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/domain/usecases/create_chat_session_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/domain/usecases/get_chat_history_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/domain/usecases/get_sessions_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/domain/usecases/send_message_usecase.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/presentation/cubit/chat_history_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/presentation/cubit/chatbot_cubit.dart';
+
 final GetIt sl = GetIt.instance;
 
 Future<void> init() async {
@@ -83,7 +95,12 @@ Future<void> init() async {
       signinWithGoogleUsecase: sl(),
     ),
   );
-  sl.registerFactory(() => SignUpCubit(signupWithEmailUsecase: sl()));
+  sl.registerFactory(
+    () => SignUpCubit(
+      signupWithEmailUsecase: sl(),
+      signinWithGoogleUsecase: sl(),
+    ),
+  );
   sl.registerLazySingleton(
     () => AuthBloc(
       // signinWithEmailUsecase: sl(),
@@ -153,4 +170,26 @@ Future<void> init() async {
       checkExamSavedUseCase: sl(),
     ),
   );
+
+  // Chatbot
+  sl.registerLazySingleton<ChatbotRemoteDataSource>(
+    () => ChatbotRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<ChatbotRepository>(
+    () => ChatbotRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => GetSessionsUseCase(sl()));
+  sl.registerLazySingleton(() => CreateChatSessionUseCase(sl()));
+  sl.registerLazySingleton(() => GetChatHistoryUseCase(sl()));
+  sl.registerLazySingleton(() => SendMessageUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteChatSessionUseCase(sl()));
+  sl.registerFactory(() => ChatHistoryCubit(
+    getSessionsUseCase: sl(),
+    deleteChatSessionUseCase: sl(),
+  ));
+  sl.registerFactory(() => ChatbotCubit(
+    getChatHistoryUseCase: sl(),
+    createChatSessionUseCase: sl(),
+    sendMessageUseCase: sl(),
+  ));
 }

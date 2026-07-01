@@ -187,21 +187,6 @@ class _ExamDetailScreenState extends State<ExamDetailScreen> with WidgetsBinding
         actions: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            BlocBuilder<ExamDetailBloc, ExamDetailState>(
-              builder: (context, state) {
-                int totalQs = 0;
-                if (state is ExamDetailLoaded) {
-                  totalQs = state.questions.length;
-                }
-                return SaveExamButton(
-                  examId: widget.examId,
-                  title: widget.title,
-                  subjectId: widget.subjectId,
-                  duration: widget.duration,
-                  totalQuestions: totalQs,
-                );
-              },
-            ),
             _timeCountdown(duration: duration),
           ],
         ),

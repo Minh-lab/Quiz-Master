@@ -28,7 +28,6 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _goToBranch(BuildContext context, int index) {
-    // Để luôn về trang gốc của tab khi ấn Bottom Navigation Bar
     navigationShell.goBranch(
       index,
       initialLocation: index == navigationShell.currentIndex,
@@ -131,6 +130,7 @@ class HomeScreen extends StatelessWidget {
         onTap: (index) => _onTap(index: index, context: context),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.quiz), label: 'Đề thi'),
+          BottomNavigationBarItem(icon: Icon(Icons.smart_toy), label: 'Chat Bot'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Cá nhân'),
         ],
       ),

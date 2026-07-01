@@ -5,8 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTypography {
   AppTypography._();
 
-
-
   static TextStyle displayLarge({Color? color}) => GoogleFonts.mulish(
         fontSize: 32,
         fontWeight: FontWeight.w700,

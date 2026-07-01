@@ -22,10 +22,22 @@ class MathTextBuilder extends StatelessWidget {
       if (parts[i].isEmpty) continue;
       
       if (i % 2 == 0) {
-        spans.add(TextSpan(
-          text: parts[i], 
-          style: style,
-        ));
+        // Parse thêm in đậm (**) nếu có
+        final boldParts = parts[i].split('**');
+        for (int j = 0; j < boldParts.length; j++) {
+          if (boldParts[j].isEmpty) continue;
+          if (j % 2 == 0) {
+            spans.add(TextSpan(
+              text: boldParts[j], 
+              style: style,
+            ));
+          } else {
+            spans.add(TextSpan(
+              text: boldParts[j], 
+              style: style?.copyWith(fontWeight: FontWeight.bold) ?? const TextStyle(fontWeight: FontWeight.bold),
+            ));
+          }
+        }
       } else {
         spans.add(
           WidgetSpan(
