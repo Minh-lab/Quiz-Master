@@ -18,14 +18,12 @@ abstract class AuthRepository {
 
   Future<Either> signInWithFacebook();
 
-
-
   Future<Either<String, void>> sendPasswordResetEmail(String email);
-
+  
   Future<Either<String, void>> changePassword({
     required String currentPassword,
     required String newPassword,
   });
 
-  Future<Either> signOut();
+  Future<Either<String, void>> signOut();
 }

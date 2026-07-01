@@ -155,7 +155,7 @@ class HistoryActionRow extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
-            child: Text('Xem chi tiết', style: AppTypography.labelMedium()),
+            child: Text('Xem chi tiết', style: AppTypography.bodySmall()),
           ),
         ),
         const SizedBox(width: 12),
@@ -177,7 +177,7 @@ class HistoryActionRow extends StatelessWidget {
                 : const Icon(Icons.delete_outline, size: 18),
             label: FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text('Xóa', style: AppTypography.labelMedium())
+              child: Text('Xóa', style: AppTypography.bodyMedium())
             ),
           ),
         ),

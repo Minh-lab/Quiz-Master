@@ -296,11 +296,14 @@ class _SignInScreenState extends State<SignInScreen> {
           //     // Spacer(),
           //   ],
           // ),
-          Text(
-            'Quên mật khẩu?',
-            style: AppTypography.bodyMedium().copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w600,
+          GestureDetector(
+            onTap: () => context.push(AppRouter.forgotPassword),
+            child: Text(
+              'Quên mật khẩu?',
+              style: AppTypography.bodyMedium().copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

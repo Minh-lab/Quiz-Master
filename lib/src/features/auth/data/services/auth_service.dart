@@ -10,6 +10,7 @@ abstract class AuthService {
   Future<Either> signInWithEmail(SigninRequest signinRequest);
   Future<Either> signInWithGoogle();
 
-  Future<Either> signOut();
+  Future<void> signOut();
+  Future<void> sendPasswordResetEmail(String email);
   Future<Either> changePassword({required String currentPassword, required String newPassword});
 }

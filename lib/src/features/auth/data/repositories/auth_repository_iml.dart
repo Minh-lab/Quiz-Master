@@ -9,19 +9,17 @@ import 'package:quiz_mater_apllication/src/features/auth/domain/repositories/aut
 class AuthRepositoryIml extends AuthRepository {
   AuthService authService = AuthServiceImpl();
   AuthRepositoryIml({required this.authService});
+  
   @override
-  // TODO: implement authStateChanges
   Stream<UserEntity?> get authStateChanges => throw UnimplementedError();
 
   @override
   Future<UserEntity?> getCurrentUser() {
-    // TODO: implement getCurrentUser
     throw UnimplementedError();
   }
 
   @override
   Future<Either> signInWithEmail(SigninRequest signinRequest) async {
-    // TODO: implement signInWithEmail
     return await authService.signInWithEmail(signinRequest);
   }
 
@@ -29,32 +27,37 @@ class AuthRepositoryIml extends AuthRepository {
   Future<Either<dynamic, dynamic>> signUpWithEmail(
     SignupRequest signupRequest,
   ) {
-    // TODO: implement signUpWithEmail
     return authService.signUpWithEmail(signupRequest);
   }
 
   @override
-  Future<Either> signOut() async {
-    // TODO: implement signOut
-    return await authService.signOut();
+  Future<Either<String, void>> signOut() async {
+    try {
+      await authService.signOut();
+      return const Right(null);
+    } catch (e) {
+      return Left(e.toString());
+    }
   }
 
   @override
-  Future<Either<String, void>> sendPasswordResetEmail(String email) {
-    // TODO: implement sendPasswordResetEmail
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<dynamic, dynamic>> signInWithFacebook() {
-    // TODO: implement signInWithFacebook
-    throw UnimplementedError();
+  Future<Either<String, void>> sendPasswordResetEmail(String email) async {
+    try {
+      await authService.sendPasswordResetEmail(email);
+      return const Right(null);
+    } catch (e) {
+      return Left(e.toString());
+    }
   }
 
   @override
   Future<Either<dynamic, dynamic>> signInWithGoogle() {
-    // TODO: implement signInWithGoogle
     return authService.signInWithGoogle();
+  }
+  
+  @override
+  Future<Either<dynamic, dynamic>> signInWithFacebook() {
+    throw UnimplementedError();
   }
 
   @override
@@ -62,14 +65,17 @@ class AuthRepositoryIml extends AuthRepository {
     required String currentPassword,
     required String newPassword,
   }) async {
-    final result = await authService.changePassword(
-      currentPassword: currentPassword,
-      newPassword: newPassword,
-    );
-    // AuthService trả về Either, ta ép kiểu sang Either<String, void>
-    return result.fold(
-      (l) => Left(l.toString()),
-      (r) => const Right(null),
-    );
+    try {
+      final result = await authService.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+      return result.fold(
+        (l) => Left(l.toString()),
+        (r) => const Right(null),
+      );
+    } catch (e) {
+      return Left(e.toString());
+    }
   }
 }

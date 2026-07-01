@@ -36,6 +36,8 @@ import 'package:quiz_mater_apllication/src/features/chatbot/presentation/pages/c
 import 'package:quiz_mater_apllication/src/features/chatbot/presentation/cubit/chat_history_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/chatbot/presentation/pages/chatbot_screen.dart';
 import 'package:quiz_mater_apllication/src/features/chatbot/presentation/cubit/chatbot_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/pages/forgot_password/forgot_password_screen.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/forgot_password/forgot_password_cubit.dart';
 
 class AppRouter {
   static final AuthBloc authBloc = sl<AuthBloc>();
@@ -109,6 +111,13 @@ class AppRouter {
         builder: (context, state) => BlocProvider(
           create: (context) => sl<SignInCubit>(),
           child: const SignInScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRouter.forgotPassword,
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<ForgotPasswordCubit>(),
+          child: const ForgotPasswordScreen(),
         ),
       ),
 

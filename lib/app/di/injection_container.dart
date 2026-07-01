@@ -8,9 +8,11 @@ import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/sign_ou
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signin_with_email.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signin_with_google.dart';
 import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/signup_with_email.dart';
+import 'package:quiz_mater_apllication/src/features/auth/domain/usecases/send_password_reset_email.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_in/sign_in_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/sign_up/sign_up_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/auth/presentation/bloc/forgot_password/forgot_password_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/chatbot/domain/usecases/delete_chat_session_usecase.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/repository/exam_repository_iml.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/data/repository/subject_repository_iml.dart';
@@ -101,6 +103,10 @@ Future<void> init() async {
       signinWithGoogleUsecase: sl(),
     ),
   );
+  
+  sl.registerLazySingleton(() => SendPasswordResetEmailUseCase(sl()));
+  sl.registerFactory(() => ForgotPasswordCubit(sl()));
+
   sl.registerLazySingleton(
     () => AuthBloc(
       // signinWithEmailUsecase: sl(),
