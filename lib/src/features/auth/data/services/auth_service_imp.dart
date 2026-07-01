@@ -96,6 +96,7 @@ class AuthServiceImpl implements AuthService {
 
   Future<Either<dynamic, dynamic>> signInWithGoogle() async {
     try {
+      await GoogleSignIn.instance.signOut();
       await GoogleSignIn.instance.initialize(
         serverClientId:
             '795544707095-rfdd4gb4teugpt0hjjkch5cmjlgc78k5.apps.googleusercontent.com',
@@ -103,7 +104,7 @@ class AuthServiceImpl implements AuthService {
 
       final googleUser = await GoogleSignIn.instance.authenticate();
 
-      final googleAuth = googleUser.authentication;
+      final googleAuth = googleUser!.authentication;
 
       final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
@@ -183,6 +184,15 @@ class AuthServiceImpl implements AuthService {
       return Left(e.message ?? 'Lỗi Firebase: ${e.code}');
     } catch (e) {
       return Left('Đã xảy ra lỗi: $e');
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.message);
     }
   }
 }
