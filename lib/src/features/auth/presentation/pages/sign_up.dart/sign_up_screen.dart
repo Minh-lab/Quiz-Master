@@ -77,14 +77,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       SizedBox(height: 16),
                       _buildDivider(),
                       SizedBox(height: 16),
-                      // SocialLoginButton(
-                      //   text: 'Đăng ký với Google',
-                      //   iconPath: AppAssetIcon.google,
-                      //   onTap: () {
-                      //     log('Sign up with Google');
-                      //     // context.read<SignInCubit>().signInWithGoogle();
-                      //   },
-                      // ),
+                      SocialLoginButton(
+                        text: 'Đăng ký với Google',
+                        iconPath: AppAssetIcon.google,
+                        onTap: () {
+                          log('Sign up with Google');
+                          context.read<SignUpCubit>().signUpWithGoogle();
+                        },
+                      ),
                       SizedBox(height: 16),
                       _buildFooter(onTap: () => context.push(AppRouter.signin)),
                     ],

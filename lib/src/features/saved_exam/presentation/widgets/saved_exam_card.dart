@@ -6,6 +6,7 @@ import 'package:quiz_mater_apllication/src/core/theme/app_typography.dart';
 import 'package:quiz_mater_apllication/src/features/saved_exam/domain/entities/saved_exam_entity.dart';
 import 'package:quiz_mater_apllication/src/features/saved_exam/presentation/cubit/saved_exam_cubit.dart';
 import 'package:quiz_mater_apllication/src/features/subject_exem/domain/entity/exam.dart';
+import 'package:quiz_mater_apllication/src/features/subject_exem/presentation/exam/widgets/list_exam_dialog.dart';
 
 class SavedExamCard extends StatelessWidget {
   final SavedExamEntity exam;
@@ -22,8 +23,7 @@ class SavedExamCard extends StatelessWidget {
         side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: InkWell(
-        onTap: () {
-          // Chuyển sang màn hình chi tiết đề
+        onTap: () async {
           final fakeExamEntity = ExamEntity(
             id: exam.examId,
             subjectId: exam.subjectId,
@@ -32,10 +32,25 @@ class SavedExamCard extends StatelessWidget {
             totalQuestions: exam.totalQuestions,
             questions: const [],
           );
-          context.push(
-            AppRouter.exambyIdDetail(exam.subjectId, exam.examId),
-            extra: fakeExamEntity,
+
+          final result = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext dialogContext) {
+              return ListExamDialog(
+                exam: fakeExamEntity,
+                onConfirm: () {
+                  Navigator.pop(dialogContext, true);
+                },
+              );
+            },
           );
+
+          if (result == true && context.mounted) {
+            context.push(
+              AppRouter.exambyIdDetail(exam.subjectId, exam.examId),
+              extra: fakeExamEntity,
+            );
+          }
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(

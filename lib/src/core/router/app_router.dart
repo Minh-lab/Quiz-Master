@@ -32,6 +32,10 @@ import 'package:quiz_mater_apllication/src/features/history/presentation/cubit/e
 // import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/wrong_answers_screen.dart';
 import 'package:quiz_mater_apllication/src/features/saved_exam/presentation/pages/saved_exams_screen.dart';
 import 'package:quiz_mater_apllication/src/features/profile/presentation/pages/learning_statistics_screen.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/presentation/pages/chat_history_screen.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/presentation/cubit/chat_history_cubit.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/presentation/pages/chatbot_screen.dart';
+import 'package:quiz_mater_apllication/src/features/chatbot/presentation/cubit/chatbot_cubit.dart';
 
 class AppRouter {
   static final AuthBloc authBloc = sl<AuthBloc>();
@@ -45,6 +49,8 @@ class AppRouter {
   static const String profileSavedExams = '/profile/saved-exams';
   static const String profileLearningStatistics =
       '/profile/learning-statistics';
+  static const String chatbot = '/chatbot';
+  static const String chatbotDetail = '/chatbot/detail';
   static const String exam = '/exam';
   static const String signin = '/signin';
   static const String signup = '/signup';
@@ -67,15 +73,10 @@ class AppRouter {
     refreshListenable: GoRouterAdapter(authBloc.stream),
     redirect: (context, state) {
       final authState = AppRouter.authBloc.state;
-
-      log(authState.toString());
-
       final isSignedInUser = authState is AuthSuccess;
-
       final isAuthPage =
           state.uri.path == AppRouter.signin ||
           state.uri.path == AppRouter.signup;
-      // print(authState);
       final isProfilePage = state.uri.path == AppRouter.profile ||
           state.uri.path.startsWith('${AppRouter.profile}/');
       if (!isSignedInUser && isProfilePage) {
@@ -179,6 +180,17 @@ class AppRouter {
         builder: (context, state) => const LearningStatisticsScreen(),
       ),
 
+      GoRoute(
+        path: AppRouter.chatbotDetail,
+        builder: (context, state) {
+          final sessionId = state.uri.queryParameters['sessionId'];
+          return BlocProvider(
+            create: (context) => sl<ChatbotCubit>(),
+            child: ChatbotScreen(sessionId: sessionId),
+          );
+        },
+      ),
+
       /// BOTTOM NAVIGATION
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -202,6 +214,21 @@ class AppRouter {
           ),
 
           // / BRANCH 2
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRouter.chatbot,
+                builder: (context, state) {
+                  return BlocProvider(
+                    create: (context) => sl<ChatHistoryCubit>(),
+                    child: const ChatHistoryScreen(),
+                  );
+                },
+              ),
+            ],
+          ),
+
+          // / BRANCH 3
           StatefulShellBranch(
             routes: [
               GoRoute(

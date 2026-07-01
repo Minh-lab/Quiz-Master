@@ -70,13 +70,13 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
     if (uid == null) return;
 
     final history = ExamHistoryEntity(
-      id: '', // Firestore sẽ tự tạo ID
+      id: '', 
       uid: uid,
       examId: widget.examId,
       examTitle: widget.title,
       subjectId: widget.subjectId,
       subjectName: widget
-          .subjectId, // Có thể thêm subjectName vào constructor sau nếu cần
+          .subjectId, 
       score: earnedScore,
       totalQuestions: widget.questions.length,
       correctAnswers: correctCount,
@@ -236,7 +236,6 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
       ),
       child: Column(
         children: [
-          // Icon cúp vàng
           const Icon(Icons.emoji_events_rounded, color: Colors.amber, size: 80),
           const SizedBox(height: 12),
           Text(
