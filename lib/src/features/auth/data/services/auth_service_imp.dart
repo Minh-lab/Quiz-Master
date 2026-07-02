@@ -20,10 +20,6 @@ class AuthServiceImpl implements AuthService {
         password: signupRequest.password,
       );
       User user = credential.user!;
-      if (user == null) {
-        return Left('Đăng ký không thành công, thử lại sau ít phút!');
-      }
-      print(user);
       UserModel userModel = UserModel.fromFirebaseUser(user);
       await _firestore
           .collection('users')
