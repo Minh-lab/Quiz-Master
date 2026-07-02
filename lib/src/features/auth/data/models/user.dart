@@ -54,12 +54,12 @@ class UserModel extends UserEntity {
   }
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      uid: json['uid'],
+      uid: json['uid'] ?? '',
       email: json['email'],
       displayName: json['displayName'],
       photoUrl: json['photoUrl'],
-      isAnonymous: json['isAnonymous'],
-      isEmailVerified: json['isEmailVerified'],
+      isAnonymous: json['isAnonymous'] ?? false,
+      isEmailVerified: json['isEmailVerified'] ?? false,
       provider: AppAuthProvider.values.firstWhere(
         (e) => e.name == json['provider'] || e.toString() == json['provider'],
         orElse: () => AppAuthProvider.email,

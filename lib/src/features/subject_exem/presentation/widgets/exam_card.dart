@@ -40,7 +40,7 @@ class ExamCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
-          
+
           // Hàng 2: Metadata (Số câu, Thời gian)
           Wrap(
             spacing: 16,
@@ -87,7 +87,6 @@ class ExamCard extends StatelessWidget {
           // Hàng 3: Action Row
           Row(
             children: [
-             
               Expanded(
                 child: SizedBox(
                   height: 48,
@@ -111,10 +110,8 @@ class ExamCard extends StatelessWidget {
                   ),
                 ),
               ),
-               if (trailing != null) ...[
-                trailing!,
-                const SizedBox(width: 12),
-              ],            ],
+              if (trailing != null) ...[trailing!, const SizedBox(width: 12)],
+            ],
           ),
         ],
       ),

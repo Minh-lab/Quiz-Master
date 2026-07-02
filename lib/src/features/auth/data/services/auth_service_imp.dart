@@ -56,10 +56,23 @@ class AuthServiceImpl implements AuthService {
           .collection('users')
           .doc(userCredential!.uid)
           .get();
-      final userData = userFirestore.data();
-      UserModel user = UserModel.fromJson(userData!);
-      ();
-      print(user.toEntity);
+          
+      UserModel user;
+      if (userFirestore.exists && userFirestore.data() != null) {
+        final userData = userFirestore.data()!;
+        user = UserModel.fromJson({
+          ...userData,
+          'uid': userData['uid'] ?? userCredential.uid,
+          'isAnonymous': userData['isAnonymous'] ?? userCredential.isAnonymous,
+          'isEmailVerified': userData['isEmailVerified'] ?? userCredential.emailVerified,
+          'provider': userData['provider'] ?? 'email',
+        });
+      } else {
+        // Tài khoản có trên Auth nhưng chưa có trên Firestore, tạo mới document
+        user = UserModel.fromFirebaseUser(userCredential);
+        await _firestore.collection('users').doc(user.uid).set(user.toJson());
+      }
+      
       return Right(user.toEntity());
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found' || e.code == 'invalid-credential' || e.code == 'wrong-password') {

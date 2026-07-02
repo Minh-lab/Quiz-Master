@@ -47,10 +47,43 @@ class ExemSubjectScreen extends StatelessWidget {
               const SizedBox(height: 16),
         
               BlocBuilder<SubjectBloc, SubjectState>(
+                buildWhen: (previous, current) {
+                  // Không build lại trạng thái Loading nếu trước đó đã có dữ liệu
+                  if (previous is SubjectLoaded && current is SubjectLoading) {
+                    return false;
+                  }
+                  return true;
+                },
                 builder: (context, state) {
-                  // if (state is SubjectLoading) {
-                  //   return const Center(child: CircularProgressIndicator());
-                  // }
+                  if (state is SubjectLoading || state is SubjectInitial) {
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 50.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (state is SubjectError) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 50.0),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Không thể tải dữ liệu: ${state.messageError}',
+                              style: const TextStyle(color: Colors.red),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {
+                                context.read<SubjectBloc>().add(FetchSubjectEvent());
+                              },
+                              child: const Text('Thử lại'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
                   if (state is SubjectLoaded) {
                     final List<SubjectEntity> subjects = state.subjects!;
         
@@ -67,7 +100,7 @@ class ExemSubjectScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                       
                         final subject = subjects[index];
-                        print(subject.iconName);
+                        // print(subject.iconName);
         
                         var color = getThemeColor(subject.themeColor);
                         var iconPath = getIconPath(subject.iconName);

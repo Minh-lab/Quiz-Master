@@ -26,8 +26,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     final result = await signOutUsecase.call();
-    result.fold((l) => emit(AuthError(l.toString())), (r) {
-      emit(AuthSignedOut(message: r));
+    result.fold((l) => emit(AuthError(l.toString())), (_) {
+      emit(AuthSignedOut(message: 'Đăng xuất thành công'));
     });
   }
 }

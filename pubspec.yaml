@@ -53,6 +53,14 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   bloc_test: 
   mocktail: ^1.0.4
+  flutter_launcher_icons: 
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/quiz_master_logo.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/quiz_master_logo.png"
 
 flutter:
   uses-material-design: true
