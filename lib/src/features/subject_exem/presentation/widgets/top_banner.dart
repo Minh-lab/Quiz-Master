@@ -152,7 +152,7 @@ class TopBanner extends StatelessWidget implements PreferredSizeWidget {
         const SizedBox(width: 16),
         OutlinedButton(
           onPressed: () {
-            context.read<AuthBloc>().add(SignOutRequested());
+            // context.read<AuthBloc>().add(SignOutRequested());
             context.pushReplacement(AppRouter.signin);
           },
           style: OutlinedButton.styleFrom(

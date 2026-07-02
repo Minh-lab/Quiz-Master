@@ -18,7 +18,7 @@ class ChatBubble extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
         padding: const EdgeInsets.all(12),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
+          maxWidth: MediaQuery.of(context).size.width * 0.85,
         ),
         decoration: BoxDecoration(
           color: isUser ? colorScheme.primary : colorScheme.surfaceContainerHighest,
@@ -32,6 +32,7 @@ class ChatBubble extends StatelessWidget {
           children: [
             MathTextBuilder(
               text: message.content,
+              maxWidth: MediaQuery.of(context).size.width * 0.85 - 24, // trừ đi padding 12x2
               style: TextStyle(
                 color: isUser ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
                 fontSize: 16,

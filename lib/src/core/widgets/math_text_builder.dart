@@ -4,11 +4,13 @@ import 'package:flutter_math_fork/flutter_math.dart';
 class MathTextBuilder extends StatelessWidget {
   final String text;
   final TextStyle? style;
+  final double? maxWidth;
 
   const MathTextBuilder({
     Key? key, 
     required this.text, 
     this.style,
+    this.maxWidth,
   }) : super(key: key);
 
   @override
@@ -44,12 +46,20 @@ class MathTextBuilder extends StatelessWidget {
             alignment: PlaceholderAlignment.middle, // Căn trục dọc công thức nằm chính giữa dòng chữ
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2), // Tạo khoảng cách nhỏ hai bên công thức
-              child: Math.tex(
-                parts[i].replaceAll(r'\\', r'\'), // Dọn dẹp lỗi nhân đôi dấu gạch chéo của Firestore nếu có
-                textStyle: style?.copyWith(
-                  fontSize: (style?.fontSize ?? 14) + 1, // Tăng nhẹ 1px cho ký tự toán dễ đọc hơn
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: maxWidth ?? double.infinity,
                 ),
-                mathStyle: MathStyle.text,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Math.tex(
+                    parts[i].replaceAll(r'\\', r'\'), // Dọn dẹp lỗi nhân đôi dấu gạch chéo của Firestore nếu có
+                    textStyle: style?.copyWith(
+                      fontSize: (style?.fontSize ?? 14) + 1, // Tăng nhẹ 1px cho ký tự toán dễ đọc hơn
+                    ),
+                    mathStyle: MathStyle.text,
+                  ),
+                ),
               ),
             ),
           ),
