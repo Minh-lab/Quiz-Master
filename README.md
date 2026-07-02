@@ -31,30 +31,35 @@
 
 ### 1. Đăng nhập & Đăng ký
 <p align="center">
-  <img src="assets/images/signin.jpg" width="220" alt="Đăng nhập" />
-  <img src="assets/images/sign_up.jpg" width="220" alt="Đăng ký" />
+  <img src="assets/images/signin.jpg" width="220" alt="Đăng nhập" />&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/images/sign_up.jpg" width="220" alt="Đăng ký" />&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="assets/images/forgot_password.jpg" width="220" alt="Quên mật khẩu" />
 </p>
 
-### 2. Trang chủ & Đề thi
+### 2. Trang chủ & Quản lý đề thi
 <p align="center">
-  <img src="assets/images/home_screen.jpg" width="220" alt="Màn hình chính" />
-  <img src="assets/images/list_exam.jpg" width="220" alt="Danh sách đề thi" />
+  <img src="assets/images/home_screen.jpg" width="220" alt="Màn hình chính" />&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/images/list_exam.jpg" width="220" alt="Danh sách đề thi" />&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="assets/images/saved_exam.jpg" width="220" alt="Đề thi đã lưu" />
 </p>
 
-### 3. Làm bài thi & Kết quả
+### 3. Làm bài thi & Lịch sử học tập
 <p align="center">
-  <img src="assets/images/do_exam.jpg" width="220" alt="Đang làm bài" />
-  <img src="assets/images/result_exam.jpg" width="220" alt="Kết quả thi" />
-  <img src="assets/images/history_exam.jpg" width="220" alt="Lịch sử thi" />
+  <img src="assets/images/do_exam.jpg" width="220" alt="Đang làm bài" />&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/images/result_exam.jpg" width="220" alt="Kết quả thi" />&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/images/history_exam.jpg" width="220" alt="Lịch sử làm bài" />
 </p>
 
-### 4. Chatbot AI & Hồ sơ
+### 4. Quản lý hồ sơ
 <p align="center">
-  <img src="assets/images/chatbot.jpg" width="220" alt="Trò chuyện cùng AI" />
-  <img src="assets/images/profile.jpg" width="220" alt="Hồ sơ cá nhân" />
-  <img src="assets/images/edit_profile.jpg" width="220" alt="Sửa hồ sơ" />
+  <img src="assets/images/profile.jpg" width="220" alt="Hồ sơ cá nhân" />&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/images/edit_profile.jpg" width="220" alt="Chỉnh sửa hồ sơ" />
+</p>
+
+### 5. Chatbot AI hỗ trợ
+<p align="center">
+  <img src="assets/images/chatbot.jpg" width="220" alt="Trò chuyện cùng AI" />&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/images/chatbot_history.jpg" width="220" alt="Lịch sử Chatbot" />
 </p>
 
 ## Công nghệ sử dụng
